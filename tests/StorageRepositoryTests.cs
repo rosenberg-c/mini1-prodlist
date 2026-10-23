@@ -13,10 +13,12 @@ namespace ProdList.tests.Tests {
         Path.GetTempPath(), "prodlist-tests",
         Guid.NewGuid().ToString("N")
       );
-      Directory.CreateDirectory(_dir);
+      _ = Directory.CreateDirectory(_dir);
     }
 
-    private string NewFile(string name) => Path.Combine(_dir, name);
+    private string NewFile(string name) {
+      return Path.Combine(_dir, name);
+    }
 
     public void Dispose() {
       if (_disposed) {
@@ -111,12 +113,14 @@ namespace ProdList.tests.Tests {
     }
 
     [Fact]
-    public async Task UpdateAsync_ThrowsWithoutWriting_WhenIdMatchesMultipleEntries() {
+    public async Task
+      UpdateAsync_ThrowsWithoutWriting_WhenIdMatchesMultipleEntries() {
       string path = NewFile("update-duplicate-id.json");
       string original = JsonSerializer.Serialize(new[] {
-        new Entry(1, "one"),
-        new Entry(1, "another")
-      });
+          new Entry(1, "one"),
+          new Entry(1, "another")
+        }
+      );
       await File.WriteAllTextAsync(path, original);
       StorageRepository<Entry> repo = new(path, static e => e.Id);
 
@@ -377,15 +381,15 @@ namespace ProdList.tests.Tests {
       StorageRepository<Entry> repo = new(path, static e => e.Id);
 
       Assert.Equal(CreateStatus.Created, await repo.TryCreateAsync(
-        id => new Entry(id, "AB-300"),
-        e => string.Equals(e.Name, "AB-300",
-          StringComparison.OrdinalIgnoreCase)
-      ));
+          id => new Entry(id, "AB-300"),
+          e => Product.IsDuplicate(e, "AB-300")
+        )
+      );
       Assert.Equal(CreateStatus.Duplicate, await repo.TryCreateAsync(
-        id => new Entry(id, "ab-300"),
-        e => string.Equals(e.Name, "ab-300",
-          StringComparison.OrdinalIgnoreCase)
-      ));
+          id => new Entry(id, "ab-300"),
+          e => Product.IsDuplicate(e, "ab-300")
+        )
+      );
       Assert.Equal([new Entry(1, "AB-300")], await repo.GetAllAsync());
     }
 
@@ -397,13 +401,11 @@ namespace ProdList.tests.Tests {
 
       Task<CreateStatus> a = first.TryCreateAsync(
         id => new Entry(id, "AB-300"),
-        e => string.Equals(e.Name, "AB-300",
-          StringComparison.OrdinalIgnoreCase)
+        e => Product.IsDuplicate(e, "AB-300")
       );
       Task<CreateStatus> b = second.TryCreateAsync(
         id => new Entry(id, "ab-300"),
-        e => string.Equals(e.Name, "ab-300",
-          StringComparison.OrdinalIgnoreCase)
+        e => Product.IsDuplicate(e, "ab-300")
       );
 
       CreateStatus[] results = await Task.WhenAll(a, b);
