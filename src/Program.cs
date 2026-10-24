@@ -164,9 +164,8 @@ async Task StatisticsAsync() {
   List<int> numbers = [];
 
   foreach (Entry entry in entries) {
-    string right = entry.Name[(entry.Name.IndexOf('-') + 1)..];
-
-    if (int.TryParse(right, out int number)) {
+    if (Product.TrySplit(entry.Name, out _, out string right)
+      && int.TryParse(right, out int number)) {
       numbers.Add(number);
     }
   }

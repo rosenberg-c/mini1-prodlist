@@ -5,6 +5,32 @@ using InputError = ProdList.src.Product.InputError;
 namespace ProdList.tests.Tests {
   public sealed class ProductValidatorTests {
     [Theory]
+    [InlineData("AB-300", "AB", "300")]
+    [InlineData("-300", "", "300")]
+    [InlineData("AB-", "AB", "")]
+    [InlineData("AB-C-400", "AB", "C-400")]
+    public void TrySplit_SplitsOnFirstSeparator(
+      string name,
+      string expectedLeft,
+      string expectedRight
+    ) {
+      bool result = Product.TrySplit(name, out string left, out string right);
+
+      Assert.True(result);
+      Assert.Equal(expectedLeft, left);
+      Assert.Equal(expectedRight, right);
+    }
+
+    [Fact]
+    public void TrySplit_ReturnsFalseWithoutSeparator() {
+      bool result = Product.TrySplit("AB300", out string left, out string right);
+
+      Assert.False(result);
+      Assert.Empty(left);
+      Assert.Empty(right);
+    }
+
+    [Theory]
     [InlineData("CE-400")]
     [InlineData("XX-480")]
     [InlineData("LABAN-231")]

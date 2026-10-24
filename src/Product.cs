@@ -8,6 +8,25 @@ namespace ProdList.src {
       return string.Equals(entry.Name, name,
         StringComparison.OrdinalIgnoreCase);
     }
+
+    public static bool TrySplit(
+      string name,
+      out string left,
+      out string right
+    ) {
+      ArgumentNullException.ThrowIfNull(name);
+
+      int dash = name.IndexOf('-');
+      if (dash < 0) {
+        left = string.Empty;
+        right = string.Empty;
+        return false;
+      }
+
+      left = name[..dash];
+      right = name[(dash + 1)..];
+      return true;
+    }
   }
 }
 
@@ -48,14 +67,9 @@ namespace ProdList.src {
         return InputError.EmptyInput;
       }
 
-      if (!name.Contains('-')) {
+      if (!TrySplit(name, out string left, out string right)) {
         return InputError.MissingDash;
       }
-
-      int dash = name.IndexOf('-');
-
-      string left = name[..dash];
-      string right = name[(dash + 1)..];
 
       if (!LettersOnly().IsMatch(left)) {
         return InputError.InvalidLeftSide;
