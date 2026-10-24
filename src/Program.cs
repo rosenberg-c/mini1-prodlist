@@ -32,7 +32,7 @@ async Task RunAsync() {
 
     switch (choice) {
       case "1": {
-        if (await AddAsync()) {
+        if (await AddAsync() == Menu.Exit) {
           return;
         }
 
@@ -45,7 +45,7 @@ async Task RunAsync() {
       }
 
       case "3": {
-        if (await SearchAsync()) {
+        if (await SearchAsync() == Menu.Exit) {
           return;
         }
 
@@ -53,7 +53,7 @@ async Task RunAsync() {
       }
 
       case "4":
-        if (await DeleteAsync()) {
+        if (await DeleteAsync() == Menu.Exit) {
           return;
         }
 
@@ -76,17 +76,17 @@ async Task RunAsync() {
   }
 }
 
-async Task<bool> AddAsync() {
+async Task<Menu> AddAsync() {
   string? product = Support.ReadString("Enter product: ");
 
   if (Support.IsExitOrNull(product)) {
-    return true;
+    return Menu.Exit;
   }
 
   InputError? error = Product.Validate(product);
   if (error is InputError code) {
     Console.WriteLine(Ui.MessageFrom(code));
-    return false;
+    return Menu.Continue;
   }
 
   CreateStatus result = await repo.TryCreateAsync(
@@ -95,7 +95,7 @@ async Task<bool> AddAsync() {
   );
 
   Console.WriteLine(Ui.MessageFrom(result));
-  return false;
+  return Menu.Continue;
 }
 
 async Task ViewAsync() {
@@ -107,16 +107,16 @@ async Task ViewAsync() {
   }
 }
 
-async Task<bool> SearchAsync() {
+async Task<Menu> SearchAsync() {
   string? query = Support.ReadString("Search product: ");
 
   if (Support.IsExitOrNull(query)) {
-    return true;
+    return Menu.Exit;
   }
 
   if (query.Length == 0) {
     Console.WriteLine("Search cannot be empty.");
-    return false;
+    return Menu.Continue;
   }
 
   List<Entry> entries = await repo.GetAllAsync();
@@ -137,14 +137,14 @@ async Task<bool> SearchAsync() {
     Console.WriteLine("- " + entry.Name);
   }
 
-  return false;
+  return Menu.Continue;
 }
 
-async Task<bool> DeleteAsync() {
+async Task<Menu> DeleteAsync() {
   string? name = Support.ReadString("Enter product to delete: ");
 
   if (Support.IsExitOrNull(name)) {
-    return true;
+    return Menu.Exit;
   }
 
   List<Entry> entriesDelete = await repo.GetAllAsync();
@@ -154,13 +154,13 @@ async Task<bool> DeleteAsync() {
 
   if (match is null) {
     Console.WriteLine("Product not found.");
-    return false;
+    return Menu.Continue;
   }
 
   _ = await repo.DeleteAsync(match.Id);
 
   Console.WriteLine("Product removed successfully.");
-  return false;
+  return Menu.Continue;
 }
 
 async Task StatisticsAsync() {
@@ -187,4 +187,9 @@ async Task StatisticsAsync() {
     Console.WriteLine($"- Highest Number: {numbers.Max()}");
     Console.WriteLine($"- Average Number: {numbers.Average():0.##}");
   }
+}
+
+internal enum Menu {
+  Continue,
+  Exit
 }
