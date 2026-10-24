@@ -15,6 +15,11 @@ A small console app for managing products.
 
 Product names use uppercase letters followed by a dash and a number from 200 to 500 (for example, `AB-300`). Search by name or number. Products are saved to `products.json` in the folder where you run the app, so run it from the same folder next time to keep your list.
 
+## VS Code
+
+For vscode users the extension "C# Dev Kit" from Microsoft may need to be installed
+
+
 ## Linting
 
 ```sh
