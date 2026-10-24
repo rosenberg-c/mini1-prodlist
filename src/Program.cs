@@ -35,7 +35,6 @@ async Task RunAsync() {
         if (await AddAsync() == Menu.Exit) {
           return;
         }
-
         break;
       }
 
@@ -48,7 +47,6 @@ async Task RunAsync() {
         if (await SearchAsync() == Menu.Exit) {
           return;
         }
-
         break;
       }
 
@@ -56,12 +54,10 @@ async Task RunAsync() {
         if (await DeleteAsync() == Menu.Exit) {
           return;
         }
-
         break;
 
       case "5": {
         await StatisticsAsync();
-
         break;
       }
 
