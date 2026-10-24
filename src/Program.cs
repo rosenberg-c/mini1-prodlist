@@ -143,8 +143,8 @@ async Task<Menu> DeleteAsync() {
     return Menu.Exit;
   }
 
-  List<Entry> entriesDelete = await repo.GetAllAsync();
-  Entry? match = entriesDelete.FirstOrDefault(e =>
+  List<Entry> entries = await repo.GetAllAsync();
+  Entry? match = entries.FirstOrDefault(e =>
     string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase)
   );
 
