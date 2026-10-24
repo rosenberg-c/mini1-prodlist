@@ -1,4 +1,5 @@
 **/bin/
 **/obj/
 products.json
+*.v1.bak
 .vscode/

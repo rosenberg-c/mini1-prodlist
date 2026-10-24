@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProdList.src {
   public enum CreateStatus {
@@ -9,16 +10,30 @@ namespace ProdList.src {
 }
 
 namespace ProdList.src {
+  internal sealed record StorageDocument<TEntry>(
+    [property: JsonPropertyName("schemaVersion")] int SchemaVersion,
+    [property: JsonPropertyName("data")] List<TEntry>? Data
+  );
+}
+
+namespace ProdList.src {
   public class StorageRepository<TEntry> {
     private readonly string _path;
     private readonly Func<TEntry, int> _getId;
+    private readonly int _schemaVersion;
 
-    public StorageRepository(string filename, Func<TEntry, int> getId) {
+    public StorageRepository(
+      string filename,
+      Func<TEntry, int> getId,
+      int schemaVersion = 1
+    ) {
       ArgumentException.ThrowIfNullOrWhiteSpace(filename);
       ArgumentNullException.ThrowIfNull(getId);
+      ArgumentOutOfRangeException.ThrowIfNegativeOrZero(schemaVersion);
 
       _path = filename;
       _getId = getId;
+      _schemaVersion = schemaVersion;
     }
 
     private readonly JsonSerializerOptions options = new() {
@@ -31,12 +46,35 @@ namespace ProdList.src {
       }
 
       string json = await File.ReadAllTextAsync(_path);
+      using JsonDocument parsed = JsonDocument.Parse(json);
+      JsonElement root = parsed.RootElement;
+      if (root.ValueKind != JsonValueKind.Object
+        || !root.TryGetProperty("schemaVersion", out JsonElement versionElement)
+        || !versionElement.TryGetInt32(out int version)) {
+        throw new JsonException(
+          "Storage document must contain a numeric schemaVersion."
+        );
+      }
 
-      return JsonSerializer.Deserialize<List<TEntry>>(json) ?? [];
+      if (version != _schemaVersion) {
+        throw new InvalidDataException(
+          $"Storage schema version {version} is not supported. "
+            + $"Expected version {_schemaVersion}."
+        );
+      }
+
+      StorageDocument<TEntry>? document =
+        root.Deserialize<StorageDocument<TEntry>>();
+      if (document is null || document.Data is null) {
+        throw new JsonException("Storage document must contain data.");
+      }
+
+      return document.Data;
     }
 
     private async Task SaveAsync(List<TEntry> entry) {
-      string json = JsonSerializer.Serialize(entry, options);
+      StorageDocument<TEntry> document = new(_schemaVersion, entry);
+      string json = JsonSerializer.Serialize(document, options);
 
       await File.WriteAllTextAsync(_path, json);
     }

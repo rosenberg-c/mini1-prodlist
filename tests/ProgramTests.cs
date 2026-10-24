@@ -23,7 +23,7 @@ namespace ProdList.tests.Tests {
       string path = Path.Combine(_dir, "products.json");
       Assert.Equal([
         new Entry(1, "AB", 300), new Entry(2, "XY", 500)
-      ], JsonSerializer.Deserialize<List<Entry>>(await File.ReadAllTextAsync(path)));
+      ], await ReadEntriesAsync(path));
 
       string second = await RunAsync("2\n3\n500\n3\nAB\n5\n4\nAB-300\n5\n6\n");
       string lines = second.ReplaceLineEndings("\n");
@@ -36,8 +36,7 @@ namespace ProdList.tests.Tests {
       Assert.Contains("- Average Number: 400", second);
       Assert.Contains("Product removed successfully.", second);
       Assert.Contains("- Total Products: 1", second);
-      Assert.Equal([new Entry(2, "XY", 500)],
-        JsonSerializer.Deserialize<List<Entry>>(await File.ReadAllTextAsync(path)));
+      Assert.Equal([new Entry(2, "XY", 500)], await ReadEntriesAsync(path));
     }
 
     [Fact]
@@ -47,6 +46,30 @@ namespace ProdList.tests.Tests {
       Assert.Contains("ERROR: Product must contain a dash (-).", output);
       Assert.Contains("Application closed.", output);
       Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
+    }
+
+    [Fact]
+    public async Task Startup_RejectsLegacyProductsWithMigrationInstructions() {
+      string path = Path.Combine(_dir, "products.json");
+      const string legacyJson = "[{\"Id\":3,\"Name\":\"AB-300\"}]";
+      await File.WriteAllTextAsync(path, legacyJson);
+
+      string output = await RunAsync("");
+
+      Assert.Contains("Cannot load products.json", output);
+      Assert.Contains("python3 scripts/migrate-products.py products.json", output);
+      Assert.Equal(legacyJson, await File.ReadAllTextAsync(path));
+      Assert.False(File.Exists(path + ".v1.bak"));
+    }
+
+    private static async Task<List<Entry>> ReadEntriesAsync(string path) {
+      using JsonDocument document = JsonDocument.Parse(
+        await File.ReadAllTextAsync(path)
+      );
+      Assert.Equal(Product.SchemaVersion,
+        document.RootElement.GetProperty("schemaVersion").GetInt32());
+      return document.RootElement.GetProperty("data")
+        .Deserialize<List<Entry>>() ?? [];
     }
 
     private async Task<string> RunAsync(string input) {

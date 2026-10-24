@@ -1,9 +1,23 @@
+using System.Text.Json;
 using ProdList.src;
 using Entry = ProdList.src.Product.Entry;
 using InputError = ProdList.src.Product.InputError;
 
 string path = Path.Combine(Directory.GetCurrentDirectory(), "products.json");
-StorageRepository<Entry> repo = new(path, static e => e.Id);
+StorageRepository<Entry> repo = new(
+  path, static e => e.Id, Product.SchemaVersion
+);
+
+try {
+  _ = await repo.GetAllAsync();
+}
+catch (Exception error) when (error is JsonException or InvalidDataException) {
+  Console.WriteLine($"Cannot load products.json: {error.Message}");
+  Console.WriteLine("Delete products.json to start with an empty inventory,");
+  Console.WriteLine("or migrate a legacy file with:");
+  Console.WriteLine("python3 scripts/migrate-products.py products.json");
+  return;
+}
 
 Console.Clear();
 await RunAsync();

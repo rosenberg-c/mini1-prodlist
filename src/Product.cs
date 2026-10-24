@@ -3,6 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace ProdList.src {
   public static partial class Product {
+    public const int SchemaVersion = 2;
+
     internal const int minNum = 200;
     internal const int maxNum = 500;
 

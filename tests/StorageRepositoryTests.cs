@@ -68,6 +68,24 @@ namespace ProdList.tests.Tests {
     }
 
     [Fact]
+    public async Task GetAllAsync_RejectsUnexpectedSchemaVersion() {
+      string path = NewFile("unsupported-version.json");
+      string json = JsonSerializer.Serialize(new {
+        schemaVersion = 2,
+        data = Array.Empty<Entry>()
+      });
+      await File.WriteAllTextAsync(path, json);
+      StorageRepository<Entry> repo = new(path, static e => e.Id);
+
+      InvalidDataException error = await Assert.ThrowsAsync<InvalidDataException>(
+        () => repo.GetAllAsync()
+      );
+
+      Assert.Contains("version 2", error.Message);
+      Assert.Contains("version 1", error.Message);
+    }
+
+    [Fact]
     public async Task GetAsync_ReturnsEntry_MatchingSelectorId() {
       string path = NewFile("get.json");
       StorageRepository<Entry> repo = new(path, static e => e.Id);
@@ -115,10 +133,10 @@ namespace ProdList.tests.Tests {
     public async Task
       UpdateAsync_ThrowsWithoutWriting_WhenIdMatchesMultipleEntries() {
       string path = NewFile("update-duplicate-id.json");
-      string original = JsonSerializer.Serialize(new[] {
+      string original = SerializeDocument([
           new Entry(1, "one"),
           new Entry(1, "another")
-        }
+        ]
       );
       await File.WriteAllTextAsync(path, original);
       StorageRepository<Entry> repo = new(path, static e => e.Id);
@@ -184,6 +202,9 @@ namespace ProdList.tests.Tests {
       );
       Assert.Throws<ArgumentException>(() =>
         new StorageRepository<Entry>("  ", static e => e.Id)
+      );
+      Assert.Throws<ArgumentOutOfRangeException>(() =>
+        new StorageRepository<Entry>("file.json", static e => e.Id, 0)
       );
     }
 
@@ -251,9 +272,7 @@ namespace ProdList.tests.Tests {
     public async Task CreateAsync_IgnoresNonPositiveIds_WhenAllocating() {
       string path = NewFile("create-nonpositive.json");
       await File.WriteAllTextAsync(path,
-        JsonSerializer.Serialize(new[]
-          { new Entry(-5, "neg"), new Entry(0, "zero") }
-        )
+        SerializeDocument([new Entry(-5, "neg"), new Entry(0, "zero")])
       );
 
       StorageRepository<Entry> repo = new(path, static e => e.Id);
@@ -292,9 +311,9 @@ namespace ProdList.tests.Tests {
     public async Task
       CreateAsync_ThrowsOverflow_DoesNotWriteFile_AtMaxIntValue() {
       string path = NewFile("create-max.json");
-      string json = JsonSerializer.Serialize(new[] {
+      string json = SerializeDocument([
           new Entry(int.MaxValue, "max")
-        }
+        ]
       );
 
       await File.WriteAllTextAsync(path, json);
@@ -323,9 +342,9 @@ namespace ProdList.tests.Tests {
     public async Task
       CreateAsync_AllocatesNewId_WithoutRepairingDuplicates() {
       string path = NewFile("legacy-dup-create.json");
-      string json = JsonSerializer.Serialize(new[] {
+      string json = SerializeDocument([
           new Entry(1, "first"), new Entry(1, "second")
-        }
+        ]
       );
       await File.WriteAllTextAsync(path, json);
 
@@ -415,5 +434,12 @@ namespace ProdList.tests.Tests {
 
     private record Entry(int Id, string Name);
     private record Order(int Number, string Label);
+
+    private static string SerializeDocument(List<Entry> entries) {
+      return JsonSerializer.Serialize(new {
+        schemaVersion = 1,
+        data = entries
+      });
+    }
   }
 }
