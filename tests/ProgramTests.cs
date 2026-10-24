@@ -22,7 +22,7 @@ namespace ProdList.tests.Tests {
 
       string path = Path.Combine(_dir, "products.json");
       Assert.Equal([
-        new Entry(1, "AB-300"), new Entry(2, "XY-500")
+        new Entry(1, "AB", 300), new Entry(2, "XY", 500)
       ], JsonSerializer.Deserialize<List<Entry>>(await File.ReadAllTextAsync(path)));
 
       string second = await RunAsync("2\n3\n500\n3\nAB\n5\n4\nAB-300\n5\n6\n");
@@ -36,7 +36,7 @@ namespace ProdList.tests.Tests {
       Assert.Contains("- Average Number: 400", second);
       Assert.Contains("Product removed successfully.", second);
       Assert.Contains("- Total Products: 1", second);
-      Assert.Equal([new Entry(2, "XY-500")],
+      Assert.Equal([new Entry(2, "XY", 500)],
         JsonSerializer.Deserialize<List<Entry>>(await File.ReadAllTextAsync(path)));
     }
 

@@ -41,6 +41,28 @@ namespace ProdList.tests.Tests {
       Assert.Null(Product.Validate(name));
     }
 
+    [Fact]
+    public void Validate_ReturnsParsedParts() {
+      InputError? error = Product.Validate(
+        " AB-300 ", out string left, out int right
+      );
+
+      Assert.Null(error);
+      Assert.Equal("AB", left);
+      Assert.Equal(300, right);
+    }
+
+    [Fact]
+    public void Validate_ClearsParts_WhenInvalid() {
+      InputError? error = Product.Validate(
+        "invalid", out string left, out int right
+      );
+
+      Assert.Equal(InputError.MissingDash, error);
+      Assert.Empty(left);
+      Assert.Equal(0, right);
+    }
+
     [Theory]
     [InlineData("", InputError.EmptyInput)]
     [InlineData("CE400", InputError.MissingDash)]

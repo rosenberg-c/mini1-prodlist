@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Xunit;
-using Entry = ProdList.src.Product.Entry;
 using ProdList.src;
 
 namespace ProdList.tests.Tests {
@@ -378,34 +377,34 @@ namespace ProdList.tests.Tests {
     [Fact]
     public async Task TryCreateAsync_RejectsDuplicateName_WithoutWriting() {
       string path = NewFile("duplicate-name.json");
-      StorageRepository<Entry> repo = new(path, static e => e.Id);
+      StorageRepository<Product.Entry> repo = new(path, static e => e.Id);
 
       Assert.Equal(CreateStatus.Created, await repo.TryCreateAsync(
-          id => new Entry(id, "AB-300"),
-          e => Product.IsDuplicate(e, "AB-300")
+          id => new Product.Entry(id, "AB", 300),
+          e => Product.IsDuplicate(e, "AB", 300)
         )
       );
       Assert.Equal(CreateStatus.Duplicate, await repo.TryCreateAsync(
-          id => new Entry(id, "ab-300"),
-          e => Product.IsDuplicate(e, "ab-300")
+          id => new Product.Entry(id, "ab", 300),
+          e => Product.IsDuplicate(e, "ab", 300)
         )
       );
-      Assert.Equal([new Entry(1, "AB-300")], await repo.GetAllAsync());
+      Assert.Equal([new Product.Entry(1, "AB", 300)], await repo.GetAllAsync());
     }
 
     [Fact]
     public async Task TryCreateAsync_TwoInstances_OnlyOneCreatesSameName() {
       string path = NewFile("concurrent-duplicate-name.json");
-      StorageRepository<Entry> first = new(path, static e => e.Id);
-      StorageRepository<Entry> second = new(path, static e => e.Id);
+      StorageRepository<Product.Entry> first = new(path, static e => e.Id);
+      StorageRepository<Product.Entry> second = new(path, static e => e.Id);
 
       Task<CreateStatus> a = first.TryCreateAsync(
-        id => new Entry(id, "AB-300"),
-        e => Product.IsDuplicate(e, "AB-300")
+        id => new Product.Entry(id, "AB", 300),
+        e => Product.IsDuplicate(e, "AB", 300)
       );
       Task<CreateStatus> b = second.TryCreateAsync(
-        id => new Entry(id, "ab-300"),
-        e => Product.IsDuplicate(e, "ab-300")
+        id => new Product.Entry(id, "ab", 300),
+        e => Product.IsDuplicate(e, "ab", 300)
       );
 
       CreateStatus[] results = await Task.WhenAll(a, b);
@@ -414,6 +413,7 @@ namespace ProdList.tests.Tests {
       Assert.Single(await first.GetAllAsync());
     }
 
+    private record Entry(int Id, string Name);
     private record Order(int Number, string Label);
   }
 }

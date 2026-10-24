@@ -79,15 +79,15 @@ async Task<Menu> AddAsync() {
     return Menu.Exit;
   }
 
-  InputError? error = Product.Validate(product);
+  InputError? error = Product.Validate(product, out string left, out int right);
   if (error is InputError code) {
     Console.WriteLine(Ui.MessageFrom(code));
     return Menu.Continue;
   }
 
   CreateStatus result = await repo.TryCreateAsync(
-    id => new Entry(id, product),
-    entry => Product.IsDuplicate(entry, product)
+    id => new Entry(id, left, right),
+    entry => Product.IsDuplicate(entry, left, right)
   );
 
   Console.WriteLine(Ui.MessageFrom(result));
@@ -161,14 +161,7 @@ async Task<Menu> DeleteAsync() {
 
 async Task StatisticsAsync() {
   List<Entry> entries = await repo.GetAllAsync();
-  List<int> numbers = [];
-
-  foreach (Entry entry in entries) {
-    if (Product.TrySplit(entry.Name, out _, out string right)
-      && int.TryParse(right, out int number)) {
-      numbers.Add(number);
-    }
-  }
+  var numbers = entries.Select(static entry => entry.Right).ToList();
 
   Console.WriteLine("Statistics:");
   Console.WriteLine($"- Total Products: {entries.Count}");

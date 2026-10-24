@@ -1,14 +1,18 @@
 using System.Text.RegularExpressions;
+using System.Text.Json.Serialization;
 
 namespace ProdList.src {
   public static partial class Product {
     internal const int minNum = 200;
     internal const int maxNum = 500;
 
-    public record Entry(int Id, string Name);
+    public record Entry(int Id, string Left, int Right) {
+      [JsonIgnore]
+      public string Name => $"{Left}-{Right}";
+    }
 
-    public static bool IsDuplicate(Entry entry, string name) {
-      return string.Equals(entry.Name, name,
+    public static bool IsDuplicate(Entry entry, string left, int right) {
+      return entry.Right == right && string.Equals(entry.Left, left,
         StringComparison.OrdinalIgnoreCase
       );
     }
@@ -64,29 +68,43 @@ namespace ProdList.src {
     private static partial Regex DigitsOnly();
 
     public static InputError? Validate(string product) {
+      return Validate(product, out _, out _);
+    }
+
+    public static InputError? Validate(
+      string product,
+      out string left,
+      out int right
+    ) {
       ArgumentNullException.ThrowIfNull(product);
+
+      left = string.Empty;
+      right = default;
 
       string name = product.Trim();
       if (name.Length == 0) {
         return InputError.EmptyInput;
       }
 
-      if (!TrySplit(name, out string left, out string right)) {
+      if (!TrySplit(name, out string parsedLeft, out string rightText)) {
         return InputError.MissingDash;
       }
 
-      if (!LettersOnly().IsMatch(left)) {
+      if (!LettersOnly().IsMatch(parsedLeft)) {
         return InputError.InvalidLeftSide;
       }
 
-      if (!DigitsOnly().IsMatch(right)) {
+      if (!DigitsOnly().IsMatch(rightText)) {
         return InputError.InvalidNumber;
       }
 
-      if (!int.TryParse(right, out int num) || num is < minNum or > maxNum) {
+      if (!int.TryParse(rightText, out int parsedRight)
+        || parsedRight is < minNum or > maxNum) {
         return InputError.NumberOutOfRange;
       }
 
+      left = parsedLeft;
+      right = parsedRight;
       return null;
     }
   }
