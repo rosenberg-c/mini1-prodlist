@@ -30,7 +30,8 @@ namespace ProdList.src {
         InputError.InvalidNumber =>
           "The right side must contain numbers only.",
         InputError.NumberOutOfRange =>
-          "The numeric part must be between 200 and 500.",
+          $"The numeric part must be between {Product.minNum} "
+            + $"and {Product.maxNum}.",
         _ => throw new ArgumentOutOfRangeException(nameof(error))
       };
 

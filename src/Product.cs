@@ -2,11 +2,15 @@ using System.Text.RegularExpressions;
 
 namespace ProdList.src {
   public static partial class Product {
+    internal const int minNum = 200;
+    internal const int maxNum = 500;
+
     public record Entry(int Id, string Name);
 
     public static bool IsDuplicate(Entry entry, string name) {
       return string.Equals(entry.Name, name,
-        StringComparison.OrdinalIgnoreCase);
+        StringComparison.OrdinalIgnoreCase
+      );
     }
 
     public static bool TrySplit(
@@ -79,7 +83,7 @@ namespace ProdList.src {
         return InputError.InvalidNumber;
       }
 
-      if (!int.TryParse(right, out int number) || number is < 200 or > 500) {
+      if (!int.TryParse(right, out int num) || num is < minNum or > maxNum) {
         return InputError.NumberOutOfRange;
       }
 
