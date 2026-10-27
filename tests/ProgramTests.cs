@@ -52,6 +52,24 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task Menu_InvalidOption_KeepsMenuRunning() {
+      string output = await RunAsync("9\n6\n");
+
+      Assert.Contains("Invalid option. Please try again.", output);
+      Assert.Contains("Application closed.", output);
+    }
+
+    [Fact]
+    public async Task Menu_ViewAndStatistics_ReturnToMenu() {
+      string output = await RunAsync("2\n5\n6\n");
+
+      Assert.Contains("Sorted valid products:", output);
+      Assert.Contains("- Total Products: 0", output);
+      Assert.Equal(3, output.Split("Select option: ").Length - 1);
+      Assert.Contains("Application closed.", output);
+    }
+
+    [Fact]
     public async Task Startup_RejectsLegacyProductsWithMigrationInstructions() {
       string path = Path.Combine(_dir, "products.json");
       const string legacyJson = "[{\"Id\":3,\"Name\":\"AB-300\"}]";
