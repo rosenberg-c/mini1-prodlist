@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
+using ProdList.src.Products;
 using Xunit;
-using ProdList.src;
-using Entry = ProdList.src.Product.Entry;
+using Entry = ProdList.src.Products.Product.Entry;
 
 namespace ProdList.tests.Tests {
   public sealed class ProgramTests : IDisposable {

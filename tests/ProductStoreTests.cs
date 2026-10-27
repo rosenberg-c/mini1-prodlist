@@ -1,4 +1,4 @@
-using ProdList.src;
+using ProdList.src.Products;
 using Xunit;
 
 namespace ProdList.tests.Tests {
@@ -38,6 +38,20 @@ namespace ProdList.tests.Tests {
       Assert.Equal(1, results.Count(status => status == CreateStatus.Created));
       Assert.Equal(1, results.Count(status => status == CreateStatus.Duplicate));
       Assert.Single(await first.GetAllAsync());
+    }
+
+    [Fact]
+    public async Task ProductStore_CreatesReadsAndDeletesProduct() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+
+      Assert.Equal(CreateStatus.Created,
+        await store.TryCreateAsync("AB", 300));
+      Product.Entry entry = Assert.Single(await store.GetAllAsync());
+      Assert.Equal("AB-300", entry.Name);
+
+      Assert.True(await store.DeleteAsync(entry.Id));
+      Assert.Empty(await store.GetAllAsync());
     }
 
     public void Dispose() {

@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using SharpStorage.src;
-using Entry = ProdList.src.Product.Entry;
+using Entry = ProdList.src.Products.Product.Entry;
 
-namespace ProdList.src {
+namespace ProdList.src.Products {
   public enum CreateStatus {
     Created,
     Duplicate

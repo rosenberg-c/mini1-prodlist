@@ -1,6 +1,7 @@
 using Xunit;
 using ProdList.src;
-using InputError = ProdList.src.Product.InputError;
+using ProdList.src.Products;
+using InputError = ProdList.src.Products.Product.InputError;
 
 namespace ProdList.tests.Tests {
   public sealed class UiTests {

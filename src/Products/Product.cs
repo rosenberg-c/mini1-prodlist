@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
-namespace ProdList.src {
+namespace ProdList.src.Products {
   public static partial class Product {
     public const int SchemaVersion = 3;
 
@@ -37,11 +37,7 @@ namespace ProdList.src {
       right = name[(dash + 1)..];
       return true;
     }
-  }
-}
 
-namespace ProdList.src {
-  public static partial class Product {
     public static List<Entry> Sort(IEnumerable<Entry> entries) {
       ArgumentNullException.ThrowIfNull(entries);
       return [
@@ -50,11 +46,7 @@ namespace ProdList.src {
           .ThenBy(static e => e.Name, StringComparer.Ordinal)
       ];
     }
-  }
-}
 
-namespace ProdList.src {
-  public static partial class Product {
     public enum InputError {
       EmptyInput,
       MissingDash,
