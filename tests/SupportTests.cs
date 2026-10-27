@@ -1,7 +1,7 @@
 using Xunit;
-using ProdList.src;
+using App.src;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class SupportTests {
     [Theory]
     [InlineData(null)]

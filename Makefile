@@ -1,6 +1,6 @@
 DOTNET ?= dotnet
-PROJECT ?= ProdList.csproj
-TESTS ?= tests/ProdList.Tests.csproj
+PROJECT ?= App.csproj
+TESTS ?= tests/App.Tests.csproj
 
 .PHONY: deps
 deps:

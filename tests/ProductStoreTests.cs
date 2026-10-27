@@ -1,7 +1,7 @@
-using ProdList.src.Products;
+using App.src.Products;
 using Xunit;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class ProductStoreTests : IDisposable {
     private readonly string _dir = Path.Combine(
       Path.GetTempPath(), "prodlist-store-tests", Guid.NewGuid().ToString("N")

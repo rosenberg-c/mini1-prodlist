@@ -10,7 +10,7 @@
   <ItemGroup>
     <Compile Remove="tests/**;dependencies/**" />
     <ProjectReference Include="dependencies/sharp-storage/SharpStorage.csproj" />
-    <InternalsVisibleTo Include="ProdList.Tests" />
+    <InternalsVisibleTo Include="App.Tests" />
   </ItemGroup>
 
 </Project>

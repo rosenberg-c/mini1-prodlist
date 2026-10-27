@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Text.Json;
-using ProdList.src.Products;
+using App.src.Products;
 using Xunit;
-using Entry = ProdList.src.Products.Product.Entry;
+using Entry = App.src.Products.Product.Entry;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class ProgramTests : IDisposable {
     private readonly string _dir = Path.Combine(
       Path.GetTempPath(), "prodlist-program-tests", Guid.NewGuid().ToString("N")

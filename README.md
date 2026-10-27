@@ -11,7 +11,7 @@ A small console app for managing products.
    make run
    ```
 
-   `make run` initializes the pinned `sharp-storage` Git submodule first. For direct `dotnet run --project ProdList.csproj`, run `make deps` once after cloning.
+   `make run` initializes the pinned `sharp-storage` Git submodule first. For direct `dotnet run --project App.csproj`, run `make deps` once after cloning.
 
 3. Choose a menu option to add, view, search, or delete products, or see statistics. Enter `6` or type `exit` to quit.
 
@@ -48,7 +48,7 @@ make lint    # Check formatting without changing files
 make format  # Format app and test code
 ```
 
-These commands use the .NET SDK. `make` is also required; if you don't have it, run `dotnet test tests/ProdList.Tests.csproj` for tests or see the equivalent `dotnet format` commands in the `Makefile`.
+These commands use the .NET SDK. `make` is also required; if you don't have it, run `dotnet test tests/App.Tests.csproj` for tests or see the equivalent `dotnet format` commands in the `Makefile`.
 
 ## Make
 

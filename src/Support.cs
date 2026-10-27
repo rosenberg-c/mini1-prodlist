@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace ProdList.src {
+namespace App.src {
   public static class Support {
     public static bool IsExitOrNull([NotNullWhen(false)] string? value) {
       return value is null || string.Equals(

@@ -1,6 +1,6 @@
-using InputError = ProdList.src.Products.Product.InputError;
+using InputError = App.src.Products.Product.InputError;
 
-namespace ProdList.src.Products {
+namespace App.src.Products {
   public static class Ui {
     public static string MessageFrom(InputError error) {
       string detail = error switch {

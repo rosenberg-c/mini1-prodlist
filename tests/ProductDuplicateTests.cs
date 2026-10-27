@@ -1,9 +1,9 @@
 using System.Text.Json;
-using ProdList.src.Products;
+using App.src.Products;
 using Xunit;
-using Entry = ProdList.src.Products.Product.Entry;
+using Entry = App.src.Products.Product.Entry;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class ProductDuplicateTests {
     [Fact]
     public void Entry_ComputesNameWithoutSerializingIt() {

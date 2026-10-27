@@ -1,9 +1,8 @@
 using Xunit;
-using ProdList.src;
-using ProdList.src.Products;
-using InputError = ProdList.src.Products.Product.InputError;
+using App.src.Products;
+using InputError = App.src.Products.Product.InputError;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class UiTests {
     [Theory]
     [InlineData(InputError.EmptyInput,

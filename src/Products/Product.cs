@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
-namespace ProdList.src.Products {
+namespace App.src.Products {
   public static partial class Product {
     public const int SchemaVersion = 3;
 

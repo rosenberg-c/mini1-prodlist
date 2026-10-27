@@ -1,8 +1,8 @@
 using System.Text.Json;
-using ProdList.src;
-using ProdList.src.Products;
-using Entry = ProdList.src.Products.Product.Entry;
-using InputError = ProdList.src.Products.Product.InputError;
+using App.src;
+using App.src.Products;
+using Entry = App.src.Products.Product.Entry;
+using InputError = App.src.Products.Product.InputError;
 
 string path = Path.Combine(Directory.GetCurrentDirectory(), "products.json");
 ProductStore store = new(path);

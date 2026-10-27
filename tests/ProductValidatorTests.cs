@@ -1,8 +1,8 @@
-using ProdList.src.Products;
+using App.src.Products;
 using Xunit;
-using InputError = ProdList.src.Products.Product.InputError;
+using InputError = App.src.Products.Product.InputError;
 
-namespace ProdList.tests.Tests {
+namespace App.tests.Tests {
   public sealed class ProductValidatorTests {
     [Theory]
     [InlineData("AB-300", "AB", "300")]

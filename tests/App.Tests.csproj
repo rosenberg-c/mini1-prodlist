@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../ProdList.csproj" />
+    <ProjectReference Include="../App.csproj" />
   </ItemGroup>
 
   <ItemGroup>
