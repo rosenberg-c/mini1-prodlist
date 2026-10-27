@@ -1,0 +1,4 @@
+[submodule "dependencies/sharp-storage"]
+	path = dependencies/sharp-storage
+	url = git@github.com:rosenberg-c/sharp-storage.git
+	branch = main

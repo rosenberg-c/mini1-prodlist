@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="tests/**" />
+    <Compile Remove="tests/**;dependencies/**" />
+    <ProjectReference Include="dependencies/sharp-storage/SharpStorage.csproj" />
+    <InternalsVisibleTo Include="ProdList.Tests" />
   </ItemGroup>
 
 </Project>

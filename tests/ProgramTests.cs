@@ -21,9 +21,12 @@ namespace ProdList.tests.Tests {
       Assert.Contains("WARNING: Product already exists.", first);
 
       string path = Path.Combine(_dir, "products.json");
-      Assert.Equal([
-        new Entry(1, "AB", 300), new Entry(2, "XY", 500)
-      ], await ReadEntriesAsync(path));
+      List<Entry> saved = await ReadEntriesAsync(path);
+      Assert.Equal(2, saved.Count);
+      Assert.Equal(("AB", 300), (saved[0].Left, saved[0].Right));
+      Assert.Equal(("XY", 500), (saved[1].Left, saved[1].Right));
+      Assert.NotEqual(Guid.Empty, saved[0].Id);
+      Assert.NotEqual(saved[0].Id, saved[1].Id);
 
       string second = await RunAsync("2\n3\n500\n3\nAB\n5\n4\nAB-300\n5\n6\n");
       string lines = second.ReplaceLineEndings("\n");
@@ -36,7 +39,7 @@ namespace ProdList.tests.Tests {
       Assert.Contains("- Average Number: 400", second);
       Assert.Contains("Product removed successfully.", second);
       Assert.Contains("- Total Products: 1", second);
-      Assert.Equal([new Entry(2, "XY", 500)], await ReadEntriesAsync(path));
+      Assert.Equal([saved[1]], await ReadEntriesAsync(path));
     }
 
     [Fact]
@@ -57,7 +60,6 @@ namespace ProdList.tests.Tests {
       string output = await RunAsync("");
 
       Assert.Contains("Cannot load products.json", output);
-      Assert.Contains("python3 scripts/migrate-products.py products.json", output);
       Assert.Equal(legacyJson, await File.ReadAllTextAsync(path));
       Assert.False(File.Exists(path + ".v1.bak"));
     }

@@ -7,15 +7,15 @@ namespace ProdList.tests.Tests {
     [Fact]
     public void ForDisplay_Sorts_Alphabetically() {
       List<Entry> entries = [
-        new Entry(1, "PC", 300),
-        new Entry(2, "MAC", 500),
-        new Entry(3, "LABAN", 200)
+        Item(1, "PC", 300),
+        Item(2, "MAC", 500),
+        Item(3, "LABAN", 200)
       ];
 
       Assert.Equal([
-          new Entry(3, "LABAN", 200),
-          new Entry(2, "MAC", 500),
-          new Entry(1, "PC", 300)
+          Item(3, "LABAN", 200),
+          Item(2, "MAC", 500),
+          Item(1, "PC", 300)
         ],
         Product.Sort(entries)
       );
@@ -24,20 +24,24 @@ namespace ProdList.tests.Tests {
     [Fact]
     public void ForDisplay_SortsIgnoringCase_ThenBreaksTiesOrdinally() {
       List<Entry> entries = [
-        new Entry(1, "b", 300),
-        new Entry(2, "a", 200),
-        new Entry(3, "B", 300),
-        new Entry(4, "A", 200)
+        Item(1, "b", 300),
+        Item(2, "a", 200),
+        Item(3, "B", 300),
+        Item(4, "A", 200)
       ];
 
       Assert.Equal([
-          new Entry(4, "A", 200),
-          new Entry(2, "a", 200),
-          new Entry(3, "B", 300),
-          new Entry(1, "b", 300)
+          Item(4, "A", 200),
+          Item(2, "a", 200),
+          Item(3, "B", 300),
+          Item(1, "b", 300)
         ],
         Product.Sort(entries)
       );
+    }
+
+    private static Entry Item(int id, string left, int right) {
+      return new Entry(new Guid(id, 0, 0, new byte[8]), left, right);
     }
   }
 }

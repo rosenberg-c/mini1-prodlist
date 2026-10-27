@@ -4,18 +4,14 @@ using Entry = ProdList.src.Product.Entry;
 using InputError = ProdList.src.Product.InputError;
 
 string path = Path.Combine(Directory.GetCurrentDirectory(), "products.json");
-StorageRepository<Entry> repo = new(
-  path, static e => e.Id, Product.SchemaVersion
-);
+ProductStore store = new(path);
 
 try {
-  _ = await repo.GetAllAsync();
+  _ = await store.GetAllAsync();
 }
 catch (Exception error) when (error is JsonException or InvalidDataException) {
   Console.WriteLine($"Cannot load products.json: {error.Message}");
   Console.WriteLine("Delete products.json to start with an empty inventory,");
-  Console.WriteLine("or migrate a legacy file with:");
-  Console.WriteLine("python3 scripts/migrate-products.py products.json");
   return;
 }
 
@@ -99,17 +95,14 @@ async Task<Menu> AddAsync() {
     return Menu.Continue;
   }
 
-  CreateStatus result = await repo.TryCreateAsync(
-    id => new Entry(id, left, right),
-    entry => Product.IsDuplicate(entry, left, right)
-  );
+  CreateStatus result = await store.TryCreateAsync(left, right);
 
   Console.WriteLine(Ui.MessageFrom(result));
   return Menu.Continue;
 }
 
 async Task ViewAsync() {
-  List<Entry> entries = await repo.GetAllAsync();
+  List<Entry> entries = await store.GetAllAsync();
   Console.WriteLine("Sorted valid products:");
 
   foreach (Entry entry in Product.Sort(entries)) {
@@ -129,7 +122,7 @@ async Task<Menu> SearchAsync() {
     return Menu.Continue;
   }
 
-  List<Entry> entries = await repo.GetAllAsync();
+  List<Entry> entries = await store.GetAllAsync();
   var matches = Product.Sort(entries)
     .Where(e => e.Name.Contains(
         query, StringComparison.OrdinalIgnoreCase
@@ -157,7 +150,7 @@ async Task<Menu> DeleteAsync() {
     return Menu.Exit;
   }
 
-  List<Entry> entries = await repo.GetAllAsync();
+  List<Entry> entries = await store.GetAllAsync();
   Entry? match = entries.FirstOrDefault(e =>
     string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase)
   );
@@ -167,14 +160,14 @@ async Task<Menu> DeleteAsync() {
     return Menu.Continue;
   }
 
-  _ = await repo.DeleteAsync(match.Id);
+  _ = await store.DeleteAsync(match.Id);
 
   Console.WriteLine("Product removed successfully.");
   return Menu.Continue;
 }
 
 async Task StatisticsAsync() {
-  List<Entry> entries = await repo.GetAllAsync();
+  List<Entry> entries = await store.GetAllAsync();
   var numbers = entries.Select(static entry => entry.Right).ToList();
 
   Console.WriteLine("Statistics:");

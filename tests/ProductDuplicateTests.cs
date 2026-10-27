@@ -7,10 +7,11 @@ namespace ProdList.tests.Tests {
   public sealed class ProductDuplicateTests {
     [Fact]
     public void Entry_ComputesNameWithoutSerializingIt() {
-      Entry entry = new(1, "AB", 300);
+      Guid id = Guid.Parse("11111111-1111-4111-8111-111111111111");
+      Entry entry = new(id, "AB", 300);
 
       Assert.Equal("AB-300", entry.Name);
-      Assert.Equal("{\"Id\":1,\"Left\":\"AB\",\"Right\":300}",
+      Assert.Equal("{\"Id\":\"11111111-1111-4111-8111-111111111111\",\"Left\":\"AB\",\"Right\":300}",
         JsonSerializer.Serialize(entry));
     }
 
@@ -23,7 +24,7 @@ namespace ProdList.tests.Tests {
       string left, int right, bool expected
     ) {
       Assert.Equal(expected,
-        Product.IsDuplicate(new Entry(1, "AB", 300), left, right));
+        Product.IsDuplicate(new Entry(Guid.Empty, "AB", 300), left, right));
     }
   }
 }

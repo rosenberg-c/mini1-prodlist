@@ -1,20 +1,39 @@
 DOTNET ?= dotnet
+PROJECT ?= ProdList.csproj
 TESTS ?= tests/ProdList.Tests.csproj
 
+.PHONY: deps
+deps:
+	git submodule update --init --recursive
+
+.PHONY: update-storage-dep
+update-storage-dep:
+	git submodule update --init --remote dependencies/sharp-storage
+	git add dependencies/sharp-storage
+
+.PHONY: build
+build: deps
+	$(DOTNET) build $(PROJECT)
+
 .PHONY: test
-test:
+test: deps
 	$(DOTNET) test $(TESTS)
 
 .PHONY: run
-run:
-	$(DOTNET) run
+run: deps
+	$(DOTNET) run --project $(PROJECT)
 
 .PHONY: lint
-lint:
-	$(DOTNET) format ProdList.csproj --verify-no-changes
+lint: deps
+	$(DOTNET) format $(PROJECT) --verify-no-changes
 	$(DOTNET) format $(TESTS) --verify-no-changes
 
 .PHONY: format
-format:
-	$(DOTNET) format ProdList.csproj
+format: deps
+	$(DOTNET) format $(PROJECT)
 	$(DOTNET) format $(TESTS)
+
+.PHONY: clean
+clean:
+	$(DOTNET) clean $(PROJECT)
+

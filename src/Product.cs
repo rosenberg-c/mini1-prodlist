@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace ProdList.src {
   public static partial class Product {
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3;
 
     internal const int minNum = 200;
     internal const int maxNum = 500;
 
-    public record Entry(int Id, string Left, int Right) {
+    public record Entry(Guid Id, string Left, int Right) {
       [JsonIgnore]
       public string Name => $"{Left}-{Right}";
     }
