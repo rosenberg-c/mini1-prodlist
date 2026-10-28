@@ -1,6 +1,4 @@
-using System.Collections.Concurrent;
 using SharpStorage.src;
-using Entry = App.src.Products.Product.Entry;
 
 namespace App.src.Products {
   public enum CreateStatus {
@@ -9,22 +7,15 @@ namespace App.src.Products {
   }
 
   internal sealed class ProductStore {
-    private static readonly ConcurrentDictionary<string, SemaphoreSlim> Gates =
-      new(StringComparer.OrdinalIgnoreCase);
-
-    private readonly StorageRepository<Entry> _storage;
-    private readonly SemaphoreSlim _gate;
+    private readonly StorageRepository<Product> _storage;
 
     internal ProductStore(string filename) {
-      _storage = new StorageRepository<Entry>(
-        filename, static entry => entry.Id, Product.SchemaVersion
-      );
-      _gate = Gates.GetOrAdd(Path.GetFullPath(filename),
-        static _ => new SemaphoreSlim(1, 1)
+      _storage = new StorageRepository<Product>(
+        filename, static p => p.Id, Product.SchemaVersion
       );
     }
 
-    internal Task<List<Entry>> GetAllAsync() {
+    internal Task<List<Product>> GetAllAsync() {
       return _storage.GetAllAsync();
     }
 
@@ -32,20 +23,18 @@ namespace App.src.Products {
       return _storage.DeleteAsync(id);
     }
 
-    internal async Task<CreateStatus> TryCreateAsync(string left, int right) {
-      await _gate.WaitAsync();
-      try {
-        List<Entry> entries = await _storage.GetAllAsync();
-        if (entries.Any(entry => Product.IsDuplicate(entry, left, right))) {
-          return CreateStatus.Duplicate;
-        }
-
-        _ = await _storage.CreateAsync(id => new Entry(id, left, right));
-        return CreateStatus.Created;
-      }
-      finally {
-        _ = _gate.Release();
-      }
+    internal async Task<Product> CreateAsync(
+      string category,
+      string name,
+      decimal price
+    ) {
+      return await _storage.CreateAsync(id => new Product(
+          id,
+          category,
+          name,
+          price
+        )
+      );
     }
   }
 }

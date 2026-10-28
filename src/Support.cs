@@ -5,7 +5,7 @@ namespace App.src {
     public static bool IsExitOrNull([NotNullWhen(false)] string? value) {
       return value is null || string.Equals(
         value?.Trim(),
-        "exit",
+        "q",
         StringComparison.OrdinalIgnoreCase
       );
     }
