@@ -22,8 +22,10 @@ namespace App.src {
         return;
       }
 
+      ProductManager manager = new(store);
+
       Console.Clear();
-      await new Main(store).RunAsync();
+      await new Main(manager).RunAsync();
       Console.WriteLine("Application closed.");
     }
   }
@@ -32,8 +34,8 @@ namespace App.src {
 internal sealed class Main {
   private readonly Actions _actions;
 
-  internal Main(ProductStore store) {
-    _actions = new Actions(store);
+  internal Main(ProductManager manager) {
+    _actions = new Actions(manager);
   }
 
   internal async Task RunAsync() {

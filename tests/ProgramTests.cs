@@ -19,9 +19,12 @@ namespace App.tests.Tests {
         "1\nElectronics\nMouse\n299.50\n1\nOffice\nMouse\n120\n3\nq\n"
       );
       Assert.Equal(2, first.Split("Product added successfully!").Length - 1);
-      Assert.Contains("[01] Electronics", first);
-      Assert.Contains("[02] Office", first);
+      Assert.Contains(" 1. Office", first);
+      Assert.Contains(" 2. Electronics", first);
+      Assert.True(first.IndexOf(" 1. Office", StringComparison.Ordinal) <
+        first.IndexOf(" 2. Electronics", StringComparison.Ordinal));
       Assert.Contains("299.5 kr", first);
+      Assert.Contains("TOTAL PRICE: 419.5 kr", first);
 
       string path = Path.Combine(_dir, "products.json");
       List<Product> saved = await ReadProductsAsync(path);
@@ -32,9 +35,10 @@ namespace App.tests.Tests {
 
       string second = await RunAsync("2\n2\n3\nq\n");
       Assert.Contains("Product removed successfully.", second);
-      Assert.Contains("[01] Electronics", second);
-      Assert.Contains("[02] Office", second);
-      Assert.Equal([saved[0]], await ReadProductsAsync(path));
+      Assert.Contains(" 1. Office", second);
+      Assert.Contains(" 2. Electronics", second);
+      Assert.Contains("TOTAL PRICE: 120 kr", second);
+      Assert.Equal([saved[1]], await ReadProductsAsync(path));
     }
 
     [Theory]
@@ -59,7 +63,7 @@ namespace App.tests.Tests {
 
       Assert.Contains("Invalid option. Please try again.", output);
       Assert.Equal(4, output.Split("Invalid product number.").Length - 1);
-      Assert.Contains("[01] Food", output);
+      Assert.Contains(" 1. Food", output);
       Assert.Single(await ReadProductsAsync(Path.Combine(_dir, "products.json")));
     }
 
@@ -67,8 +71,8 @@ namespace App.tests.Tests {
     public async Task Menu_EmptyViewAndDelete_ThenQuitWithoutWriting() {
       string output = await RunAsync("3\n2\nq\n");
 
-      Assert.Contains("PRODUCTS", output);
-      Assert.DoesNotContain("[01]", output);
+      Assert.Contains("TOTAL PRICE: 0 kr", output);
+      Assert.Contains("No products to delete.", output);
       Assert.Contains("Application closed.", output);
       Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
     }

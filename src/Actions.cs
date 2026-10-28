@@ -1,4 +1,3 @@
-using App.src.Products;
 using Product = App.src.Products.Product;
 
 namespace App.src {
@@ -8,10 +7,12 @@ namespace App.src {
   }
 
   internal sealed class Actions {
-    private readonly ProductStore _store;
+    private readonly ProductManager _m;
 
-    internal Actions(ProductStore store) {
-      _store = store;
+    internal Actions(
+      ProductManager manager
+    ) {
+      _m = manager;
     }
 
     internal async Task<MenuResult> AddAsync() {
@@ -36,38 +37,37 @@ namespace App.src {
         return MenuResult.Continue;
       }
 
-      _ = await _store.CreateAsync(category, name, price);
+      _ = await _m.CreateAsync(category, name, price);
       Console.WriteLine("Product added successfully!");
       return MenuResult.Continue;
     }
 
-    internal async Task ViewAsync() {
-      List<Product> entries = await _store.GetAllAsync();
-      Console.WriteLine("");
-      Console.WriteLine(
-        $"{"".PadRight(14, '=')} PRODUCTS {"".PadRight(14, '=')}"
-      );
-      Console.WriteLine("");
-      if (entries.Count == 0) {
-        Console.WriteLine("No products to delete.");
-        return;
+    internal static void ItemListAsync(List<Product> p) {
+      for (int i = 0; i < p.Count; i++) {
+        Console.Write($"{i + 1,2}. ");
+        Console.WriteLine(p[i].GetListItemString());
       }
+      Console.WriteLine();
 
-      for (int i = 0; i < entries.Count; i++) {
-        Console.Write($"[{i + 1:D2}] ");
-        Console.WriteLine(entries[i].GetListItemString());
-      }
+    }
+
+    internal async Task ViewAsync() {
+      ProductListResult results = await _m.ProductListSorted();
+
+      ItemListAsync(results.Products);
+      Console.WriteLine($"TOTAL PRICE: {results.Total:0.##} kr");
     }
 
     internal async Task<MenuResult> DeleteAsync() {
-      List<Product> entries = await _store.GetAllAsync();
+      ProductListResult result = await _m.ProductListSorted();
+      List<Product> entries = result.Products;
+
+      ItemListAsync(result.Products);
 
       if (entries.Count == 0) {
         Console.WriteLine("No products to delete.");
         return MenuResult.Continue;
       }
-
-      await ViewAsync();
 
       string? intStr = Support.ReadString("Enter product to delete: ");
 
@@ -82,7 +82,7 @@ namespace App.src {
       }
 
       Guid id = entries[idx - 1].Id;
-      bool deleted = await _store.DeleteAsync(id);
+      bool deleted = await _m.DeleteAsync(id);
       Console.WriteLine(deleted
         ? "Product removed successfully."
         : "Product not found."

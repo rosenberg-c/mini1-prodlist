@@ -1,11 +1,6 @@
 using SharpStorage.src;
 
 namespace App.src.Products {
-  public enum CreateStatus {
-    Created,
-    Duplicate
-  }
-
   internal sealed class ProductStore {
     private readonly StorageRepository<Product> _storage;
 
