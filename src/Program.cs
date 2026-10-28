@@ -38,16 +38,16 @@ internal sealed class Main {
 
   internal async Task RunAsync() {
     Console.WriteLine("----------------------------------------");
-    Console.WriteLine("PRODUCT INVENTORY SYSTEM - LEVEL 4");
+    Console.WriteLine("PRODUCT INVENTORY SYSTEM");
     Console.WriteLine("----------------------------------------");
 
     Console.WriteLine("Enter q to exit");
     while (true) {
       Console.WriteLine();
       Console.WriteLine("1. Add Product");
-      Console.WriteLine("2. View Products");
-      Console.WriteLine("3. Search Product");
-      Console.WriteLine("4. Delete Product");
+      Console.WriteLine("2. Delete Product");
+      Console.WriteLine("3. View Products");
+
       Console.WriteLine();
 
       string? choice = Support.ReadString("Select option: ");
@@ -64,26 +64,17 @@ internal sealed class Main {
 
           break;
         }
-
-        case "2": {
-          await _actions.ViewAsync();
-          break;
-        }
-
-        case "3": {
-          if (await _actions.SearchAsync() == MenuResult.Exit) {
-            return;
-          }
-
-          break;
-        }
-
-        case "4":
+        case "2":
           if (await _actions.DeleteAsync() == MenuResult.Exit) {
             return;
           }
 
           break;
+
+        case "3": {
+          await _actions.ViewAsync();
+          break;
+        }
 
         default:
           Console.WriteLine("Invalid option. Please try again.");
@@ -92,4 +83,3 @@ internal sealed class Main {
     }
   }
 }
-
