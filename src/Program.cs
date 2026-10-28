@@ -7,16 +7,17 @@ using InputError = App.src.Products.Product.InputError;
 namespace App.src {
   public class Program {
     public static async Task Main() {
-      string path =
-        Path.Combine(Directory.GetCurrentDirectory(), "products.json");
+      string path = Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "products.json"
+      );
       ProductStore store = new(path);
 
       try {
         _ = await store.GetAllAsync();
       }
-      catch (Exception error) when (error is JsonException
-                                      or InvalidDataException) {
-        Console.WriteLine($"Cannot load products.json: {error.Message}");
+      catch (Exception e) when (e is JsonException or InvalidDataException) {
+        Console.WriteLine($"Cannot load products.json: {e.Message}");
         Console.WriteLine(
           "Delete products.json to start with an empty inventory,"
         );
@@ -103,6 +104,7 @@ internal sealed class Main {
     }
   }
 }
+
 namespace App.src {
   internal enum MenuResult {
     Continue,
