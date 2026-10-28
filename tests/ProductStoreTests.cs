@@ -1,3 +1,4 @@
+using System.Text.Json;
 using App.src.Products;
 using Xunit;
 
@@ -8,50 +9,40 @@ namespace App.tests.Tests {
     );
 
     public ProductStoreTests() {
-      _ = Directory.CreateDirectory(_dir);
+      Directory.CreateDirectory(_dir);
     }
 
     [Fact]
-    public async Task TryCreateAsync_RejectsDuplicateProductWithoutWriting() {
-      string path = Path.Combine(_dir, "products.json");
-      ProductStore store = new(path);
-      Assert.Equal(CreateStatus.Created,
-        await store.TryCreateAsync("AB", 300));
-      string before = await File.ReadAllTextAsync(path);
-
-      Assert.Equal(CreateStatus.Duplicate,
-        await store.TryCreateAsync("ab", 300));
-      Assert.Equal(before, await File.ReadAllTextAsync(path));
-    }
-
-    [Fact]
-    public async Task TryCreateAsync_TwoInstancesOnlyCreateOneMatchingProduct() {
-      string path = Path.Combine(_dir, "products.json");
-      ProductStore first = new(path);
-      ProductStore second = new(path);
-
-      CreateStatus[] results = await Task.WhenAll(
-        first.TryCreateAsync("AB", 300),
-        second.TryCreateAsync("ab", 300)
-      );
-
-      Assert.Equal(1, results.Count(status => status == CreateStatus.Created));
-      Assert.Equal(1, results.Count(status => status == CreateStatus.Duplicate));
-      Assert.Single(await first.GetAllAsync());
-    }
-
-    [Fact]
-    public async Task ProductStore_CreatesReadsAndDeletesProduct() {
+    public async Task CreateAsync_PersistsFieldsAndDistinctIds_ForRepeatedNames() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);
 
-      Assert.Equal(CreateStatus.Created,
-        await store.TryCreateAsync("AB", 300));
-      Product.Entry entry = Assert.Single(await store.GetAllAsync());
-      Assert.Equal("AB-300", entry.Name);
+      Product first = await store.CreateAsync("Electronics", "Mouse", 299.50m);
+      Product second = await store.CreateAsync("Office", "Mouse", 120m);
 
-      Assert.True(await store.DeleteAsync(entry.Id));
-      Assert.Empty(await store.GetAllAsync());
+      Assert.NotEqual(Guid.Empty, first.Id);
+      Assert.NotEqual(first.Id, second.Id);
+      Assert.Equal("Electronics", first.Category);
+      Assert.Equal("Mouse", first.Name);
+      Assert.Equal(299.50m, first.Price);
+      Assert.Equal([first, second], await new ProductStore(path).GetAllAsync());
+
+      using JsonDocument document = JsonDocument.Parse(await File.ReadAllTextAsync(path));
+      Assert.Equal(Product.SchemaVersion,
+        document.RootElement.GetProperty("schemaVersion").GetInt32());
+      Assert.Equal(299.50m,
+        document.RootElement.GetProperty("data")[0].GetProperty("Price").GetDecimal());
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesOnlyTheSelectedId() {
+      ProductStore store = new(Path.Combine(_dir, "products.json"));
+      Product first = await store.CreateAsync("Office", "Pen", 1.25m);
+      Product second = await store.CreateAsync("Office", "Pen", 1.25m);
+
+      Assert.True(await store.DeleteAsync(second.Id));
+      Assert.False(await store.DeleteAsync(second.Id));
+      Assert.Equal([first], await store.GetAllAsync());
     }
 
     public void Dispose() {

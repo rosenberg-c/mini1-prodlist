@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using App.src.Products;
 using Xunit;
-using Entry = App.src.Products.Product.Entry;
 
 namespace App.tests.Tests {
   public sealed class ProgramTests : IDisposable {
@@ -15,81 +14,85 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task Menu_AddSearchDeleteAndStatistics_PersistAcrossRuns() {
-      string first = await RunAsync("1\nAB-300\n1\nAB-300\n1\nXY-500\n6\n");
-      Assert.Contains("Product added successfully.", first);
-      Assert.Contains("WARNING: Product already exists.", first);
+    public async Task Menu_AddViewAndDeleteByIndex_PersistAcrossRuns() {
+      string first = await RunAsync(
+        "1\nElectronics\nMouse\n299.50\n1\nOffice\nMouse\n120\n3\nq\n"
+      );
+      Assert.Equal(2, first.Split("Product added successfully!").Length - 1);
+      Assert.Contains("[01] Electronics", first);
+      Assert.Contains("[02] Office", first);
+      Assert.Contains("299.5 kr", first);
 
       string path = Path.Combine(_dir, "products.json");
-      List<Entry> saved = await ReadEntriesAsync(path);
+      List<Product> saved = await ReadProductsAsync(path);
       Assert.Equal(2, saved.Count);
-      Assert.Equal(("AB", 300), (saved[0].Left, saved[0].Right));
-      Assert.Equal(("XY", 500), (saved[1].Left, saved[1].Right));
-      Assert.NotEqual(Guid.Empty, saved[0].Id);
+      Assert.Equal("Mouse", saved[0].Name);
+      Assert.Equal("Mouse", saved[1].Name);
       Assert.NotEqual(saved[0].Id, saved[1].Id);
 
-      string second = await RunAsync("2\n3\n500\n3\nAB\n5\n4\nAB-300\n5\n6\n");
-      string lines = second.ReplaceLineEndings("\n");
-      Assert.Contains("Sorted valid products:\n- AB-300\n- XY-500", lines);
-      Assert.Contains("Results:\n- XY-500", lines);
-      Assert.Contains("Results:\n- AB-300", lines);
-      Assert.Contains("- Total Products: 2", second);
-      Assert.Contains("- Lowest Number: 300", second);
-      Assert.Contains("- Highest Number: 500", second);
-      Assert.Contains("- Average Number: 400", second);
+      string second = await RunAsync("2\n2\n3\nq\n");
       Assert.Contains("Product removed successfully.", second);
-      Assert.Contains("- Total Products: 1", second);
-      Assert.Equal([saved[1]], await ReadEntriesAsync(path));
+      Assert.Contains("[01] Electronics", second);
+      Assert.Contains("[02] Office", second);
+      Assert.Equal([saved[0]], await ReadProductsAsync(path));
+    }
+
+    [Theory]
+    [InlineData("1\n\nq\n")]
+    [InlineData("1\nFood\n\nq\n")]
+    [InlineData("1\nFood\nPizza\n\nq\n")]
+    [InlineData("1\nFood\nPizza\nabc\nq\n")]
+    [InlineData("1\nFood\nPizza\n-100\nq\n")]
+    [InlineData("1\n")]
+    public async Task Menu_IncompleteOrInvalidEntry_DoesNotWriteFile(string input) {
+      string output = await RunAsync(input);
+
+      Assert.DoesNotContain("Product added successfully!", output);
+      Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
     }
 
     [Fact]
-    public async Task Menu_InvalidProductAndExitAtPrompt_DoNotWriteFile() {
-      string output = await RunAsync("1\ninvalid\n1\n EXIT \n");
+    public async Task Menu_BadOptionAndInvalidIndexes_KeepProducts() {
+      string output = await RunAsync(
+        "9\n1\nFood\nPizza\n120\n2\nabc\n2\n0\n2\n-1\n2\n2\n3\nq\n"
+      );
 
-      Assert.Contains("ERROR: Product must contain a dash (-).", output);
+      Assert.Contains("Invalid option. Please try again.", output);
+      Assert.Equal(4, output.Split("Invalid product number.").Length - 1);
+      Assert.Contains("[01] Food", output);
+      Assert.Single(await ReadProductsAsync(Path.Combine(_dir, "products.json")));
+    }
+
+    [Fact]
+    public async Task Menu_EmptyViewAndDelete_ThenQuitWithoutWriting() {
+      string output = await RunAsync("3\n2\nq\n");
+
+      Assert.Contains("PRODUCTS", output);
+      Assert.DoesNotContain("[01]", output);
       Assert.Contains("Application closed.", output);
       Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
     }
 
     [Fact]
-    public async Task Menu_InvalidOption_KeepsMenuRunning() {
-      string output = await RunAsync("9\n6\n");
-
-      Assert.Contains("Invalid option. Please try again.", output);
-      Assert.Contains("Application closed.", output);
-    }
-
-    [Fact]
-    public async Task Menu_ViewAndStatistics_ReturnToMenu() {
-      string output = await RunAsync("2\n5\n6\n");
-
-      Assert.Contains("Sorted valid products:", output);
-      Assert.Contains("- Total Products: 0", output);
-      Assert.Equal(3, output.Split("Select option: ").Length - 1);
-      Assert.Contains("Application closed.", output);
-    }
-
-    [Fact]
-    public async Task Startup_RejectsLegacyProductsWithMigrationInstructions() {
+    public async Task Startup_RejectsIncompatibleSchemaWithoutChangingFile() {
       string path = Path.Combine(_dir, "products.json");
-      const string legacyJson = "[{\"Id\":3,\"Name\":\"AB-300\"}]";
+      const string legacyJson = "{\"schemaVersion\":3,\"data\":[]}";
       await File.WriteAllTextAsync(path, legacyJson);
 
       string output = await RunAsync("");
 
       Assert.Contains("Cannot load products.json", output);
       Assert.Equal(legacyJson, await File.ReadAllTextAsync(path));
-      Assert.False(File.Exists(path + ".v1.bak"));
     }
 
-    private static async Task<List<Entry>> ReadEntriesAsync(string path) {
+    private static async Task<List<Product>> ReadProductsAsync(string path) {
       using JsonDocument document = JsonDocument.Parse(
         await File.ReadAllTextAsync(path)
       );
       Assert.Equal(Product.SchemaVersion,
         document.RootElement.GetProperty("schemaVersion").GetInt32());
       return document.RootElement.GetProperty("data")
-        .Deserialize<List<Entry>>() ?? [];
+        .Deserialize<List<Product>>() ?? [];
     }
 
     private async Task<string> RunAsync(string input) {
@@ -100,6 +103,7 @@ namespace App.tests.Tests {
         RedirectStandardError = true,
         UseShellExecute = false
       };
+      start.Environment["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1";
       start.ArgumentList.Add(typeof(Product).Assembly.Location);
 
       using Process process = Process.Start(start)

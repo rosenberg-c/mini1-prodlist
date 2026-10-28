@@ -8,13 +8,6 @@ namespace App.src {
   }
 
   internal sealed class Actions {
-    private static void DisplayFor(Product product) {
-      // Add tabs to space out line
-      Console.WriteLine(
-        $"{product.Category} | {product.Name} | {product.Price:0.##} kr"
-      );
-    }
-
     private readonly ProductStore _store;
 
     internal Actions(ProductStore store) {
@@ -23,22 +16,22 @@ namespace App.src {
 
     internal async Task<MenuResult> AddAsync() {
       string? category = Support.ReadString("Enter Category: ");
-      if (Support.IsExitOrNull(category)) {
-        return MenuResult.Exit;
+      if (Support.IsEmptyOrNull(category)) {
+        return MenuResult.Continue;
       }
 
       string? name = Support.ReadString("Enter Product Name: ");
-      if (name is null) {
-        return MenuResult.Exit;
+      if (Support.IsEmptyOrNull(name)) {
+        return MenuResult.Continue;
       }
 
-      string? text = Support.ReadString("Enter Price: ");
-      if (text is null) {
-        return MenuResult.Exit;
+      string? priceStr = Support.ReadString("Enter Price: ");
+      if (Support.IsEmptyOrNull(priceStr)) {
+        return MenuResult.Continue;
       }
 
       if (category.Length == 0 || name.Length == 0 ||
-          !decimal.TryParse(text, out decimal price) || price < 0m) {
+          !decimal.TryParse(priceStr, out decimal price) || price < 0m) {
         Console.WriteLine("ERROR: Invalid product fields.");
         return MenuResult.Continue;
       }
@@ -50,61 +43,50 @@ namespace App.src {
 
     internal async Task ViewAsync() {
       List<Product> entries = await _store.GetAllAsync();
-      Console.WriteLine("Products:");
-
-      foreach (Product entry in entries) {
-        DisplayFor(entry);
-      }
-    }
-
-    internal async Task<MenuResult> SearchAsync() {
-      string? query = Support.ReadString("Search product: ");
-
-      if (Support.IsExitOrNull(query)) {
-        return MenuResult.Exit;
+      Console.WriteLine("");
+      Console.WriteLine(
+        $"{"".PadRight(14, '=')} PRODUCTS {"".PadRight(14, '=')}"
+      );
+      Console.WriteLine("");
+      if (entries.Count == 0) {
+        Console.WriteLine("No products to delete.");
+        return;
       }
 
-      if (query.Length == 0) {
-        Console.WriteLine("Search cannot be empty.");
-        return MenuResult.Continue;
+      for (int i = 0; i < entries.Count; i++) {
+        Console.Write($"[{i + 1:D2}] ");
+        Console.WriteLine(entries[i].GetListItemString());
       }
-
-      List<Product> entries = await _store.GetAllAsync();
-      var matches = entries;
-
-      Console.WriteLine("Results:");
-
-      if (matches.Count == 0) {
-        Console.WriteLine("No products found.");
-      }
-
-      foreach (Product entry in matches) {
-        DisplayFor(entry);
-      }
-
-      return MenuResult.Continue;
     }
 
     internal async Task<MenuResult> DeleteAsync() {
-      string? name = Support.ReadString("Enter product to delete: ");
-
-      if (Support.IsExitOrNull(name)) {
-        return MenuResult.Exit;
-      }
-
       List<Product> entries = await _store.GetAllAsync();
-      Product? match = entries.FirstOrDefault(e =>
-        string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase)
-      );
 
-      if (match is null) {
-        Console.WriteLine("Product not found.");
+      if (entries.Count == 0) {
+        Console.WriteLine("No products to delete.");
         return MenuResult.Continue;
       }
 
-      _ = await _store.DeleteAsync(match.Id);
+      await ViewAsync();
 
-      Console.WriteLine("Product removed successfully.");
+      string? intStr = Support.ReadString("Enter product to delete: ");
+
+      if (Support.IsExitOrNull(intStr)) {
+        return MenuResult.Continue;
+      }
+
+      if (!int.TryParse(intStr, out int idx) || idx < 1 ||
+          idx > entries.Count) {
+        Console.WriteLine("Invalid product number.");
+        return MenuResult.Continue;
+      }
+
+      Guid id = entries[idx - 1].Id;
+      bool deleted = await _store.DeleteAsync(id);
+      Console.WriteLine(deleted
+        ? "Product removed successfully."
+        : "Product not found."
+      );
       return MenuResult.Continue;
     }
   }

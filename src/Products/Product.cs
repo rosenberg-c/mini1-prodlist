@@ -6,5 +6,9 @@ namespace App.src.Products {
     decimal Price
   ) {
     public const int SchemaVersion = 4;
+
+    public string GetListItemString() {
+      return $"{Category.PadRight(14)} | {Name.PadRight(14)} | {Price:0.##} kr";
+    }
   }
 }
