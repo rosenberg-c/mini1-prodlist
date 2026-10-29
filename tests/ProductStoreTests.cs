@@ -45,6 +45,45 @@ namespace App.tests.Tests {
       Assert.Equal([first], await store.GetAllAsync());
     }
 
+    [Fact]
+    public async Task UpdateAsync_ChangesOnlySelectedProductAndPreservesId() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product first = await store.CreateAsync("Office", "Pen", 1.25m);
+      Product second = await store.CreateAsync("Office", "Pen", 1.25m);
+      Product updated = second with { Category = "Food", Name = "Pizza", Price = 0m };
+
+      Assert.True(await store.UpdateAsync(second.Id, updated));
+      Assert.Equal([first, updated], await new ProductStore(path).GetAllAsync());
+      Assert.Equal(second.Id, updated.Id);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_MissingIdDoesNotChangeTheFile() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product existing = await store.CreateAsync("Office", "Pen", 1.25m);
+      string before = await File.ReadAllTextAsync(path);
+
+      Assert.False(await store.UpdateAsync(Guid.NewGuid(),
+        existing with { Name = "Changed" }));
+      Assert.Equal(before, await File.ReadAllTextAsync(path));
+      Assert.Equal([existing], await store.GetAllAsync());
+    }
+
+    [Fact]
+    public async Task UpdateAsync_RejectsDifferentIdWithoutChangingTheFile() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product existing = await store.CreateAsync("Office", "Pen", 1.25m);
+      string before = await File.ReadAllTextAsync(path);
+
+      await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        store.UpdateAsync(existing.Id, existing with { Id = Guid.NewGuid() }));
+      Assert.Equal(before, await File.ReadAllTextAsync(path));
+      Assert.Equal([existing], await store.GetAllAsync());
+    }
+
     public void Dispose() {
       GC.SuppressFinalize(this);
       Directory.Delete(_dir, recursive: true);
