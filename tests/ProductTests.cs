@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using App.src.Products;
 using Xunit;
@@ -18,14 +17,25 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public void GetListItemString_IncludesCategoryNameAndPrice() {
-      Product product = new(Guid.NewGuid(), "Food", "Pizza", 120.50m);
+    public void WithMethods_CreateNewProductsWithoutChangingOriginalOrId() {
+      Product original = new(Guid.NewGuid(), "Food", "Pizza", 120.50m);
 
-      string line = product.GetListItemString();
+      Product category = original.WithCategory("Office");
+      Product name = original.WithName("Pen");
+      Product price = original.WithPrice(0m);
 
-      Assert.Contains("Food", line);
-      Assert.Contains("Pizza", line);
-      Assert.Contains(120.50m.ToString("0.##", CultureInfo.CurrentCulture) + " kr", line);
+      Assert.Equal("Office", category.Category);
+      Assert.Equal("Pen", name.Name);
+      Assert.Equal(0m, price.Price);
+      Assert.Equal(original.Id, category.Id);
+      Assert.Equal(original.Id, name.Id);
+      Assert.Equal(original.Id, price.Id);
+      Assert.Equal("Food", original.Category);
+      Assert.Equal("Pizza", original.Name);
+      Assert.Equal(120.50m, original.Price);
+      Assert.NotSame(original, category);
+      Assert.NotSame(original, name);
+      Assert.NotSame(original, price);
     }
   }
 }

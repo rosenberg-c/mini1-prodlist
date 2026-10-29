@@ -23,12 +23,5 @@ namespace App.src.Products {
       return this with { Price = price };
     }
 
-    public string GetListItemString() {
-      string c = Category.PadRight(14);
-      string n = Name.PadRight(14);
-      string p = $"{Price:0.##} kr".PadRight(14);
-
-      return $"{c} | {n} | {p}";
-    }
   }
 }

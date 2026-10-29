@@ -4,12 +4,27 @@ namespace App.src {
   internal sealed class Actions {
     private readonly ProductManager _m;
 
-    internal static void DisplayItemListAsync(List<Product> p) {
-      for (int i = 0; i < p.Count; i++) {
-        Console.Write($"{i + 1,2}. ");
-        Console.WriteLine(p[i].GetListItemString());
+    internal static void DisplayItemListAsync(List<Product> products) {
+      const int width = 16;
+      string segment = new('-', width + 2);
+      string border = $"    +{segment}+{segment}+{segment}+";
+
+      string header =
+        $"| {"Category".PadRight(width)} | {"Name".PadRight(width)} | {"Price".PadRight(width)} |";
+      Console.WriteLine(border);
+      Console.WriteLine($"    {header}");
+      Console.WriteLine(border);
+
+      for (int i = 0; i < products.Count; i++) {
+        Product product = products[i];
+        string price = $"{product.Price:0.##} kr";
+        string row =
+          $"| {product.Category.PadRight(width)} | {product.Name.PadRight(width)} | {price.PadRight(width)} |";
+
+        Console.WriteLine($"{i + 1,2}. {row}");
       }
 
+      Console.WriteLine(border);
       Console.WriteLine();
     }
 
@@ -248,11 +263,7 @@ namespace App.src {
         if (term == string.Empty) {
           Support.WriteLineRed("Empty search query, list all.");
           Console.WriteLine();
-
-          for (int i = 0; i < result.Products.Count; i++) {
-            Support.WriteLineYellow(entries[i].GetListItemString());
-          }
-
+          DisplayItemListAsync(entries);
           Console.WriteLine();
 
           continue;
@@ -260,11 +271,7 @@ namespace App.src {
 
         if (ProductInput.TryField(term, out string _)) {
           Console.WriteLine();
-
-          for (int i = 0; i < entries.Count; i++) {
-            Support.WriteLineGreen(entries[i].GetListItemString());
-          }
-
+          DisplayItemListAsync(entries);
           Console.WriteLine();
 
           continue;
