@@ -4,7 +4,10 @@ namespace App.src {
   internal sealed class Actions {
     private readonly ProductManager _m;
 
-    internal static void DisplayItemListAsync(List<Product> products) {
+    internal static void DisplayItemListAsync(
+      List<Product> products,
+      bool highlightMatches = false
+    ) {
       const int width = 16;
       string segment = new('-', width + 2);
       string border = $"    +{segment}+{segment}+{segment}+";
@@ -21,7 +24,12 @@ namespace App.src {
         string row =
           $"| {product.Category.PadRight(width)} | {product.Name.PadRight(width)} | {price.PadRight(width)} |";
 
-        Console.WriteLine($"{i + 1,2}. {row}");
+        string numberedRow = $"{i + 1,2}. {row}";
+        if (highlightMatches) {
+          Support.WriteLineGreen(numberedRow);
+        } else {
+          Console.WriteLine(numberedRow);
+        }
       }
 
       Console.WriteLine(border);
@@ -271,7 +279,7 @@ namespace App.src {
 
         if (ProductInput.TryField(term, out string _)) {
           Console.WriteLine();
-          DisplayItemListAsync(entries);
+          DisplayItemListAsync(entries, highlightMatches: true);
           Console.WriteLine();
 
           continue;
