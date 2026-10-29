@@ -50,6 +50,7 @@ internal sealed class Main {
     Console.WriteLine("3. Update Product");
     Console.WriteLine("4. View Products");
     Console.WriteLine("5. Search Products");
+    Console.WriteLine("6. Statistics");
     Console.WriteLine();
     Console.WriteLine("".PadRight(pad, '-'));
 
@@ -103,6 +104,15 @@ internal sealed class Main {
         case "5": {
           Console.Clear();
           await _actions.SearchAsync();
+          Console.Clear();
+          DisplayInit();
+
+          break;
+        }
+
+        case "6": {
+          Console.Clear();
+          await _actions.StatisticsAsync();
           Console.Clear();
           DisplayInit();
 

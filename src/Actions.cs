@@ -284,5 +284,39 @@ namespace App.src {
 
       return;
     }
+
+    internal async Task StatisticsAsync() {
+      Console.WriteLine("Search Product");
+      Console.WriteLine("");
+
+      ProductListResult result = await _m.ProductListSorted();
+      List<Product> entries = result.Products;
+
+      if (entries.Count == 0) {
+        Console.WriteLine("No products available for statistics.");
+        return;
+      }
+
+      Product cheapest = entries[0];
+      Product mostExpensive = entries[^1];
+
+      Console.WriteLine(
+        $"Most expensive: {mostExpensive.Name} - {mostExpensive.Price:0.##} kr"
+      );
+      Console.WriteLine($"Cheapest: {cheapest.Name} - {cheapest.Price:0.##} kr"
+      );
+      decimal average = result.Total / entries.Count;
+      Console.WriteLine($"Average price: {average:0.##} kr");
+
+      Console.WriteLine("Products per category:");
+      foreach (IGrouping<string, Product>? group in entries
+                 .GroupBy(static p => p.Category)
+                 .OrderBy(static g => g.Key)) {
+        Console.WriteLine($"{group.Key}: {group.Count()}");
+      }
+      Console.WriteLine();
+      Console.WriteLine("Press any key to return.");
+      Support.HoldPressAnyKey();
+    }
   }
 }
