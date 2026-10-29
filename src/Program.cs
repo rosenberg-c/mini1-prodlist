@@ -43,12 +43,13 @@ internal sealed class Main {
     Console.WriteLine("".PadRight(pad, '-'));
     Console.WriteLine("PRODUCT INVENTORY SYSTEM");
     Console.WriteLine("".PadRight(pad, '-'));
-    Console.WriteLine("Enter q to exit");
+    Console.WriteLine("Enter q to exit/back");
     Console.WriteLine();
     Console.WriteLine("1. Add Product");
     Console.WriteLine("2. Delete Product");
-    Console.WriteLine("3. View Products");
-    Console.WriteLine("4. Search Products");
+    Console.WriteLine("3. Update Product");
+    Console.WriteLine("4. View Products");
+    Console.WriteLine("5. Search Products");
     Console.WriteLine();
     Console.WriteLine("".PadRight(pad, '-'));
 
@@ -70,6 +71,7 @@ internal sealed class Main {
         }
 
         case "1": {
+          Console.Clear();
           if (await _actions.AddAsync() == MenuResult.Exit) {
             return;
           }
@@ -79,6 +81,7 @@ internal sealed class Main {
           break;
         }
         case "2":
+          Console.Clear();
           if (await _actions.DeleteAsync() == MenuResult.Exit) {
             return;
           }
@@ -88,12 +91,25 @@ internal sealed class Main {
           break;
 
         case "3": {
-          await _actions.ViewAsync();
+          Console.Clear();
+          _ = await _actions.EditAsync();
+          Console.Clear();
+          DisplayInit();
+
           break;
         }
 
         case "4": {
+          await _actions.ViewAsync();
+          break;
+        }
+
+        case "5": {
+          Console.Clear();
           _ = await _actions.SearchAsync();
+          Console.Clear();
+          DisplayInit();
+
           break;
         }
 

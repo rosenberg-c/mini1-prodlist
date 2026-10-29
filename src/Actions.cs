@@ -18,6 +18,57 @@ namespace App.src {
       Console.WriteLine();
     }
 
+    private static bool TryReadName(out string name) {
+      name = string.Empty;
+
+      while (true) {
+        string? text = Support.ReadString("Enter Name: ");
+        if (Support.IsExitOrNull(text)) {
+          return false;
+        }
+
+        if (ProductInput.TryField(text, out name)) {
+          return true;
+        }
+
+        Support.WriteLineRed("ERROR: Name cannot be empty.");
+      }
+    }
+
+    private static bool TryReadCategory(out string category) {
+      category = string.Empty;
+
+      while (true) {
+        string? text = Support.ReadString("Enter Category: ");
+        if (Support.IsExitOrNull(text)) {
+          return false;
+        }
+
+        if (ProductInput.TryField(text, out category)) {
+          return true;
+        }
+
+        Support.WriteLineRed("ERROR: Category cannot be empty.");
+      }
+    }
+
+    private static bool TryReadPrice(out decimal price) {
+      price = 0m;
+
+      while (true) {
+        string? text = Support.ReadString("Enter Price: ");
+        if (Support.IsExitOrNull(text)) {
+          return false;
+        }
+
+        if (ProductInput.TryPrice(text, out price, out string e)) {
+          return true;
+        }
+
+        Support.WriteLineRed($"ERROR: {e}");
+      }
+    }
+
     internal Actions(
       ProductManager manager
     ) {
@@ -25,51 +76,116 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> AddAsync() {
+      Console.WriteLine("Add product");
+      Console.WriteLine();
       while (true) {
-        string category;
-        while (true) {
-          string? text = Support.ReadString("Enter Category: ");
-          if (Support.IsExitOrNull(text)) {
-            return MenuResult.Continue;
-          }
-
-          if (ProductInput.TryField(text, out category)) {
-            break;
-          }
-
-          Support.WriteLineRed("ERROR: Category cannot be empty.");
+        if (!TryReadCategory(out string category)) {
+          return MenuResult.Continue;
         }
 
-        string name;
-        while (true) {
-          string? text = Support.ReadString("Enter Product Name: ");
-          if (Support.IsExitOrNull(text)) {
-            return MenuResult.Continue;
-          }
-
-          if (ProductInput.TryField(text, out name)) {
-            break;
-          }
-
-          Support.WriteLineRed("ERROR: Product name cannot be empty.");
+        if (!TryReadName(out string name)) {
+          return MenuResult.Continue;
         }
 
-        decimal price;
-        while (true) {
-          string? text = Support.ReadString("Enter price: ");
-          if (Support.IsExitOrNull(text)) {
-            return MenuResult.Continue;
-          }
-
-          if (ProductInput.TryPrice(text, out price, out string error)) {
-            break;
-          }
-
-          Support.WriteLineRed($"ERROR: {error}");
+        if (!TryReadPrice(out decimal price)) {
+          return MenuResult.Continue;
         }
 
         _ = await _m.CreateAsync(category, name, price);
         Support.WriteLineGreen("Product added successfully!");
+      }
+    }
+
+    internal static void DisplayInit() {
+      Console.WriteLine();
+      Console.WriteLine("|-- EDIT --");
+      Console.WriteLine("| 1. Category");
+      Console.WriteLine("| 2. Name");
+      Console.WriteLine("| 3. Price");
+      Console.WriteLine("|----------");
+      Console.WriteLine();
+    }
+
+    internal static void DisplayUpdated(bool updated) {
+      if (updated) {
+        Support.WriteLineGreen("Product updated successfully.");
+      } else {
+        Support.WriteLineYellow("Product not found.");
+      }
+    }
+
+    internal async Task<MenuResult> EditAsync() {
+      Console.WriteLine("Update Product");
+      Console.WriteLine("");
+
+      while (true) {
+        ProductListResult result = await _m.ProductListSorted();
+        List<Product> entries = result.Products;
+
+        DisplayItemListAsync(result.Products);
+
+        if (entries.Count == 0) {
+          Support.WriteLineYellow("No products to edit.");
+          Console.Write("Press any key to continue...");
+          Support.HoldPressAnyKey();
+          return MenuResult.Continue;
+        }
+
+        string? intStr = Support.ReadString("Enter product to edit: ");
+        if (Support.IsExitOrNull(intStr)) {
+          return MenuResult.Continue;
+        }
+
+        if (!int.TryParse(intStr, out int idx) || idx < 1 ||
+            idx > entries.Count) {
+          Support.WriteLineYellow("Invalid product number.");
+          continue;
+        }
+
+        Product old = entries[idx - 1];
+
+        while (true) {
+          DisplayInit();
+          string? choice = Support.ReadString("Select option: ");
+          if (Support.IsExitOrNull(choice)) {
+            return MenuResult.Continue;
+          }
+
+          Product updated;
+          switch (choice) {
+            case "1":
+              if (!TryReadCategory(out string category)) {
+                return MenuResult.Continue;
+              }
+
+              updated = old.WithCategory(category);
+              break;
+
+            case "2":
+              if (!TryReadName(out string name)) {
+                return MenuResult.Continue;
+              }
+
+              updated = old.WithName(name);
+              break;
+
+            case "3":
+              if (!TryReadPrice(out decimal price)) {
+                return MenuResult.Continue;
+              }
+
+              updated = old.WithPrice(price);
+              break;
+
+            default:
+              Support.WriteLineYellow("Invalid option. Please try again.");
+              continue;
+          }
+
+          bool saved = await _m.UpdateAsync(old.Id, updated);
+          DisplayUpdated(saved);
+          break;
+        }
       }
     }
 
@@ -86,6 +202,9 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> DeleteAsync() {
+      Console.WriteLine("Delete Product");
+      Console.WriteLine("");
+
       while (true) {
         ProductListResult result = await _m.ProductListSorted();
         List<Product> entries = result.Products;
@@ -122,6 +241,9 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> SearchAsync() {
+      Console.WriteLine("Search Product");
+      Console.WriteLine("");
+
       while (true) {
         string? term = Support.ReadString("Search category or name: ");
         if (Support.IsExitOrNull(term)) {

@@ -41,6 +41,10 @@ internal class ProductManager {
     return _store.DeleteAsync(id);
   }
 
+  internal Task<bool> UpdateAsync(Guid id, Product product) {
+    return _store.UpdateAsync(id, product);
+  }
+
   internal static List<Product> SortForDisplay(IEnumerable<Product> products) {
     return products.OrderBy(static p => p.Price)
       .ThenBy(static p => p.Category, StringComparer.OrdinalIgnoreCase)

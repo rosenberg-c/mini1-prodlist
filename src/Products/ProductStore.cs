@@ -18,6 +18,10 @@ namespace App.src.Products {
       return _storage.DeleteAsync(id);
     }
 
+    internal Task<bool> UpdateAsync(Guid id, Product product) {
+      return _storage.UpdateAsync(id, old => product.Copy());
+    }
+
     internal async Task<Product> CreateAsync(
       string category,
       string name,
