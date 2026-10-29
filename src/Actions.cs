@@ -71,8 +71,6 @@ namespace App.src {
     }
 
     internal async Task AddAsync() {
-      Console.WriteLine("Add product");
-      Console.WriteLine();
       while (true) {
         if (!TryReadCategory(out string category)) {
           return;
@@ -110,9 +108,6 @@ namespace App.src {
     }
 
     internal async Task EditAsync() {
-      Console.WriteLine("Update Product");
-      Console.WriteLine("");
-
       while (true) {
         ProductListResult result = await _m.ProductListSorted();
         List<Product> entries = result.Products;
@@ -197,9 +192,6 @@ namespace App.src {
     }
 
     internal async Task DeleteAsync() {
-      Console.WriteLine("Delete Product");
-      Console.WriteLine("");
-
       while (true) {
         ProductListResult result = await _m.ProductListSorted();
         List<Product> entries = result.Products;
@@ -236,9 +228,6 @@ namespace App.src {
     }
 
     internal async Task SearchAsync() {
-      Console.WriteLine("Search Product");
-      Console.WriteLine("");
-
       while (true) {
         string? term = Support.ReadString("Search category or name: ");
         if (Support.IsExitOrNull(term)) {
@@ -286,9 +275,6 @@ namespace App.src {
     }
 
     internal async Task StatisticsAsync() {
-      Console.WriteLine("Search Product");
-      Console.WriteLine("");
-
       ProductListResult result = await _m.ProductListSorted();
       List<Product> entries = result.Products;
 
@@ -314,9 +300,6 @@ namespace App.src {
                  .OrderBy(static g => g.Key)) {
         Console.WriteLine($"{group.Key}: {group.Count()}");
       }
-      Console.WriteLine();
-      Console.WriteLine("Press any key to return.");
-      Support.HoldPressAnyKey();
     }
   }
 }

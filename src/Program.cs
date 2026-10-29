@@ -38,11 +38,21 @@ internal sealed class Main {
     _actions = new Actions(manager);
   }
 
-  internal static void DisplayInit() {
+  internal static void Header(string header) {
+    int pad = 40;
+    Console.Clear();
+    Console.WriteLine("".PadRight(pad, '-'));
+    Console.WriteLine(header);
+    Console.WriteLine("".PadRight(pad, '-'));
+  }
+
+  internal static void Footer() {
     int pad = 40;
     Console.WriteLine("".PadRight(pad, '-'));
-    Console.WriteLine("PRODUCT INVENTORY SYSTEM");
-    Console.WriteLine("".PadRight(pad, '-'));
+  }
+
+  internal static void DisplayInit() {
+    Header("PRODUCT INVENTORY SYSTEM");
     Console.WriteLine("Enter q to exit/back");
     Console.WriteLine();
     Console.WriteLine("1. Add Product");
@@ -52,8 +62,7 @@ internal sealed class Main {
     Console.WriteLine("5. Search Products");
     Console.WriteLine("6. Statistics");
     Console.WriteLine();
-    Console.WriteLine("".PadRight(pad, '-'));
-
+    Footer();
   }
 
   internal async Task RunAsync() {
@@ -72,48 +81,52 @@ internal sealed class Main {
         }
 
         case "1": {
-          Console.Clear();
+          Header("Add product");
           await _actions.AddAsync();
-          Console.Clear();
           DisplayInit();
 
           break;
         }
         case "2":
-          Console.Clear();
+          Header("Delete product");
           await _actions.DeleteAsync();
-          Console.Clear();
           DisplayInit();
 
           break;
 
         case "3": {
-          Console.Clear();
+          Header("Edit product");
           await _actions.EditAsync();
-          Console.Clear();
           DisplayInit();
 
           break;
         }
 
         case "4": {
+          Header("View");
           await _actions.ViewAsync();
+          Footer();
+          Console.WriteLine("Press any key to return.");
+          Support.HoldPressAnyKey();
+
+          DisplayInit();
           break;
         }
 
         case "5": {
-          Console.Clear();
+          Header("Search product");
           await _actions.SearchAsync();
-          Console.Clear();
           DisplayInit();
 
           break;
         }
 
         case "6": {
-          Console.Clear();
+          Header("Statistics");
           await _actions.StatisticsAsync();
-          Console.Clear();
+          Footer();
+          Console.WriteLine("Press any key to return.");
+          Support.HoldPressAnyKey();
           DisplayInit();
 
           break;
