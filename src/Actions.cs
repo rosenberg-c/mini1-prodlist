@@ -9,6 +9,15 @@ namespace App.src {
   internal sealed class Actions {
     private readonly ProductManager _m;
 
+    internal static void DisplayItemListAsync(List<Product> p) {
+      for (int i = 0; i < p.Count; i++) {
+        Console.Write($"{i + 1,2}. ");
+        Console.WriteLine(p[i].GetListItemString());
+      }
+
+      Console.WriteLine();
+    }
+
     internal Actions(
       ProductManager manager
     ) {
@@ -62,15 +71,6 @@ namespace App.src {
         _ = await _m.CreateAsync(category, name, price);
         Support.WriteLineGreen("Product added successfully!");
       }
-    }
-
-    internal static void DisplayItemListAsync(List<Product> p) {
-      for (int i = 0; i < p.Count; i++) {
-        Console.Write($"{i + 1,2}. ");
-        Console.WriteLine(p[i].GetListItemString());
-      }
-
-      Console.WriteLine();
     }
 
     internal async Task ViewAsync() {
