@@ -16,51 +16,53 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> AddAsync() {
-      string category;
       while (true) {
-        string? text = Support.ReadString("Enter Category: ");
-        if (Support.IsExitOrNull(text)) {
-          return MenuResult.Continue;
+        string category;
+        while (true) {
+          string? text = Support.ReadString("Enter Category: ");
+          if (Support.IsExitOrNull(text)) {
+            return MenuResult.Continue;
+          }
+
+          if (ProductInput.TryField(text, out category)) {
+            break;
+          }
+
+          Support.WriteLineRed("ERROR: Category cannot be empty.");
         }
 
-        if (ProductInput.TryField(text, out category)) {
-          break;
+        string name;
+        while (true) {
+          string? text = Support.ReadString("Enter Product Name: ");
+          if (Support.IsExitOrNull(text)) {
+            return MenuResult.Continue;
+          }
+
+          if (ProductInput.TryField(text, out name)) {
+            break;
+          }
+
+          Support.WriteLineRed("ERROR: Product name cannot be empty.");
         }
 
-        Support.WriteLineRed("ERROR: Category cannot be empty.");
+        decimal price;
+        while (true) {
+          string? text = Support.ReadString("Enter price: ");
+          if (Support.IsExitOrNull(text)) {
+            return MenuResult.Continue;
+          }
+
+          if (ProductInput.TryPrice(text, out price, out string error)) {
+            break;
+          }
+
+          Support.WriteLineRed($"ERROR: {error}");
+        }
+
+        _ = await _m.CreateAsync(category, name, price);
+        Support.WriteLineGreen("Product added successfully!");
+        //return MenuResult.Continue;
       }
-
-      string name;
-      while (true) {
-        string? text = Support.ReadString("Enter Product Name: ");
-        if (Support.IsExitOrNull(text)) {
-          return MenuResult.Continue;
-        }
-
-        if (ProductInput.TryField(text, out name)) {
-          break;
-        }
-
-        Support.WriteLineRed("ERROR: Product name cannot be empty.");
-      }
-
-      decimal price;
-      while (true) {
-        string? text = Support.ReadString("Enter price: ");
-        if (Support.IsExitOrNull(text)) {
-          return MenuResult.Continue;
-        }
-
-        if (ProductInput.TryPrice(text, out price, out string error)) {
-          break;
-        }
-
-        Support.WriteLineRed($"ERROR: {error}");
-      }
-
-      _ = await _m.CreateAsync(category, name, price);
-      Support.WriteLineGreen("Product added successfully!");
-      return MenuResult.Continue;
     }
 
     internal static void DisplayItemListAsync(List<Product> p) {
@@ -85,35 +87,57 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> DeleteAsync() {
-      ProductListResult result = await _m.ProductListSorted();
-      List<Product> entries = result.Products;
+      while (true) {
+        ProductListResult result = await _m.ProductListSorted();
+        List<Product> entries = result.Products;
 
-      DisplayItemListAsync(result.Products);
+        DisplayItemListAsync(result.Products);
 
-      if (entries.Count == 0) {
-        Support.WriteLineYellow("No products to delete.");
-        return MenuResult.Continue;
+        if (entries.Count == 0) {
+          Support.WriteLineYellow("No products to delete.");
+          Console.Write("Press any key to continue...");
+          Support.HoldPressAnyKey();
+          return MenuResult.Continue;
+        }
+
+        string? intStr = Support.ReadString("Enter product to delete: ");
+        if (Support.IsExitOrNull(intStr)) {
+          return MenuResult.Continue;
+        }
+
+        if (!int.TryParse(intStr, out int idx) || idx < 1 ||
+            idx > entries.Count) {
+          Support.WriteLineYellow("Invalid product number.");
+          continue;
+        }
+
+        Guid id = entries[idx - 1].Id;
+        bool deleted = await _m.DeleteAsync(id);
+
+        if (deleted) {
+          Support.WriteLineGreen("Product removed successfully.");
+        } else {
+          Support.WriteLineYellow("Product not found.");
+        }
       }
+    }
 
-      string? intStr = Support.ReadString("Enter product to delete: ");
+    ////
 
-      if (Support.IsExitOrNull(intStr)) {
-        return MenuResult.Continue;
-      }
+    internal async Task<MenuResult> SearchAsync() {
+      string query;
+      while (true) {
+        string? text = Support.ReadString("Search for category or name: ");
+        if (Support.IsExitOrNull(text)) {
+          return MenuResult.Continue;
+        }
 
-      if (!int.TryParse(intStr, out int idx) || idx < 1 ||
-          idx > entries.Count) {
-        Support.WriteLineYellow("Invalid product number.");
-        return MenuResult.Continue;
-      }
+        if (ProductInput.TryField(text, out query)) {
+          Support.WriteLineYellow($"You search for: {query}");
+          break;
+        }
 
-      Guid id = entries[idx - 1].Id;
-      bool deleted = await _m.DeleteAsync(id);
-
-      if (deleted) {
-        Support.WriteLineGreen("Product removed successfully.");
-      } else {
-        Support.WriteLineYellow("Product not found.");
+        Support.WriteLineRed("ERROR: Category cannot be empty.");
       }
 
       return MenuResult.Continue;

@@ -17,7 +17,7 @@ namespace App.tests.Tests {
     [Fact]
     public async Task Menu_AddViewAndDeleteByIndex_PersistAcrossRuns() {
       string first = await RunAsync(
-        "1\nElectronics\nMouse\n299.50\n1\nOffice\nMouse\n120\n3\nq\n"
+        "1\nElectronics\nMouse\n299.50\nOffice\nMouse\n120\nq\n3\nq\n"
       );
       Assert.Equal(2, first.Split("Product added successfully!").Length - 1);
       Assert.Contains(" 1. Office", first);
@@ -34,7 +34,7 @@ namespace App.tests.Tests {
       Assert.Equal("Mouse", saved[1].Name);
       Assert.NotEqual(saved[0].Id, saved[1].Id);
 
-      string second = await RunAsync("2\n2\n3\nq\n");
+      string second = await RunAsync("2\n2\nq\n3\nq\n");
       Assert.Contains("Product removed successfully.", second);
       Assert.Contains(" 1. Office", second);
       Assert.Contains(" 2. Electronics", second);
@@ -96,7 +96,7 @@ namespace App.tests.Tests {
     [Fact]
     public async Task Menu_ZeroAndFractionalPrices_DisplayAndPersist() {
       string output = await RunAsync(
-        "1\nFood\nSample\n0\n3\n1\nOffice\nPen\n299.50\n3\nq\n"
+        "1\nFood\nSample\n0\nq\n3\n1\nOffice\nPen\n299.50\nq\n3\nq\n"
       );
 
       Assert.Contains("TOTAL PRICE: 0 kr", output);
@@ -111,7 +111,7 @@ namespace App.tests.Tests {
     [Fact]
     public async Task Menu_AfterViewing_CanAddAgainAndViewUpdatedTotal() {
       string output = await RunAsync(
-        "1\nFood\nPizza\n120\n3\n1\nOffice\nPen\n1.25\n3\nq\n"
+        "1\nFood\nPizza\n120\nq\n3\n1\nOffice\nPen\n1.25\nq\n3\nq\n"
       );
 
       Assert.Equal(2, output.Split("Product added successfully!").Length - 1);
@@ -127,7 +127,7 @@ namespace App.tests.Tests {
     public async Task Menu_OverflowingTotal_ReportsErrorAndKeepsProducts() {
       string maximum = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
       string output = await RunAsync(
-        $"1\nFood\nFirst\n{maximum}\n1\nFood\nSecond\n{maximum}\n3\nq\n"
+        $"1\nFood\nFirst\n{maximum}\nFood\nSecond\n{maximum}\nq\n3\nq\n"
       );
 
       Assert.Contains("ERROR: Total price is too large.", output);
@@ -141,7 +141,7 @@ namespace App.tests.Tests {
     [Fact]
     public async Task Menu_BadOptionAndInvalidIndexes_KeepProducts() {
       string output = await RunAsync(
-        "9\n1\nFood\nPizza\n120\n2\nabc\n2\n0\n2\n-1\n2\n2\n3\nq\n"
+        "9\n1\nFood\nPizza\n120\nq\n2\nabc\n0\n-1\n2\nq\n3\nq\n"
       );
 
       Assert.Contains("Invalid option. Please try again.", output);
@@ -151,13 +151,50 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task Menu_EmptyViewAndDelete_ThenQuitWithoutWriting() {
-      string output = await RunAsync("3\n2\nq\n");
+    public async Task Menu_DeleteSeveral_RedisplaysRemainingNumbersAndReturnsOnQ() {
+      string output = await RunAsync(
+        "1\nFood\nPizza\n120\nOffice\nPen\n1.25\nElectronics\nMouse\n299\nq\n2\n2\n1\nq\n3\nq\n"
+      );
 
-      Assert.Contains("TOTAL PRICE: 0 kr", output);
+      Assert.Equal(2, output.Split("Product removed successfully.").Length - 1);
+      Assert.Contains(" 2. Food", output);
+      Assert.Contains(" 1. Office", output);
+      Assert.Contains("TOTAL PRICE: 299 kr", output);
+      Product remaining = Assert.Single(await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      ));
+      Assert.Equal("Mouse", remaining.Name);
+    }
+
+    [Fact]
+    public async Task Menu_DeletePromptEof_ReturnsToMenuWithoutRemovingProduct() {
+      string output = await RunAsync("1\nFood\nPizza\n120\nq\n2\n");
+
+      Assert.Contains("Application closed.", output);
+      Assert.DoesNotContain("Product removed successfully.", output);
+      Assert.Single(await ReadProductsAsync(Path.Combine(_dir, "products.json")));
+    }
+
+    [Fact]
+    public async Task Menu_EmptyViewAndDelete_PausesBeforeReturningToMenu() {
+      string output = await RunAsync("3\n2\nx\n3\nq\n");
+
+      Assert.Equal(2, output.Split("TOTAL PRICE: 0 kr").Length - 1);
       Assert.Contains("No products to delete.", output);
+      Assert.Contains("Press any key to continue...", output);
       Assert.Contains("Application closed.", output);
       Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
+    }
+
+    [Fact]
+    public async Task Menu_AfterDeletingLastProduct_PausesBeforeReturningToMenu() {
+      string output = await RunAsync("1\nFood\nPizza\n120\nq\n2\n1\nx\n3\nq\n");
+
+      Assert.Contains("Product removed successfully.", output);
+      Assert.Contains("No products to delete.", output);
+      Assert.Contains("Press any key to continue...", output);
+      Assert.Contains("TOTAL PRICE: 0 kr", output);
+      Assert.Empty(await ReadProductsAsync(Path.Combine(_dir, "products.json")));
     }
 
     [Fact]

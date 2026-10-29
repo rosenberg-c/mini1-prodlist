@@ -19,6 +19,14 @@ namespace App.src {
       return Console.ReadLine()?.Trim();
     }
 
+    public static void HoldPressAnyKey() {
+      if (Console.IsInputRedirected) {
+        _ = Console.ReadLine();
+      } else {
+        _ = Console.ReadKey(intercept: true);
+      }
+    }
+
     public static void WriteLineGreen(string prompt) {
       Console.ForegroundColor = ConsoleColor.Green;
       Console.WriteLine(prompt);

@@ -58,4 +58,7 @@ internal class ProductManager {
     List<Product> sorted = SortForDisplay(products);
     return new ProductListResult(sorted, CalculateTotal(sorted));
   }
+  internal async Task<string> SearchAsync() {
+    return "Hello";
+  }
 }

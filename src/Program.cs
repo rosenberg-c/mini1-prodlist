@@ -69,6 +69,8 @@ internal sealed class Main {
           if (await _actions.AddAsync() == MenuResult.Exit) {
             return;
           }
+          Console.Clear();
+          DisplayInit();
 
           break;
         }
@@ -76,6 +78,8 @@ internal sealed class Main {
           if (await _actions.DeleteAsync() == MenuResult.Exit) {
             return;
           }
+          Console.Clear();
+          DisplayInit();
 
           break;
 
