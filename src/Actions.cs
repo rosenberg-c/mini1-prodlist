@@ -1,11 +1,6 @@
 using Product = App.src.Products.Product;
 
 namespace App.src {
-  internal enum MenuResult {
-    Continue,
-    Exit
-  }
-
   internal sealed class Actions {
     private readonly ProductManager _m;
 
@@ -75,20 +70,20 @@ namespace App.src {
       _m = manager;
     }
 
-    internal async Task<MenuResult> AddAsync() {
+    internal async Task AddAsync() {
       Console.WriteLine("Add product");
       Console.WriteLine();
       while (true) {
         if (!TryReadCategory(out string category)) {
-          return MenuResult.Continue;
+          return;
         }
 
         if (!TryReadName(out string name)) {
-          return MenuResult.Continue;
+          return;
         }
 
         if (!TryReadPrice(out decimal price)) {
-          return MenuResult.Continue;
+          return;
         }
 
         _ = await _m.CreateAsync(category, name, price);
@@ -114,7 +109,7 @@ namespace App.src {
       }
     }
 
-    internal async Task<MenuResult> EditAsync() {
+    internal async Task EditAsync() {
       Console.WriteLine("Update Product");
       Console.WriteLine("");
 
@@ -128,12 +123,12 @@ namespace App.src {
           Support.WriteLineYellow("No products to edit.");
           Console.Write("Press any key to continue...");
           Support.HoldPressAnyKey();
-          return MenuResult.Continue;
+          return;
         }
 
         string? intStr = Support.ReadString("Enter product to edit: ");
         if (Support.IsExitOrNull(intStr)) {
-          return MenuResult.Continue;
+          return;
         }
 
         if (!int.TryParse(intStr, out int idx) || idx < 1 ||
@@ -148,14 +143,14 @@ namespace App.src {
           DisplayInit();
           string? choice = Support.ReadString("Select option: ");
           if (Support.IsExitOrNull(choice)) {
-            return MenuResult.Continue;
+            return;
           }
 
           Product updated;
           switch (choice) {
             case "1":
               if (!TryReadCategory(out string category)) {
-                return MenuResult.Continue;
+                return;
               }
 
               updated = old.WithCategory(category);
@@ -163,7 +158,7 @@ namespace App.src {
 
             case "2":
               if (!TryReadName(out string name)) {
-                return MenuResult.Continue;
+                return;
               }
 
               updated = old.WithName(name);
@@ -171,7 +166,7 @@ namespace App.src {
 
             case "3":
               if (!TryReadPrice(out decimal price)) {
-                return MenuResult.Continue;
+                return;
               }
 
               updated = old.WithPrice(price);
@@ -201,7 +196,7 @@ namespace App.src {
       }
     }
 
-    internal async Task<MenuResult> DeleteAsync() {
+    internal async Task DeleteAsync() {
       Console.WriteLine("Delete Product");
       Console.WriteLine("");
 
@@ -215,12 +210,12 @@ namespace App.src {
           Support.WriteLineYellow("No products to delete.");
           Console.Write("Press any key to continue...");
           Support.HoldPressAnyKey();
-          return MenuResult.Continue;
+          return;
         }
 
         string? intStr = Support.ReadString("Enter product to delete: ");
         if (Support.IsExitOrNull(intStr)) {
-          return MenuResult.Continue;
+          return;
         }
 
         if (!int.TryParse(intStr, out int idx) || idx < 1 ||
@@ -240,7 +235,7 @@ namespace App.src {
       }
     }
 
-    internal async Task<MenuResult> SearchAsync() {
+    internal async Task SearchAsync() {
       Console.WriteLine("Search Product");
       Console.WriteLine("");
 
@@ -287,7 +282,7 @@ namespace App.src {
         }
       }
 
-      return MenuResult.Continue;
+      return;
     }
   }
 }

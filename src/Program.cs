@@ -72,9 +72,7 @@ internal sealed class Main {
 
         case "1": {
           Console.Clear();
-          if (await _actions.AddAsync() == MenuResult.Exit) {
-            return;
-          }
+          await _actions.AddAsync();
           Console.Clear();
           DisplayInit();
 
@@ -82,9 +80,7 @@ internal sealed class Main {
         }
         case "2":
           Console.Clear();
-          if (await _actions.DeleteAsync() == MenuResult.Exit) {
-            return;
-          }
+          await _actions.DeleteAsync();
           Console.Clear();
           DisplayInit();
 
@@ -92,7 +88,7 @@ internal sealed class Main {
 
         case "3": {
           Console.Clear();
-          _ = await _actions.EditAsync();
+          await _actions.EditAsync();
           Console.Clear();
           DisplayInit();
 
@@ -106,7 +102,7 @@ internal sealed class Main {
 
         case "5": {
           Console.Clear();
-          _ = await _actions.SearchAsync();
+          await _actions.SearchAsync();
           Console.Clear();
           DisplayInit();
 
