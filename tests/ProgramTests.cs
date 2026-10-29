@@ -198,6 +198,41 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task Menu_SearchByNameAndCategory_IsCaseInsensitiveAndLeavesProductsUnchanged() {
+      string output = await RunAsync(
+        "1\nElectronics\nMouse\n299\nFood\nMousepad\n120\nElectronics\nKeyboard\n30\nq\n4\nmOuSe\nELECTRONICS\nq\nq\n"
+      );
+      string[] searches = output.Split("Search category or name: ");
+
+      Assert.True(searches.Length >= 3);
+      Assert.Matches(@"Electronics\s+\|\s+Mouse\s+\|\s+299 kr", searches[1]);
+      Assert.Matches(@"Food\s+\|\s+Mousepad\s+\|\s+120 kr", searches[1]);
+      Assert.DoesNotContain("Keyboard", searches[1]);
+      Assert.Matches(@"Electronics\s+\|\s+Mouse\s+\|\s+299 kr", searches[2]);
+      Assert.Matches(@"Electronics\s+\|\s+Keyboard\s+\|\s+30 kr", searches[2]);
+      Assert.DoesNotContain("Mousepad", searches[2]);
+      Assert.Equal(3, (await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      )).Count);
+    }
+
+    [Fact]
+    public async Task Menu_SearchNoMatchesThenEmptyQuery_ListsAllProducts() {
+      string output = await RunAsync(
+        "1\nFood\nPizza\n120\nOffice\nPen\n1.25\nq\n4\nmissing\n\nq\nq\n"
+      );
+      string[] searches = output.Split("Search category or name: ");
+
+      Assert.True(searches.Length >= 3);
+      Assert.Contains("No products found.", searches[1]);
+      Assert.DoesNotContain("Pizza", searches[1]);
+      Assert.Contains("Empty search query, list all.", searches[2]);
+      Assert.Matches(@"Office\s+\|\s+Pen\s+\|\s+1.25 kr", searches[2]);
+      Assert.Matches(@"Food\s+\|\s+Pizza\s+\|\s+120 kr", searches[2]);
+      Assert.Contains("Application closed.", output);
+    }
+
+    [Fact]
     public async Task Startup_RejectsIncompatibleSchemaWithoutChangingFile() {
       string path = Path.Combine(_dir, "products.json");
       const string legacyJson = "{\"schemaVersion\":3,\"data\":[]}";

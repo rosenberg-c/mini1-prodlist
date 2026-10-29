@@ -61,7 +61,6 @@ namespace App.src {
 
         _ = await _m.CreateAsync(category, name, price);
         Support.WriteLineGreen("Product added successfully!");
-        //return MenuResult.Continue;
       }
     }
 
@@ -122,22 +121,48 @@ namespace App.src {
       }
     }
 
-    ////
-
     internal async Task<MenuResult> SearchAsync() {
-      string query;
       while (true) {
-        string? text = Support.ReadString("Search for category or name: ");
-        if (Support.IsExitOrNull(text)) {
-          return MenuResult.Continue;
-        }
-
-        if (ProductInput.TryField(text, out query)) {
-          Support.WriteLineYellow($"You search for: {query}");
+        string? term = Support.ReadString("Search category or name: ");
+        if (Support.IsExitOrNull(term)) {
           break;
         }
 
-        Support.WriteLineRed("ERROR: Category cannot be empty.");
+        ProductListResult result = await _m.ProductListSorted();
+        var entries = result.Products.Where(p =>
+          p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+          p.Category.Contains(term, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+
+        if (entries.Count == 0) {
+          Support.WriteLineYellow("No products found.");
+          continue;
+        }
+
+        if (term == string.Empty) {
+          Support.WriteLineRed("Empty search query, list all.");
+          Console.WriteLine();
+
+          for (int i = 0; i < result.Products.Count; i++) {
+            Support.WriteLineYellow(entries[i].GetListItemString());
+          }
+
+          Console.WriteLine();
+
+          continue;
+        }
+
+        if (ProductInput.TryField(term, out string _)) {
+          Console.WriteLine();
+
+          for (int i = 0; i < entries.Count; i++) {
+            Support.WriteLineGreen(entries[i].GetListItemString());
+          }
+
+          Console.WriteLine();
+
+          continue;
+        }
       }
 
       return MenuResult.Continue;

@@ -39,15 +39,19 @@ internal sealed class Main {
   }
 
   internal static void DisplayInit() {
-    Console.WriteLine("----------------------------------------");
+    int pad = 40;
+    Console.WriteLine("".PadRight(pad, '-'));
     Console.WriteLine("PRODUCT INVENTORY SYSTEM");
-    Console.WriteLine("----------------------------------------");
+    Console.WriteLine("".PadRight(pad, '-'));
     Console.WriteLine("Enter q to exit");
     Console.WriteLine();
     Console.WriteLine("1. Add Product");
     Console.WriteLine("2. Delete Product");
     Console.WriteLine("3. View Products");
+    Console.WriteLine("4. Search Products");
     Console.WriteLine();
+    Console.WriteLine("".PadRight(pad, '-'));
+
   }
 
   internal async Task RunAsync() {
@@ -85,6 +89,11 @@ internal sealed class Main {
 
         case "3": {
           await _actions.ViewAsync();
+          break;
+        }
+
+        case "4": {
+          _ = await _actions.SearchAsync();
           break;
         }
 
