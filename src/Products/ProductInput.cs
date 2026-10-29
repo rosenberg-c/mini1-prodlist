@@ -1,0 +1,25 @@
+using System.Globalization;
+
+internal class ProductInput {
+  internal static bool TryField(string? text, out string value) {
+    value = text?.Trim() ?? string.Empty;
+    return !string.IsNullOrWhiteSpace(value);
+  }
+
+  internal static bool TryPrice(string? text, out decimal price,
+    out string error) {
+    if (!decimal.TryParse(text,
+          NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+          CultureInfo.CurrentCulture, out price
+        )) {
+      error = "Invalid price. Please enter a numeric value.";
+      return false;
+    }
+    if (price < 0) {
+      error = "Price cannot be negative.";
+      return false;
+    }
+    error = string.Empty;
+    return true;
+  }
+}

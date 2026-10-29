@@ -55,6 +55,53 @@ namespace App.tests.Tests {
       Assert.Equal(0m, result.Total);
     }
 
+    [Theory]
+    [InlineData("", "Pizza", 1, "category")]
+    [InlineData("   ", "Pizza", 1, "category")]
+    [InlineData("Food", "", 1, "name")]
+    [InlineData("Food", "   ", 1, "name")]
+    [InlineData("Food", "Pizza", -1, "price")]
+    public void CreateAsync_RejectsInvalidFieldsBeforeWriting(
+      string category, string name, int price, string parameter
+    ) {
+      string path = Path.Combine(_dir, "products.json");
+      ProductManager manager = new(new ProductStore(path));
+
+      ArgumentException error = Assert.Throws<ArgumentException>(
+        () => { _ = manager.CreateAsync(category, name, price); }
+      );
+
+      Assert.Equal(parameter, error.ParamName);
+      Assert.False(File.Exists(path));
+    }
+
+    [Fact]
+    public async Task CreateAsync_TrimsFieldsAndAcceptsZeroAndFractionalPrices() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductManager manager = new(new ProductStore(path));
+
+      Product free = await manager.CreateAsync("  Food  ", "  Sample  ", 0m);
+      Product paid = await manager.CreateAsync("Office", "Pen", 1.25m);
+
+      Assert.Equal("Food", free.Category);
+      Assert.Equal("Sample", free.Name);
+      Assert.Equal(0m, free.Price);
+      Assert.Equal(1.25m, paid.Price);
+      Assert.Equal([free, paid], await new ProductStore(path).GetAllAsync());
+    }
+
+    [Fact]
+    public async Task ProductListSorted_OverflowDoesNotChangeStoredProducts() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      ProductManager manager = new(store);
+      await manager.CreateAsync("Food", "First", decimal.MaxValue);
+      await manager.CreateAsync("Food", "Second", decimal.MaxValue);
+
+      await Assert.ThrowsAsync<OverflowException>(() => manager.ProductListSorted());
+      Assert.Equal(2, (await store.GetAllAsync()).Count);
+    }
+
     private static Product Item(int id, string category, string name, decimal price) {
       return new Product(new Guid(id, 0, 0, new byte[8]), category, name, price);
     }

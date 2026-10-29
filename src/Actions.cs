@@ -16,25 +16,46 @@ namespace App.src {
     }
 
     internal async Task<MenuResult> AddAsync() {
-      string? category = Support.ReadString("Enter Category: ");
-      if (Support.IsEmptyOrNull(category)) {
-        return MenuResult.Continue;
+      string category;
+      while (true) {
+        string? text = Support.ReadString("Enter Category: ");
+        if (Support.IsExitOrNull(text)) {
+          return MenuResult.Exit;
+        }
+
+        if (ProductInput.TryField(text, out category)) {
+          break;
+        }
+
+        Console.WriteLine("ERROR: Category cannot be empty.");
       }
 
-      string? name = Support.ReadString("Enter Product Name: ");
-      if (Support.IsEmptyOrNull(name)) {
-        return MenuResult.Continue;
+      string name;
+      while (true) {
+        string? text = Support.ReadString("Enter Product Name: ");
+        if (Support.IsExitOrNull(text)) {
+          return MenuResult.Exit;
+        }
+
+        if (ProductInput.TryField(text, out name)) {
+          break;
+        }
+
+        Console.WriteLine("ERROR: Product name cannot be empty.");
       }
 
-      string? priceStr = Support.ReadString("Enter Price: ");
-      if (Support.IsEmptyOrNull(priceStr)) {
-        return MenuResult.Continue;
-      }
+      decimal price;
+      while (true) {
+        string? text = Support.ReadString("Enter price: ");
+        if (Support.IsExitOrNull(text)) {
+          return MenuResult.Exit;
+        }
 
-      if (category.Length == 0 || name.Length == 0 ||
-          !decimal.TryParse(priceStr, out decimal price) || price < 0m) {
-        Console.WriteLine("ERROR: Invalid product fields.");
-        return MenuResult.Continue;
+        if (ProductInput.TryPrice(text, out price, out string error)) {
+          break;
+        }
+
+        Console.WriteLine($"ERROR: {error}");
       }
 
       _ = await _m.CreateAsync(category, name, price);
@@ -47,15 +68,20 @@ namespace App.src {
         Console.Write($"{i + 1,2}. ");
         Console.WriteLine(p[i].GetListItemString());
       }
-      Console.WriteLine();
 
+      Console.WriteLine();
     }
 
     internal async Task ViewAsync() {
-      ProductListResult results = await _m.ProductListSorted();
+      try {
+        ProductListResult results = await _m.ProductListSorted();
 
-      ItemListAsync(results.Products);
-      Console.WriteLine($"TOTAL PRICE: {results.Total:0.##} kr");
+        ItemListAsync(results.Products);
+        Console.WriteLine($"TOTAL PRICE: {results.Total:0.##} kr");
+      }
+      catch (OverflowException) {
+        Console.WriteLine("ERROR: Total price is too large.");
+      }
     }
 
     internal async Task<MenuResult> DeleteAsync() {

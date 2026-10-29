@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using App.src.Products;
 using Xunit;
@@ -47,12 +48,94 @@ namespace App.tests.Tests {
     [InlineData("1\nFood\nPizza\n\nq\n")]
     [InlineData("1\nFood\nPizza\nabc\nq\n")]
     [InlineData("1\nFood\nPizza\n-100\nq\n")]
+    [InlineData("1\n   \nq\n")]
+    [InlineData("1\nFood\n   \nq\n")]
+    [InlineData("1\nFood\nPizza\n   \nq\n")]
     [InlineData("1\n")]
+    [InlineData("1\nFood\n")]
+    [InlineData("1\nFood\nPizza\n")]
+    [InlineData("1\nq\n")]
+    [InlineData("1\nFood\nq\n")]
+    [InlineData("1\nFood\nPizza\nq\n")]
     public async Task Menu_IncompleteOrInvalidEntry_DoesNotWriteFile(string input) {
       string output = await RunAsync(input);
 
       Assert.DoesNotContain("Product added successfully!", output);
+      Assert.Contains("Application closed.", output);
       Assert.False(File.Exists(Path.Combine(_dir, "products.json")));
+    }
+
+    [Theory]
+    [InlineData("1\n\nFood\nPizza\n120\nq\n",
+      "ERROR: Category cannot be empty.")]
+    [InlineData("1\nFood\n   \nPizza\n120\nq\n",
+      "ERROR: Product name cannot be empty.")]
+    [InlineData("1\nFood\nPizza\nabc\n120\nq\n",
+      "ERROR: Invalid price. Please enter a numeric value.")]
+    [InlineData("1\nFood\nPizza\n\n120\nq\n",
+      "ERROR: Invalid price. Please enter a numeric value.")]
+    [InlineData("1\nFood\nPizza\n999999999999999999999999999999999\n120\nq\n",
+      "ERROR: Invalid price. Please enter a numeric value.")]
+    [InlineData("1\nFood\nPizza\n-100\n120\nq\n",
+      "ERROR: Price cannot be negative.")]
+    public async Task Menu_InvalidField_RetriesSamePromptAndSavesOnce(
+      string input, string error
+    ) {
+      string output = await RunAsync(input);
+
+      Assert.Contains(error, output);
+      Assert.Equal(1, output.Split("Product added successfully!").Length - 1);
+      Product product = Assert.Single(await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      ));
+      Assert.Equal("Food", product.Category);
+      Assert.Equal("Pizza", product.Name);
+      Assert.Equal(120m, product.Price);
+    }
+
+    [Fact]
+    public async Task Menu_ZeroAndFractionalPrices_DisplayAndPersist() {
+      string output = await RunAsync(
+        "1\nFood\nSample\n0\n3\n1\nOffice\nPen\n299.50\n3\nq\n"
+      );
+
+      Assert.Contains("TOTAL PRICE: 0 kr", output);
+      Assert.Contains("299.5 kr", output);
+      Assert.Contains("TOTAL PRICE: 299.5 kr", output);
+      List<Product> products = await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      );
+      Assert.Equal([0m, 299.50m], products.Select(p => p.Price));
+    }
+
+    [Fact]
+    public async Task Menu_AfterViewing_CanAddAgainAndViewUpdatedTotal() {
+      string output = await RunAsync(
+        "1\nFood\nPizza\n120\n3\n1\nOffice\nPen\n1.25\n3\nq\n"
+      );
+
+      Assert.Equal(2, output.Split("Product added successfully!").Length - 1);
+      Assert.True(output.IndexOf("TOTAL PRICE: 120 kr", StringComparison.Ordinal) <
+        output.IndexOf("TOTAL PRICE: 121.25 kr", StringComparison.Ordinal));
+      Assert.Contains("Application closed.", output);
+      Assert.Equal(2, (await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      )).Count);
+    }
+
+    [Fact]
+    public async Task Menu_OverflowingTotal_ReportsErrorAndKeepsProducts() {
+      string maximum = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+      string output = await RunAsync(
+        $"1\nFood\nFirst\n{maximum}\n1\nFood\nSecond\n{maximum}\n3\nq\n"
+      );
+
+      Assert.Contains("ERROR: Total price is too large.", output);
+      Assert.DoesNotContain("TOTAL PRICE:", output);
+      Assert.Contains("Application closed.", output);
+      Assert.Equal(2, (await ReadProductsAsync(
+        Path.Combine(_dir, "products.json")
+      )).Count);
     }
 
     [Fact]

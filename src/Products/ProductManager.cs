@@ -12,8 +12,25 @@ internal class ProductManager {
     _store = store;
   }
 
-  internal Task<Product> CreateAsync(string c, string n, decimal p) {
-    return _store.CreateAsync(c, n, p);
+  internal Task<Product> CreateAsync(
+    string category,
+    string name,
+    decimal price
+  ) {
+    if (!ProductInput.TryField(category, out string cat)) {
+      throw new ArgumentException("Category cannot be empty.", nameof(category)
+      );
+    }
+
+    if (!ProductInput.TryField(name, out string n)) {
+      throw new ArgumentException("Name cannot be empty.", nameof(name));
+    }
+
+    if (price < 0m) {
+      throw new ArgumentException("Price cannot be negative.", nameof(price));
+    }
+
+    return _store.CreateAsync(cat, n, price);
   }
 
   private Task<List<Product>> GetAllAsync() {
