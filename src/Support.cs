@@ -19,21 +19,21 @@ namespace App.src {
       return Console.ReadLine()?.Trim();
     }
 
-    public static void StringGreen(string prompt) {
+    public static void WriteLineGreen(string prompt) {
       Console.ForegroundColor = ConsoleColor.Green;
-      Console.Write(prompt);
+      Console.WriteLine(prompt);
       Console.ResetColor();
     }
 
-    public static void StringRed(string prompt) {
+    public static void WriteLineRed(string prompt) {
       Console.ForegroundColor = ConsoleColor.Red;
-      Console.Write(prompt);
+      Console.WriteLine(prompt);
       Console.ResetColor();
     }
 
-    public static void StringYellow(string prompt) {
+    public static void WriteLineYellow(string prompt) {
       Console.ForegroundColor = ConsoleColor.Yellow;
-      Console.Write(prompt);
+      Console.WriteLine(prompt);
       Console.ResetColor();
     }
   }

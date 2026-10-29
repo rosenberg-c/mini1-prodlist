@@ -85,7 +85,7 @@ internal sealed class Main {
         }
 
         default:
-          Console.WriteLine("Invalid option. Please try again.");
+          Support.WriteLineYellow("Invalid option. Please try again.");
           break;
       }
 

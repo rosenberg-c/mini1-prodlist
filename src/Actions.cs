@@ -27,7 +27,7 @@ namespace App.src {
           break;
         }
 
-        Console.WriteLine("ERROR: Category cannot be empty.");
+        Support.WriteLineRed("ERROR: Category cannot be empty.");
       }
 
       string name;
@@ -41,7 +41,7 @@ namespace App.src {
           break;
         }
 
-        Console.WriteLine("ERROR: Product name cannot be empty.");
+        Support.WriteLineRed("ERROR: Product name cannot be empty.");
       }
 
       decimal price;
@@ -55,11 +55,11 @@ namespace App.src {
           break;
         }
 
-        Console.WriteLine($"ERROR: {error}");
+        Support.WriteLineRed($"ERROR: {error}");
       }
 
       _ = await _m.CreateAsync(category, name, price);
-      Console.WriteLine("Product added successfully!");
+      Support.WriteLineGreen("Product added successfully!");
       return MenuResult.Continue;
     }
 
@@ -76,11 +76,11 @@ namespace App.src {
       try {
         ProductListResult results = await _m.ProductListSorted();
 
-        Console.WriteLine($"TOTAL PRICE: {results.Total:0.##} kr");
         DisplayItemListAsync(results.Products);
+        Support.WriteLineYellow($"TOTAL PRICE: {results.Total:0.##} kr");
       }
       catch (OverflowException) {
-        Console.WriteLine("ERROR: Total price is too large.");
+        Support.WriteLineRed("ERROR: Total price is too large.");
       }
     }
 
@@ -91,7 +91,7 @@ namespace App.src {
       DisplayItemListAsync(result.Products);
 
       if (entries.Count == 0) {
-        Console.WriteLine("No products to delete.");
+        Support.WriteLineYellow("No products to delete.");
         return MenuResult.Continue;
       }
 
@@ -103,16 +103,19 @@ namespace App.src {
 
       if (!int.TryParse(intStr, out int idx) || idx < 1 ||
           idx > entries.Count) {
-        Console.WriteLine("Invalid product number.");
+        Support.WriteLineYellow("Invalid product number.");
         return MenuResult.Continue;
       }
 
       Guid id = entries[idx - 1].Id;
       bool deleted = await _m.DeleteAsync(id);
-      Console.WriteLine(deleted
-        ? "Product removed successfully."
-        : "Product not found."
-      );
+
+      if (deleted) {
+        Support.WriteLineGreen("Product removed successfully.");
+      } else {
+        Support.WriteLineYellow("Product not found.");
+      }
+
       return MenuResult.Continue;
     }
   }
