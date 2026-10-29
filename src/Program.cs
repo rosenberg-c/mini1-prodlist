@@ -38,27 +38,33 @@ internal sealed class Main {
     _actions = new Actions(manager);
   }
 
-  internal async Task RunAsync() {
+  internal static void DisplayInit() {
     Console.WriteLine("----------------------------------------");
     Console.WriteLine("PRODUCT INVENTORY SYSTEM");
     Console.WriteLine("----------------------------------------");
-
     Console.WriteLine("Enter q to exit");
+    Console.WriteLine();
+    Console.WriteLine("1. Add Product");
+    Console.WriteLine("2. Delete Product");
+    Console.WriteLine("3. View Products");
+    Console.WriteLine();
+  }
+
+  internal async Task RunAsync() {
+    string? choice = string.Empty;
+
     while (true) {
-      Console.WriteLine();
-      Console.WriteLine("1. Add Product");
-      Console.WriteLine("2. Delete Product");
-      Console.WriteLine("3. View Products");
-
-      Console.WriteLine();
-
-      string? choice = Support.ReadString("Select option: ");
+      DisplayInit();
 
       if (Support.IsExitOrNull(choice)) {
         return;
       }
 
       switch (choice) {
+        case "": {
+          break;
+        }
+
         case "1": {
           if (await _actions.AddAsync() == MenuResult.Exit) {
             return;
@@ -82,6 +88,10 @@ internal sealed class Main {
           Console.WriteLine("Invalid option. Please try again.");
           break;
       }
+
+      choice = Support.ReadString("Select option: ");
+
+      Console.Clear();
     }
   }
 }

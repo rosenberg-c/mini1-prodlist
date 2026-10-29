@@ -20,7 +20,7 @@ namespace App.src {
       while (true) {
         string? text = Support.ReadString("Enter Category: ");
         if (Support.IsExitOrNull(text)) {
-          return MenuResult.Exit;
+          return MenuResult.Continue;
         }
 
         if (ProductInput.TryField(text, out category)) {
@@ -34,7 +34,7 @@ namespace App.src {
       while (true) {
         string? text = Support.ReadString("Enter Product Name: ");
         if (Support.IsExitOrNull(text)) {
-          return MenuResult.Exit;
+          return MenuResult.Continue;
         }
 
         if (ProductInput.TryField(text, out name)) {
@@ -48,7 +48,7 @@ namespace App.src {
       while (true) {
         string? text = Support.ReadString("Enter price: ");
         if (Support.IsExitOrNull(text)) {
-          return MenuResult.Exit;
+          return MenuResult.Continue;
         }
 
         if (ProductInput.TryPrice(text, out price, out string error)) {
@@ -63,7 +63,7 @@ namespace App.src {
       return MenuResult.Continue;
     }
 
-    internal static void ItemListAsync(List<Product> p) {
+    internal static void DisplayItemListAsync(List<Product> p) {
       for (int i = 0; i < p.Count; i++) {
         Console.Write($"{i + 1,2}. ");
         Console.WriteLine(p[i].GetListItemString());
@@ -76,8 +76,8 @@ namespace App.src {
       try {
         ProductListResult results = await _m.ProductListSorted();
 
-        ItemListAsync(results.Products);
         Console.WriteLine($"TOTAL PRICE: {results.Total:0.##} kr");
+        DisplayItemListAsync(results.Products);
       }
       catch (OverflowException) {
         Console.WriteLine("ERROR: Total price is too large.");
@@ -88,7 +88,7 @@ namespace App.src {
       ProductListResult result = await _m.ProductListSorted();
       List<Product> entries = result.Products;
 
-      ItemListAsync(result.Products);
+      DisplayItemListAsync(result.Products);
 
       if (entries.Count == 0) {
         Console.WriteLine("No products to delete.");

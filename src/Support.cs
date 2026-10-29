@@ -18,6 +18,23 @@ namespace App.src {
       Console.Write(prompt);
       return Console.ReadLine()?.Trim();
     }
+
+    public static void StringGreen(string prompt) {
+      Console.ForegroundColor = ConsoleColor.Green;
+      Console.Write(prompt);
+      Console.ResetColor();
+    }
+
+    public static void StringRed(string prompt) {
+      Console.ForegroundColor = ConsoleColor.Red;
+      Console.Write(prompt);
+      Console.ResetColor();
+    }
+
+    public static void StringYellow(string prompt) {
+      Console.ForegroundColor = ConsoleColor.Yellow;
+      Console.Write(prompt);
+      Console.ResetColor();
+    }
   }
 }
-
