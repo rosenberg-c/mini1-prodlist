@@ -13,13 +13,22 @@ A small console app for managing products.
 
    `make run` initializes the pinned `sharp-storage` Git submodule first. If you're on Windows or not using Make, run `git submodule update --init --recursive` from the project folder after cloning, then run `dotnet run --project App.csproj`. The submodule uses a GitHub SSH URL, so GitHub SSH access must be configured. Alternatively, clone with `git clone --recurse-submodules <repo-url>` to initialize the submodule during cloning.
 
-3. Choose a menu option to add, view, search, or delete products, or see statistics. Enter `6` or type `exit` to quit.
+3. Choose a menu option (1–6). Type `q` at the main menu to quit, or at a prompt to return to the main menu. The app also quits if input ends.
 
-Product names use uppercase letters followed by a dash and a number from 200 to 500 (for example, `AB-300`). Search by name or number. Products are saved to `products.json` in the folder where you run the app, so run it from the same folder next time to keep your list. Each product now has a GUID ID. `m1pl` owns the rule that names matching without case are duplicates; `sharp-storage` only manages IDs and persistence.
+## Using the app
+
+- **Add Product (1):** Enter a category, name, and price. You can add more products without returning to the menu.
+- **Delete Product (2):** Select a product by its displayed list number.
+- **Update Product (3):** Select a product by its displayed list number, then choose to change its category, name, or price.
+- **View Products (4):** See the products and their total price.
+- **Search Products (5):** Search category or name using a case-insensitive partial match. An empty search lists all products.
+- **Statistics (6):** See the cheapest and most expensive products, average price, and count per category.
+
+Categories and names cannot be empty (surrounding spaces are trimmed). Prices must be non-negative numbers in your system's number format. Products are displayed in ascending price order, then by category and name. Prices are shown in `kr`. The app saves products to `products.json` in the folder where you run it; run it from the same folder next time to keep your inventory.
 
 ## Existing product files
 
-The current schema is version 3. If startup reports a legacy version-1 or version-2 `products.json`, run `python3 scripts/migrate-products.py products.json` in the directory containing that file. The script creates a `.v1.bak` or `.v2.bak` copy before replacing it, assigns a GUID to each product, and refuses to overwrite an existing backup. Keep the backup until you have checked your migrated data. The old `sharp-storage` tag `v0.0.1` is incompatible with this app; the submodule pins a newer commit.
+The current `products.json` schema is version 4. On startup, the app rejects files with an older schema version or invalid JSON instead of changing them. Keep a backup of any existing file before starting a new inventory; there is no migration script in this repository. To start with an empty inventory, move or delete the incompatible `products.json` from the folder where you run the app.
 
 ## VS Code
 
