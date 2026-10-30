@@ -66,11 +66,9 @@ internal sealed class Main {
   }
 
   internal async Task RunAsync() {
-    string? choice = string.Empty;
-
     while (true) {
       DisplayInit();
-      choice = Support.ReadString("Select option: ");
+      string? choice = Support.ReadString("Select option: ");
 
       if (Support.IsExitOrNull(choice)) {
         return;
