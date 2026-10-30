@@ -70,6 +70,7 @@ internal sealed class Main {
 
     while (true) {
       DisplayInit();
+      choice = Support.ReadString("Select option: ");
 
       if (Support.IsExitOrNull(choice)) {
         return;
@@ -83,21 +84,18 @@ internal sealed class Main {
         case "1": {
           Header("Add product");
           await _actions.AddAsync();
-          DisplayInit();
 
           break;
         }
         case "2":
           Header("Delete product");
           await _actions.DeleteAsync();
-          DisplayInit();
 
           break;
 
         case "3": {
           Header("Edit product");
           await _actions.EditAsync();
-          DisplayInit();
 
           break;
         }
@@ -109,14 +107,12 @@ internal sealed class Main {
           Console.WriteLine("Press any key to return.");
           Support.HoldPressAnyKey();
 
-          DisplayInit();
           break;
         }
 
         case "5": {
           Header("Search product");
           await _actions.SearchAsync();
-          DisplayInit();
 
           break;
         }
@@ -127,7 +123,6 @@ internal sealed class Main {
           Footer();
           Console.WriteLine("Press any key to return.");
           Support.HoldPressAnyKey();
-          DisplayInit();
 
           break;
         }
@@ -136,10 +131,6 @@ internal sealed class Main {
           Support.WriteLineYellow("Invalid option. Please try again.");
           break;
       }
-
-      choice = Support.ReadString("Select option: ");
-
-      Console.Clear();
     }
   }
 }
