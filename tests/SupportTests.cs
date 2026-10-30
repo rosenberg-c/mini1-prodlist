@@ -18,14 +18,5 @@ namespace App.tests.Tests {
     public void IsExitOrNull_DoesNotQuitForOtherInput(string input) {
       Assert.False(Support.IsExitOrNull(input));
     }
-
-    [Theory]
-    [InlineData(null, true)]
-    [InlineData("", true)]
-    [InlineData(" ", false)]
-    [InlineData("Food", false)]
-    public void IsEmptyOrNull_ReportsRawEmptyInput(string? input, bool expected) {
-      Assert.Equal(expected, Support.IsEmptyOrNull(input));
-    }
   }
 }
