@@ -65,6 +65,12 @@ internal sealed class Main {
     Footer();
   }
 
+  private static void Pause() {
+    Footer();
+    Console.WriteLine("Press any key to return.");
+    Support.HoldPressAnyKey();
+  }
+
   internal async Task RunAsync() {
     while (true) {
       DisplayInit();
@@ -101,9 +107,7 @@ internal sealed class Main {
         case "4": {
           Header("View");
           await _actions.ViewAsync();
-          Footer();
-          Console.WriteLine("Press any key to return.");
-          Support.HoldPressAnyKey();
+          Pause();
 
           break;
         }
@@ -118,9 +122,7 @@ internal sealed class Main {
         case "6": {
           Header("Statistics");
           await _actions.StatisticsAsync();
-          Footer();
-          Console.WriteLine("Press any key to return.");
-          Support.HoldPressAnyKey();
+          Pause();
 
           break;
         }
