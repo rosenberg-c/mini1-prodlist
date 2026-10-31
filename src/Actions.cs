@@ -1,5 +1,6 @@
 using Product = App.src.Products.Product;
 using App.src.Products;
+using App.src.ConsoleCore;
 using App.src.Validation;
 
 namespace App.src {
@@ -28,7 +29,7 @@ namespace App.src {
 
         string numberedRow = $"{i + 1,2}. {row}";
         if (highlightMatches) {
-          Support.WriteLineGreen(numberedRow);
+          ConsoleSupport.WriteLineGreen(numberedRow);
         } else {
           Console.WriteLine(numberedRow);
         }
@@ -42,8 +43,8 @@ namespace App.src {
       name = string.Empty;
 
       while (true) {
-        string? text = Support.ReadString("Enter Name: ");
-        if (Support.IsExitOrNull(text)) {
+        string? text = ConsoleSupport.ReadString("Enter Name: ");
+        if (ConsoleSupport.IsExitOrNull(text)) {
           return false;
         }
 
@@ -51,7 +52,7 @@ namespace App.src {
           return true;
         }
 
-        Support.WriteLineRed("ERROR: Name cannot be empty.");
+        ConsoleSupport.WriteLineRed("ERROR: Name cannot be empty.");
       }
     }
 
@@ -59,8 +60,8 @@ namespace App.src {
       category = string.Empty;
 
       while (true) {
-        string? text = Support.ReadString("Enter Category: ");
-        if (Support.IsExitOrNull(text)) {
+        string? text = ConsoleSupport.ReadString("Enter Category: ");
+        if (ConsoleSupport.IsExitOrNull(text)) {
           return false;
         }
 
@@ -68,7 +69,7 @@ namespace App.src {
           return true;
         }
 
-        Support.WriteLineRed("ERROR: Category cannot be empty.");
+        ConsoleSupport.WriteLineRed("ERROR: Category cannot be empty.");
       }
     }
 
@@ -76,8 +77,8 @@ namespace App.src {
       price = 0m;
 
       while (true) {
-        string? text = Support.ReadString("Enter Price: ");
-        if (Support.IsExitOrNull(text)) {
+        string? text = ConsoleSupport.ReadString("Enter Price: ");
+        if (ConsoleSupport.IsExitOrNull(text)) {
           return false;
         }
 
@@ -85,7 +86,7 @@ namespace App.src {
           return true;
         }
 
-        Support.WriteLineRed($"ERROR: {e}");
+        ConsoleSupport.WriteLineRed($"ERROR: {e}");
       }
     }
 
@@ -110,7 +111,7 @@ namespace App.src {
         }
 
         _ = await _m.CreateAsync(category, name, price);
-        Support.WriteLineGreen("Product added successfully!");
+        ConsoleSupport.WriteLineGreen("Product added successfully!");
       }
     }
 
@@ -126,9 +127,9 @@ namespace App.src {
 
     internal static void DisplayUpdated(bool updated) {
       if (updated) {
-        Support.WriteLineGreen("Product updated successfully.");
+        ConsoleSupport.WriteLineGreen("Product updated successfully.");
       } else {
-        Support.WriteLineYellow("Product not found.");
+        ConsoleSupport.WriteLineYellow("Product not found.");
       }
     }
 
@@ -140,20 +141,20 @@ namespace App.src {
         DisplayItemListAsync(result.Products);
 
         if (entries.Count == 0) {
-          Support.WriteLineYellow("No products to edit.");
+          ConsoleSupport.WriteLineYellow("No products to edit.");
           Console.Write("Press any key to continue...");
-          Support.HoldPressAnyKey();
+          ConsoleSupport.HoldPressAnyKey();
           return;
         }
 
-        string? intStr = Support.ReadString("Enter product to edit: ");
-        if (Support.IsExitOrNull(intStr)) {
+        string? intStr = ConsoleSupport.ReadString("Enter product to edit: ");
+        if (ConsoleSupport.IsExitOrNull(intStr)) {
           return;
         }
 
         if (!int.TryParse(intStr, out int idx) || idx < 1 ||
             idx > entries.Count) {
-          Support.WriteLineYellow("Invalid product number.");
+          ConsoleSupport.WriteLineYellow("Invalid product number.");
           continue;
         }
 
@@ -161,8 +162,8 @@ namespace App.src {
 
         while (true) {
           DisplayInit();
-          string? choice = Support.ReadString("Select option: ");
-          if (Support.IsExitOrNull(choice)) {
+          string? choice = ConsoleSupport.ReadString("Select option: ");
+          if (ConsoleSupport.IsExitOrNull(choice)) {
             return;
           }
 
@@ -193,7 +194,7 @@ namespace App.src {
               break;
 
             default:
-              Support.WriteLineYellow("Invalid option. Please try again.");
+              ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");
               continue;
           }
 
@@ -209,10 +210,10 @@ namespace App.src {
         ProductListResult results = await _m.ProductListSorted();
 
         DisplayItemListAsync(results.Products);
-        Support.WriteLineYellow($"TOTAL PRICE: {results.Total:0.##} kr");
+        ConsoleSupport.WriteLineYellow($"TOTAL PRICE: {results.Total:0.##} kr");
       }
       catch (OverflowException) {
-        Support.WriteLineRed("ERROR: Total price is too large.");
+        ConsoleSupport.WriteLineRed("ERROR: Total price is too large.");
       }
     }
 
@@ -224,20 +225,20 @@ namespace App.src {
         DisplayItemListAsync(result.Products);
 
         if (entries.Count == 0) {
-          Support.WriteLineYellow("No products to delete.");
+          ConsoleSupport.WriteLineYellow("No products to delete.");
           Console.Write("Press any key to continue...");
-          Support.HoldPressAnyKey();
+          ConsoleSupport.HoldPressAnyKey();
           return;
         }
 
-        string? intStr = Support.ReadString("Enter product to delete: ");
-        if (Support.IsExitOrNull(intStr)) {
+        string? intStr = ConsoleSupport.ReadString("Enter product to delete: ");
+        if (ConsoleSupport.IsExitOrNull(intStr)) {
           return;
         }
 
         if (!int.TryParse(intStr, out int idx) || idx < 1 ||
             idx > entries.Count) {
-          Support.WriteLineYellow("Invalid product number.");
+          ConsoleSupport.WriteLineYellow("Invalid product number.");
           continue;
         }
 
@@ -245,17 +246,17 @@ namespace App.src {
         bool deleted = await _m.DeleteAsync(id);
 
         if (deleted) {
-          Support.WriteLineGreen("Product removed successfully.");
+          ConsoleSupport.WriteLineGreen("Product removed successfully.");
         } else {
-          Support.WriteLineYellow("Product not found.");
+          ConsoleSupport.WriteLineYellow("Product not found.");
         }
       }
     }
 
     internal async Task SearchAsync() {
       while (true) {
-        string? term = Support.ReadString("Search category or name: ");
-        if (Support.IsExitOrNull(term)) {
+        string? term = ConsoleSupport.ReadString("Search category or name: ");
+        if (ConsoleSupport.IsExitOrNull(term)) {
           break;
         }
 
@@ -266,12 +267,12 @@ namespace App.src {
         ).ToList();
 
         if (entries.Count == 0) {
-          Support.WriteLineYellow("No products found.");
+          ConsoleSupport.WriteLineYellow("No products found.");
           continue;
         }
 
         if (term == string.Empty) {
-          Support.WriteLineRed("Empty search query, list all.");
+          ConsoleSupport.WriteLineRed("Empty search query, list all.");
           Console.WriteLine();
           DisplayItemListAsync(entries);
           Console.WriteLine();

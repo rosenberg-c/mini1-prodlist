@@ -1,5 +1,6 @@
 using System.Text.Json;
 using App.src.Products;
+using App.src.ConsoleCore;
 using App.src;
 
 namespace App.src {
@@ -68,15 +69,15 @@ internal sealed class Main {
   private static void Pause() {
     Footer();
     Console.WriteLine("Press any key to return.");
-    Support.HoldPressAnyKey();
+    ConsoleSupport.HoldPressAnyKey();
   }
 
   internal async Task RunAsync() {
     while (true) {
       DisplayInit();
-      string? choice = Support.ReadString("Select option: ");
+      string? choice = ConsoleSupport.ReadString("Select option: ");
 
-      if (Support.IsExitOrNull(choice)) {
+      if (ConsoleSupport.IsExitOrNull(choice)) {
         return;
       }
 
@@ -128,7 +129,7 @@ internal sealed class Main {
         }
 
         default:
-          Support.WriteLineYellow("Invalid option. Please try again.");
+          ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");
           break;
       }
     }

@@ -1,11 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace App.src {
-  public static class Support {
+namespace App.src.ConsoleCore {
+  public static class ConsoleSupport {
+    internal const string QuitCommand = "q";
+
     public static bool IsExitOrNull([NotNullWhen(false)] string? value) {
       return value is null || string.Equals(
         value?.Trim(),
-        "q",
+        QuitCommand,
         StringComparison.OrdinalIgnoreCase
       );
     }
