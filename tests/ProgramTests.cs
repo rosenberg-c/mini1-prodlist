@@ -277,6 +277,21 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task Menu_InvalidEditIndexes_RetryAndUpdateOnlySelectedProduct() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product first = await store.CreateAsync("Food", "Pizza", 120m);
+      Product second = await store.CreateAsync("Office", "Pen", 20m);
+
+      string output = await RunAsync("3\nabc\n0\n3\n2\n2\nPencil\nq\nq\n");
+
+      Assert.Equal(3, output.Split("Invalid product number.").Length - 1);
+      Assert.Equal(1, output.Split("Product updated successfully.").Length - 1);
+      Assert.Equal([first with { Name = "Pencil" }, second],
+        await ReadProductsAsync(path));
+    }
+
+    [Fact]
     public async Task Menu_EditOptions_DisplayChoicesAndAllowSelection() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);

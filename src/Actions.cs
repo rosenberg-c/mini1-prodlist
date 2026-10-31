@@ -46,18 +46,19 @@ namespace App.src {
           return;
         }
 
-        string? intStr = ConsoleSupport.ReadString("Enter product to edit: ");
-        if (ConsoleSupport.IsExitOrNull(intStr)) {
+        NumberedSelectionResult selection = NumberedSelection.ReadIndex(
+          entries.Count, "Enter product to edit: "
+        );
+        if (selection.Status == SelectionStatus.Cancelled) {
           return;
         }
 
-        if (!int.TryParse(intStr, out int idx) || idx < 1 ||
-            idx > entries.Count) {
+        if (selection.Status == SelectionStatus.Invalid) {
           ConsoleSupport.WriteLineYellow("Invalid product number.");
           continue;
         }
 
-        Product old = entries[idx - 1];
+        Product old = entries[selection.Index];
 
         while (true) {
           ProductDisplay.DisplayEditOptions();
