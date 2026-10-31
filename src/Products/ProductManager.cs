@@ -1,4 +1,5 @@
 using App.src.Products;
+using App.src.Validation;
 
 internal readonly record struct ProductListResult(
   List<Product> Products,
@@ -17,12 +18,12 @@ internal class ProductManager {
     string name,
     decimal price
   ) {
-    if (!ProductInput.TryField(category, out string cat)) {
+    if (!TextFieldValidation.TryField(category, out string cat)) {
       throw new ArgumentException("Category cannot be empty.", nameof(category)
       );
     }
 
-    if (!ProductInput.TryField(name, out string n)) {
+    if (!TextFieldValidation.TryField(name, out string n)) {
       throw new ArgumentException("Name cannot be empty.", nameof(name));
     }
 

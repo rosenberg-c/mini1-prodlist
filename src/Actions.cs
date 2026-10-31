@@ -1,4 +1,5 @@
 using Product = App.src.Products.Product;
+using App.src.Validation;
 
 namespace App.src {
   internal sealed class Actions {
@@ -45,7 +46,7 @@ namespace App.src {
           return false;
         }
 
-        if (ProductInput.TryField(text, out name)) {
+        if (TextFieldValidation.TryField(text, out name)) {
           return true;
         }
 
@@ -62,7 +63,7 @@ namespace App.src {
           return false;
         }
 
-        if (ProductInput.TryField(text, out category)) {
+        if (TextFieldValidation.TryField(text, out category)) {
           return true;
         }
 
@@ -277,7 +278,7 @@ namespace App.src {
           continue;
         }
 
-        if (ProductInput.TryField(term, out string _)) {
+        if (TextFieldValidation.TryField(term, out string _)) {
           Console.WriteLine();
           DisplayItemListAsync(entries, highlightMatches: true);
           Console.WriteLine();
