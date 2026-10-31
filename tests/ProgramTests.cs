@@ -20,10 +20,10 @@ namespace App.tests.Tests {
         "1\nElectronics\nMouse\n299.50\nOffice\nMouse\n120\nq\n4\nx\nq\n"
       );
       Assert.Equal(2, first.Split("Product added successfully!").Length - 1);
-      Assert.Contains(" 1. | Office", first);
-      Assert.Contains(" 2. | Electronics", first);
-      Assert.True(first.IndexOf(" 1. | Office", StringComparison.Ordinal) <
-        first.IndexOf(" 2. | Electronics", StringComparison.Ordinal));
+      Assert.Contains("|  1 | Office", first);
+      Assert.Contains("|  2 | Electronics", first);
+      Assert.True(first.IndexOf("|  1 | Office", StringComparison.Ordinal) <
+        first.IndexOf("|  2 | Electronics", StringComparison.Ordinal));
       Assert.Contains("299.5 kr", first);
       Assert.Contains("TOTAL PRICE: 419.5 kr", first);
 
@@ -36,8 +36,8 @@ namespace App.tests.Tests {
 
       string second = await RunAsync("2\n2\nq\n4\nx\nq\n");
       Assert.Contains("Product removed successfully.", second);
-      Assert.Contains(" 1. | Office", second);
-      Assert.Contains(" 2. | Electronics", second);
+      Assert.Contains("|  1 | Office", second);
+      Assert.Contains("|  2 | Electronics", second);
       Assert.Contains("TOTAL PRICE: 120 kr", second);
       Assert.Equal([saved[1]], await ReadProductsAsync(path));
     }
@@ -146,7 +146,7 @@ namespace App.tests.Tests {
 
       Assert.Contains("Invalid option. Please try again.", output);
       Assert.Equal(4, output.Split("Invalid product number.").Length - 1);
-      Assert.Contains(" 1. | Food", output);
+      Assert.Contains("|  1 | Food", output);
       Assert.Single(await ReadProductsAsync(Path.Combine(_dir, "products.json")));
     }
 
@@ -157,8 +157,8 @@ namespace App.tests.Tests {
       );
 
       Assert.Equal(2, output.Split("Product removed successfully.").Length - 1);
-      Assert.Contains(" 2. | Food", output);
-      Assert.Contains(" 1. | Office", output);
+      Assert.Contains("|  2 | Food", output);
+      Assert.Contains("|  1 | Office", output);
       Assert.Contains("TOTAL PRICE: 299 kr", output);
       Product remaining = Assert.Single(await ReadProductsAsync(
         Path.Combine(_dir, "products.json")
@@ -244,7 +244,7 @@ namespace App.tests.Tests {
       );
 
       Assert.Equal(3, output.Split("Product updated successfully.").Length - 1);
-      Assert.Contains(" 1. | Electronics", output);
+      Assert.Contains("|  1 | Electronics", output);
       Assert.Contains("TOTAL PRICE: 120 kr", output);
       Assert.Equal([food, office with {
         Category = "Electronics", Name = "Stylus", Price = 0m
@@ -325,14 +325,14 @@ namespace App.tests.Tests {
 
       string output = await RunAsync("4\nx\nq\n");
       string[] lines = output.Split('\n');
-      string border = "    +" + new string('-', 18) + "+" +
-        new string('-', 18) + "+" + new string('-', 18) + "+";
-      string header = "    | " + "Category".PadRight(16) + " | " +
-        "Name".PadRight(16) + " | " + "Price".PadRight(16) + " |";
-      string first = " 1. | " + "Office".PadRight(16) + " | " +
-        "Pen".PadRight(16) + " | " + "1.25 kr".PadRight(16) + " |";
-      string second = " 2. | " + "Food".PadRight(16) + " | " +
-        "Pizza".PadRight(16) + " | " + "120.5 kr".PadRight(16) + " |";
+      string border = "+----+" + new string('-', 26) + "+" +
+        new string('-', 26) + "+" + new string('-', 26) + "+";
+      string header = "|    | " + "Category".PadRight(24) + " | " +
+        "Name".PadRight(24) + " | " + "Price".PadRight(24) + " |";
+      string first = "|  1 | " + "Office".PadRight(24) + " | " +
+        "Pen".PadRight(24) + " | " + "1.25 kr".PadRight(24) + " |";
+      string second = "|  2 | " + "Food".PadRight(24) + " | " +
+        "Pizza".PadRight(24) + " | " + "120.5 kr".PadRight(24) + " |";
 
       Assert.Contains(border, lines);
       Assert.Contains(header, lines);

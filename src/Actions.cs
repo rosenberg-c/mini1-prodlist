@@ -11,32 +11,15 @@ namespace App.src {
       List<Product> products,
       bool highlightMatches = false
     ) {
-      const int width = 16;
-      string segment = new('-', width + 2);
-      string border = $"    +{segment}+{segment}+{segment}+";
-
-      string header =
-        $"| {"Category".PadRight(width)} | {"Name".PadRight(width)} | {"Price".PadRight(width)} |";
-      Console.WriteLine(border);
-      Console.WriteLine($"    {header}");
-      Console.WriteLine(border);
-
-      for (int i = 0; i < products.Count; i++) {
-        Product product = products[i];
-        string price = $"{product.Price:0.##} kr";
-        string row =
-          $"| {product.Category.PadRight(width)} | {product.Name.PadRight(width)} | {price.PadRight(width)} |";
-
-        string numberedRow = $"{i + 1,2}. {row}";
-        if (highlightMatches) {
-          ConsoleSupport.WriteLineGreen(numberedRow);
-        } else {
-          Console.WriteLine(numberedRow);
-        }
-      }
-
-      Console.WriteLine(border);
-      Console.WriteLine();
+      ConsoleTable.Write(
+        ["Category", "Name", "Price"],
+        products.Select(static p => (IReadOnlyList<string>)[
+            p.Category, p.Name, $"{p.Price:0.##} kr"
+          ]
+        ),
+        numberRows: true,
+        highlightRows: highlightMatches
+      );
     }
 
     internal Actions(
