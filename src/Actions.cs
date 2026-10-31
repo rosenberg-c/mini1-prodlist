@@ -234,21 +234,28 @@ namespace App.src {
 
       Product cheapest = entries[0];
       Product mostExpensive = entries[^1];
-
-      Console.WriteLine(
-        $"Most expensive: {mostExpensive.Name} - {mostExpensive.Price:0.##} kr"
-      );
-      Console.WriteLine($"Cheapest: {cheapest.Name} - {cheapest.Price:0.##} kr"
-      );
       decimal average = result.Total / entries.Count;
-      Console.WriteLine($"Average price: {average:0.##} kr");
+
+      IReadOnlyList<string>[] summary = [
+        [
+          "Most expensive",
+          $"{mostExpensive.Name} - {mostExpensive.Price:0.##} kr"
+        ],
+        ["Cheapest", $"{cheapest.Name} - {cheapest.Price:0.##} kr"],
+        ["Average price", $"{average:0.##} kr"]
+      ];
+
+      ConsoleTable.Write(["Statistic", "Value"], summary);
 
       Console.WriteLine("Products per category:");
-      foreach (IGrouping<string, Product>? group in entries
-                 .GroupBy(static p => p.Category)
-                 .OrderBy(static g => g.Key)) {
-        Console.WriteLine($"{group.Key}: {group.Count()}");
-      }
+      IReadOnlyList<string>[] categories = entries
+        .GroupBy(static p => p.Category)
+        .OrderBy(static g => g.Key)
+        .Select(static g => (IReadOnlyList<string>)[g.Key, g.Count().ToString()]
+        )
+        .ToArray();
+
+      ConsoleTable.Write(["Category", "Count"], categories);
     }
   }
 }
