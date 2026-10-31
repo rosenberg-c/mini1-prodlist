@@ -1,7 +1,6 @@
 using System.Text.Json;
 using App.src.Products;
 using App.src.ConsoleCore;
-using App.src;
 
 namespace App.src {
   public class Program {
@@ -33,10 +32,10 @@ namespace App.src {
 }
 
 internal sealed class Main {
-  private readonly Actions _actions;
+  private readonly ProductActions _actions;
 
   internal Main(ProductManager manager) {
-    _actions = new Actions(manager);
+    _actions = new ProductActions(manager);
   }
 
   internal static void Header(string header) {

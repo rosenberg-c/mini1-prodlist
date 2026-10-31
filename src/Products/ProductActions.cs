@@ -1,13 +1,11 @@
-using Product = App.src.Products.Product;
-using App.src.Products;
 using App.src.ConsoleCore;
 using App.src.Validation;
 
-namespace App.src {
-  internal sealed class Actions {
+namespace App.src.Products {
+  internal sealed class ProductActions {
     private readonly ProductManager _m;
 
-    internal Actions(
+    internal ProductActions(
       ProductManager manager
     ) {
       _m = manager;
