@@ -11,11 +11,13 @@ namespace App.src.ConsoleCore {
   );
 
   internal static class NumberedSelection {
-    internal static NumberedSelectionResult ReadIndex(int count, string prompt) {
+    internal static NumberedSelectionResult
+      ReadIndex(int count, string prompt) {
       return ParseIndex(count, ConsoleSupport.ReadString(prompt));
     }
 
-    internal static NumberedSelectionResult ParseIndex(int count, string? input) {
+    internal static NumberedSelectionResult
+      ParseIndex(int count, string? input) {
       if (ConsoleSupport.IsExitOrNull(input)) {
         return new NumberedSelectionResult(SelectionStatus.Cancelled, -1);
       }
