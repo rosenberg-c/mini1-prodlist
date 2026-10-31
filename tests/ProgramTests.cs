@@ -277,6 +277,33 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task Menu_EditOptions_DisplayChoicesAndAllowSelection() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product original = await store.CreateAsync("Food", "Pizza", 120m);
+
+      string output = await RunAsync("3\n1\n2\nPasta\nq\nq\n");
+
+      string[] lines = output.Split('\n');
+      string border = "+----+" + new string('-', 26) + "+";
+      string header = "|    | " + "EDIT".PadRight(24) + " |";
+      string category = "|  1 | " + "Category".PadRight(24) + " |";
+      string name = "|  2 | " + "Name".PadRight(24) + " |";
+      string price = "|  3 | " + "Price".PadRight(24) + " |";
+
+      Assert.Contains(border, lines);
+      Assert.Contains(header, lines);
+      Assert.Contains(category, lines);
+      Assert.Contains(name, lines);
+      Assert.Contains(price, lines);
+      Assert.Equal(border.Length, header.Length);
+      Assert.Equal(border.Length, category.Length);
+      Assert.Contains("Product updated successfully.", output);
+      Assert.Equal([original with { Name = "Pasta" }],
+        await ReadProductsAsync(path));
+    }
+
+    [Fact]
     public async Task Menu_EditPromptEof_ReturnsWithoutChangingProduct() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);

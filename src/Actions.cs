@@ -49,12 +49,11 @@ namespace App.src {
 
     internal static void DisplayInit() {
       Console.WriteLine();
-      Console.WriteLine("|-- EDIT --");
-      Console.WriteLine("| 1. Category");
-      Console.WriteLine("| 2. Name");
-      Console.WriteLine("| 3. Price");
-      Console.WriteLine("|----------");
-      Console.WriteLine();
+      ConsoleTable.Write(
+        ["EDIT"],
+        [["Category"], ["Name"], ["Price"]],
+        numberRows: true
+      );
     }
 
     internal static void DisplayUpdated(bool updated) {
