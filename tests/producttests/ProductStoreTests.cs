@@ -28,7 +28,7 @@ namespace App.tests.Tests {
       Assert.Equal([first, second], await new ProductStore(path).GetAllAsync());
 
       using JsonDocument document = JsonDocument.Parse(await File.ReadAllTextAsync(path));
-      Assert.Equal(Product.SchemaVersion,
+      Assert.Equal(ProductStore.SchemaVersion,
         document.RootElement.GetProperty("schemaVersion").GetInt32());
       Assert.Equal(299.50m,
         document.RootElement.GetProperty("data")[0].GetProperty("Price").GetDecimal());

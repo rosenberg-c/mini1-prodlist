@@ -5,7 +5,6 @@ namespace App.src.Products {
     string Name,
     decimal Price
   ) {
-    public const int SchemaVersion = 4;
 
     public Product Copy() {
       return new Product(Id, Category, Name, Price);

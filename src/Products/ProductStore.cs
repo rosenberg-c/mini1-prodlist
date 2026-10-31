@@ -2,11 +2,13 @@ using SharpStorage.src;
 
 namespace App.src.Products {
   internal sealed class ProductStore {
+    public const int SchemaVersion = 4;
+
     private readonly StorageRepository<Product> _storage;
 
     internal ProductStore(string filename) {
       _storage = new StorageRepository<Product>(
-        filename, static p => p.Id, Product.SchemaVersion
+        filename, static p => p.Id, SchemaVersion
       );
     }
 

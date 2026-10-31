@@ -465,7 +465,7 @@ namespace App.tests.Tests {
       using JsonDocument document = JsonDocument.Parse(
         await File.ReadAllTextAsync(path)
       );
-      Assert.Equal(Product.SchemaVersion,
+      Assert.Equal(ProductStore.SchemaVersion,
         document.RootElement.GetProperty("schemaVersion").GetInt32());
       return document.RootElement.GetProperty("data")
         .Deserialize<List<Product>>() ?? [];
