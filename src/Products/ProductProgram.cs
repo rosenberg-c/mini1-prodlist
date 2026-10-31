@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace App.src.Products {
   public class ProductProgram {
-    internal static async Task RunProductAsync() {
+    internal static async Task RunAsync() {
       string path = Environment.GetEnvironmentVariable("APP_DATA_PATH")
         ?? "products.json";
 
