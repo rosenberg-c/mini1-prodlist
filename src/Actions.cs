@@ -1,4 +1,5 @@
 using Product = App.src.Products.Product;
+using App.src.Products;
 using App.src.Validation;
 
 namespace App.src {
@@ -80,7 +81,7 @@ namespace App.src {
           return false;
         }
 
-        if (ProductInput.TryPrice(text, out price, out string e)) {
+        if (ProductPriceValidation.TryPrice(text, out price, out string e)) {
           return true;
         }
 
