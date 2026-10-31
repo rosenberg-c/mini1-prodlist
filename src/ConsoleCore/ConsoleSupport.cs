@@ -4,6 +4,12 @@ namespace App.src.ConsoleCore {
   public static class ConsoleSupport {
     internal const string QuitCommand = "q";
 
+    internal static void Pause() {
+      ConsoleRender.Footer();
+      Console.WriteLine("Press any key to return.");
+      HoldPressAnyKey();
+    }
+
     public static bool IsExitOrNull([NotNullWhen(false)] string? value) {
       return value is null || string.Equals(
         value?.Trim(),

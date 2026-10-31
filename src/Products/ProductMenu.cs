@@ -22,12 +22,6 @@ namespace App.src.Products {
       ConsoleRender.Footer();
     }
 
-    private static void Pause() {
-      ConsoleRender.Footer();
-      Console.WriteLine("Press any key to return.");
-      ConsoleSupport.HoldPressAnyKey();
-    }
-
     internal async Task RunAsync() {
       while (true) {
         DisplayMenu();
@@ -62,7 +56,7 @@ namespace App.src.Products {
           case "4": {
             ConsoleRender.Header("View");
             await _actions.ViewAsync();
-            Pause();
+            ConsoleSupport.Pause();
             break;
           }
 
@@ -75,7 +69,7 @@ namespace App.src.Products {
           case "6": {
             ConsoleRender.Header("Statistics");
             await _actions.StatisticsAsync();
-            Pause();
+            ConsoleSupport.Pause();
             break;
           }
 
