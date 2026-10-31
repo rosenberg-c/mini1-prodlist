@@ -7,21 +7,6 @@ namespace App.src {
   internal sealed class Actions {
     private readonly ProductManager _m;
 
-    internal static void DisplayItemListAsync(
-      List<Product> products,
-      bool highlightMatches = false
-    ) {
-      ConsoleTable.Write(
-        ["Category", "Name", "Price"],
-        products.Select(static p => (IReadOnlyList<string>)[
-            p.Category, p.Name, $"{p.Price:0.##} kr"
-          ]
-        ),
-        numberRows: true,
-        highlightRows: highlightMatches
-      );
-    }
-
     internal Actions(
       ProductManager manager
     ) {
@@ -47,29 +32,12 @@ namespace App.src {
       }
     }
 
-    internal static void DisplayInit() {
-      Console.WriteLine();
-      ConsoleTable.Write(
-        ["EDIT"],
-        [["Category"], ["Name"], ["Price"]],
-        numberRows: true
-      );
-    }
-
-    internal static void DisplayUpdated(bool updated) {
-      if (updated) {
-        ConsoleSupport.WriteLineGreen("Product updated successfully.");
-      } else {
-        ConsoleSupport.WriteLineYellow("Product not found.");
-      }
-    }
-
     internal async Task EditAsync() {
       while (true) {
         ProductListResult result = await _m.ListProductsSortedAsync();
         List<Product> entries = result.Products;
 
-        DisplayItemListAsync(result.Products);
+        ProductDisplay.DisplayTable(result.Products);
 
         if (entries.Count == 0) {
           ConsoleSupport.WriteLineYellow("No products to edit.");
@@ -92,7 +60,7 @@ namespace App.src {
         Product old = entries[idx - 1];
 
         while (true) {
-          DisplayInit();
+          ProductDisplay.DisplayEditOptions();
           string? choice = ConsoleSupport.ReadString("Select option: ");
           if (ConsoleSupport.IsExitOrNull(choice)) {
             return;
@@ -130,7 +98,7 @@ namespace App.src {
           }
 
           bool saved = await _m.UpdateAsync(old.Id, updated);
-          DisplayUpdated(saved);
+          ProductDisplay.DisplayDidUpdate(saved);
           break;
         }
       }
@@ -140,7 +108,7 @@ namespace App.src {
       try {
         ProductListResult results = await _m.ListProductsSortedAsync();
 
-        DisplayItemListAsync(results.Products);
+        ProductDisplay.DisplayTable(results.Products);
         ConsoleSupport.WriteLineYellow($"TOTAL PRICE: {results.Total:0.##} kr");
       }
       catch (OverflowException) {
@@ -153,7 +121,7 @@ namespace App.src {
         ProductListResult result = await _m.ListProductsSortedAsync();
         List<Product> entries = result.Products;
 
-        DisplayItemListAsync(result.Products);
+        ProductDisplay.DisplayTable(result.Products);
 
         if (entries.Count == 0) {
           ConsoleSupport.WriteLineYellow("No products to delete.");
@@ -205,7 +173,7 @@ namespace App.src {
         if (term == string.Empty) {
           ConsoleSupport.WriteLineRed("Empty search query, list all.");
           Console.WriteLine();
-          DisplayItemListAsync(entries);
+          ProductDisplay.DisplayTable(entries);
           Console.WriteLine();
 
           continue;
@@ -213,7 +181,7 @@ namespace App.src {
 
         if (TextFieldValidation.TryField(term, out string _)) {
           Console.WriteLine();
-          DisplayItemListAsync(entries, highlightMatches: true);
+          ProductDisplay.DisplayTable(entries, highlightMatches: true);
           Console.WriteLine();
 
           continue;
@@ -232,30 +200,7 @@ namespace App.src {
         return;
       }
 
-      Product cheapest = entries[0];
-      Product mostExpensive = entries[^1];
-      decimal average = result.Total / entries.Count;
-
-      IReadOnlyList<string>[] summary = [
-        [
-          "Most expensive",
-          $"{mostExpensive.Name} - {mostExpensive.Price:0.##} kr"
-        ],
-        ["Cheapest", $"{cheapest.Name} - {cheapest.Price:0.##} kr"],
-        ["Average price", $"{average:0.##} kr"]
-      ];
-
-      ConsoleTable.Write(["Statistic", "Value"], summary);
-
-      Console.WriteLine("Products per category:");
-      IReadOnlyList<string>[] categories = entries
-        .GroupBy(static p => p.Category)
-        .OrderBy(static g => g.Key)
-        .Select(static g => (IReadOnlyList<string>)[g.Key, g.Count().ToString()]
-        )
-        .ToArray();
-
-      ConsoleTable.Write(["Category", "Count"], categories);
+      ProductDisplay.DisplayStatistics(result);
     }
   }
 }
