@@ -37,3 +37,6 @@ format: deps
 clean:
 	$(DOTNET) clean $(PROJECT)
 
+.PHONY: reset
+reset:
+	cp products.example.json products.json

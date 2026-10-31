@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 4,
+  "data": [
+    {
+      "Id": "e25f91f7-1d65-44ba-8c56-8632dd442655",
+      "Category": "electronics",
+      "Name": "Laser",
+      "Price": 300.99
+    },
+    {
+      "Id": "c8703aa6-ba90-47b3-84be-adf5d8a26943",
+      "Category": "electronics",
+      "Name": "Mouse",
+      "Price": 20.29
+    },
+    {
+      "Id": "5b02a873-5bc5-42bf-8ced-137a27632a3a",
+      "Category": "sport",
+      "Name": "Golf club",
+      "Price": 110.79
+    },
+    {
+      "Id": "39208f6a-2014-48e7-9c0d-842c1bdc2c7b",
+      "Category": "motor",
+      "Name": "Sparkplug",
+      "Price": 50
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590101",
+      "Category": "electronics",
+      "Name": "Keyboard",
+      "Price": 45.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590102",
+      "Category": "electronics",
+      "Name": "Monitor",
+      "Price": 249.5
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590103",
+      "Category": "electronics",
+      "Name": "Headphones",
+      "Price": 79.95
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590104",
+      "Category": "electronics",
+      "Name": "Webcam",
+      "Price": 59.9
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590105",
+      "Category": "sport",
+      "Name": "Tennis racket",
+      "Price": 89
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590106",
+      "Category": "sport",
+      "Name": "Football",
+      "Price": 24.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590107",
+      "Category": "sport",
+      "Name": "Yoga mat",
+      "Price": 32.5
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590108",
+      "Category": "sport",
+      "Name": "Dumbbells",
+      "Price": 64.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590109",
+      "Category": "motor",
+      "Name": "Oil filter",
+      "Price": 15.75
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590110",
+      "Category": "motor",
+      "Name": "Brake pads",
+      "Price": 74.5
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590111",
+      "Category": "motor",
+      "Name": "Car battery",
+      "Price": 129.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590112",
+      "Category": "motor",
+      "Name": "Wiper blades",
+      "Price": 22.95
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590113",
+      "Category": "home",
+      "Name": "Desk lamp",
+      "Price": 39.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590114",
+      "Category": "home",
+      "Name": "Coffee maker",
+      "Price": 89.95
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590115",
+      "Category": "home",
+      "Name": "Wall clock",
+      "Price": 27.5
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590116",
+      "Category": "home",
+      "Name": "Throw pillow",
+      "Price": 18.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590117",
+      "Category": "office",
+      "Name": "Notebook",
+      "Price": 6.5
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590118",
+      "Category": "office",
+      "Name": "Pen set",
+      "Price": 12.99
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590119",
+      "Category": "office",
+      "Name": "Desk organizer",
+      "Price": 21.95
+    },
+    {
+      "Id": "d1b3c48a-3107-4f2c-9d52-b82467590120",
+      "Category": "office",
+      "Name": "Stapler",
+      "Price": 9.75
+    }
+  ]
+}
