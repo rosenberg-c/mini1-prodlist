@@ -25,11 +25,11 @@ namespace App.src.Products {
       Header("PRODUCT INVENTORY SYSTEM");
       Console.WriteLine($"Enter {ConsoleSupport.QuitCommand} to exit/back");
       Console.WriteLine();
-      Console.WriteLine("1. Add Product");
-      Console.WriteLine("2. Delete Product");
-      Console.WriteLine("3. Update Product");
-      Console.WriteLine("4. View Products");
-      Console.WriteLine("5. Search Products");
+      Console.WriteLine("1. Add");
+      Console.WriteLine("2. Delete");
+      Console.WriteLine("3. Edit");
+      Console.WriteLine("4. View");
+      Console.WriteLine("5. Search");
       Console.WriteLine("6. Statistics");
       Console.WriteLine();
       Footer();
@@ -56,18 +56,18 @@ namespace App.src.Products {
           }
 
           case "1": {
-            Header("Add product");
+            Header("Add");
             await _actions.AddAsync();
             break;
           }
 
           case "2":
-            Header("Delete product");
+            Header("Delete");
             await _actions.DeleteAsync();
             break;
 
           case "3": {
-            Header("Edit product");
+            Header("Edit");
             await _actions.EditAsync();
             break;
           }
@@ -80,7 +80,7 @@ namespace App.src.Products {
           }
 
           case "5": {
-            Header("Search product");
+            Header("Search");
             await _actions.SearchAsync();
             break;
           }
