@@ -11,6 +11,7 @@
         <Compile Remove="tests/**;dependencies/**" />
         <ProjectReference Include="dependencies/sharp-storage/SharpStorage.csproj" />
         <InternalsVisibleTo Include="App.Tests" />
+        <InternalsVisibleTo Include="App.Integration.Tests" />
     </ItemGroup>
 
 </Project>

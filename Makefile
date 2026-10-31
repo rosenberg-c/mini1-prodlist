@@ -1,7 +1,8 @@
 DOTNET ?= dotnet
 JB ?= jb
 PROJECT ?= App.csproj
-TESTS ?= tests/App.Tests.csproj
+PRODUCT_TESTS ?= tests/producttests/App.Tests.csproj
+APP_TESTS ?= tests/apptests/App.Integration.Tests.csproj
 
 -include .env
 APP_DATA_PATH ?= $(CURDIR)/products.json
@@ -21,7 +22,8 @@ build: deps
 
 .PHONY: test
 test: deps
-	$(DOTNET) test $(TESTS)
+	$(DOTNET) test $(PRODUCT_TESTS)
+	$(DOTNET) test $(APP_TESTS)
 
 .PHONY: run
 run: deps
@@ -30,12 +32,14 @@ run: deps
 .PHONY: lint
 lint: deps
 	$(DOTNET) format $(PROJECT) --verify-no-changes
-	$(DOTNET) format $(TESTS) --verify-no-changes
+	$(DOTNET) format $(PRODUCT_TESTS) --verify-no-changes
+	$(DOTNET) format $(APP_TESTS) --verify-no-changes
 
 .PHONY: format
 format: deps
 	$(JB) cleanupcode $(PROJECT) --profile="Built-in: Reformat Code"
-	$(JB) cleanupcode $(TESTS) --profile="Built-in: Reformat Code"
+	$(JB) cleanupcode $(PRODUCT_TESTS) --profile="Built-in: Reformat Code"
+	$(JB) cleanupcode $(APP_TESTS) --profile="Built-in: Reformat Code"
 
 .PHONY: clean
 clean:

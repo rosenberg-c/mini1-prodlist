@@ -55,7 +55,7 @@ make lint    # Check .NET formatting without changing files
 make format  # Format app and tests with JetBrains ReSharper
 ```
 
-`make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. Without Make, run `dotnet test tests/App.Tests.csproj` for tests or use the commands in the `Makefile`.
+`make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. Without Make, run `dotnet test tests/producttests/App.Tests.csproj` for Product tests or `dotnet test tests/apptests/App.Integration.Tests.csproj` for app tests or use the commands in the `Makefile`.
 
 ## Make
 
