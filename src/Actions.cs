@@ -39,57 +39,6 @@ namespace App.src {
       Console.WriteLine();
     }
 
-    private static bool TryReadName(out string name) {
-      name = string.Empty;
-
-      while (true) {
-        string? text = ConsoleSupport.ReadString("Enter Name: ");
-        if (ConsoleSupport.IsExitOrNull(text)) {
-          return false;
-        }
-
-        if (TextFieldValidation.TryField(text, out name)) {
-          return true;
-        }
-
-        ConsoleSupport.WriteLineRed("ERROR: Name cannot be empty.");
-      }
-    }
-
-    private static bool TryReadCategory(out string category) {
-      category = string.Empty;
-
-      while (true) {
-        string? text = ConsoleSupport.ReadString("Enter Category: ");
-        if (ConsoleSupport.IsExitOrNull(text)) {
-          return false;
-        }
-
-        if (TextFieldValidation.TryField(text, out category)) {
-          return true;
-        }
-
-        ConsoleSupport.WriteLineRed("ERROR: Category cannot be empty.");
-      }
-    }
-
-    private static bool TryReadPrice(out decimal price) {
-      price = 0m;
-
-      while (true) {
-        string? text = ConsoleSupport.ReadString("Enter Price: ");
-        if (ConsoleSupport.IsExitOrNull(text)) {
-          return false;
-        }
-
-        if (ProductPriceValidation.TryPrice(text, out price, out string e)) {
-          return true;
-        }
-
-        ConsoleSupport.WriteLineRed($"ERROR: {e}");
-      }
-    }
-
     internal Actions(
       ProductManager manager
     ) {
@@ -98,15 +47,15 @@ namespace App.src {
 
     internal async Task AddAsync() {
       while (true) {
-        if (!TryReadCategory(out string category)) {
+        if (!ProductPrompts.TryReadCategory(out string category)) {
           return;
         }
 
-        if (!TryReadName(out string name)) {
+        if (!ProductPrompts.TryReadName(out string name)) {
           return;
         }
 
-        if (!TryReadPrice(out decimal price)) {
+        if (!ProductPrompts.TryReadPrice(out decimal price)) {
           return;
         }
 
@@ -170,7 +119,7 @@ namespace App.src {
           Product updated;
           switch (choice) {
             case "1":
-              if (!TryReadCategory(out string category)) {
+              if (!ProductPrompts.TryReadCategory(out string category)) {
                 return;
               }
 
@@ -178,7 +127,7 @@ namespace App.src {
               break;
 
             case "2":
-              if (!TryReadName(out string name)) {
+              if (!ProductPrompts.TryReadName(out string name)) {
                 return;
               }
 
@@ -186,7 +135,7 @@ namespace App.src {
               break;
 
             case "3":
-              if (!TryReadPrice(out decimal price)) {
+              if (!ProductPrompts.TryReadPrice(out decimal price)) {
                 return;
               }
 

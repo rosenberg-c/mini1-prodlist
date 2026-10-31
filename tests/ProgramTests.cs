@@ -277,6 +277,21 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task Menu_EditPromptEof_ReturnsWithoutChangingProduct() {
+      string path = Path.Combine(_dir, "products.json");
+      ProductStore store = new(path);
+      Product original = await store.CreateAsync("Food", "Pizza", 120m);
+      string before = await File.ReadAllTextAsync(path);
+
+      string output = await RunAsync("3\n");
+
+      Assert.Contains("Application closed.", output);
+      Assert.DoesNotContain("Product updated successfully.", output);
+      Assert.Equal(before, await File.ReadAllTextAsync(path));
+      Assert.Equal([original], await ReadProductsAsync(path));
+    }
+
+    [Fact]
     public async Task Menu_InvalidEditFields_RetryWithoutSavingUntilValid() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);
