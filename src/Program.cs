@@ -3,20 +3,22 @@ using App.src.Products;
 
 namespace App.src {
   public class Program {
-    public static async Task Main() {
-      string path = Path.Combine(
-        Directory.GetCurrentDirectory(),
-        "products.json"
-      );
+    public static Task Main() {
+      string path = Environment.GetEnvironmentVariable("APP_DATA_PATH")
+        ?? "products.json";
+      return RunAsync(path);
+    }
+
+    internal static async Task RunAsync(string path) {
       ProductStore store = new(path);
 
       try {
         _ = await store.GetAllAsync();
       }
       catch (Exception e) when (e is JsonException or InvalidDataException) {
-        Console.WriteLine($"Cannot load products.json: {e.Message}");
+        Console.WriteLine($"Cannot load {path}: {e.Message}");
         Console.WriteLine(
-          "Delete products.json to start with an empty inventory,"
+          $"Delete {path} to start with an empty inventory,"
         );
         return;
       }

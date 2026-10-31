@@ -4,3 +4,4 @@ products.json
 *.v1.bak
 *.v2.bak
 .vscode/
+.env

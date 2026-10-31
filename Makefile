@@ -3,6 +3,9 @@ JB ?= jb
 PROJECT ?= App.csproj
 TESTS ?= tests/App.Tests.csproj
 
+-include .env
+APP_DATA_PATH ?= $(CURDIR)/products.json
+
 .PHONY: deps
 deps:
 	git submodule update --init --recursive
@@ -22,7 +25,7 @@ test: deps
 
 .PHONY: run
 run: deps
-	$(DOTNET) run --project $(PROJECT)
+	APP_DATA_PATH="$(APP_DATA_PATH)" $(DOTNET) run --project $(PROJECT)
 
 .PHONY: lint
 lint: deps
@@ -40,4 +43,4 @@ clean:
 
 .PHONY: reset
 reset:
-	cp products.example.json products.json
+	cp products.example.json "$(APP_DATA_PATH)"
