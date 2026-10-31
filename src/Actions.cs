@@ -135,7 +135,7 @@ namespace App.src {
 
     internal async Task EditAsync() {
       while (true) {
-        ProductListResult result = await _m.ProductListSorted();
+        ProductListResult result = await _m.ListProductsSortedAsync();
         List<Product> entries = result.Products;
 
         DisplayItemListAsync(result.Products);
@@ -207,7 +207,7 @@ namespace App.src {
 
     internal async Task ViewAsync() {
       try {
-        ProductListResult results = await _m.ProductListSorted();
+        ProductListResult results = await _m.ListProductsSortedAsync();
 
         DisplayItemListAsync(results.Products);
         ConsoleSupport.WriteLineYellow($"TOTAL PRICE: {results.Total:0.##} kr");
@@ -219,7 +219,7 @@ namespace App.src {
 
     internal async Task DeleteAsync() {
       while (true) {
-        ProductListResult result = await _m.ProductListSorted();
+        ProductListResult result = await _m.ListProductsSortedAsync();
         List<Product> entries = result.Products;
 
         DisplayItemListAsync(result.Products);
@@ -260,7 +260,7 @@ namespace App.src {
           break;
         }
 
-        ProductListResult result = await _m.ProductListSorted();
+        ProductListResult result = await _m.ListProductsSortedAsync();
         var entries = result.Products.Where(p =>
           p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
           p.Category.Contains(term, StringComparison.OrdinalIgnoreCase)
@@ -293,7 +293,7 @@ namespace App.src {
     }
 
     internal async Task StatisticsAsync() {
-      ProductListResult result = await _m.ProductListSorted();
+      ProductListResult result = await _m.ListProductsSortedAsync();
       List<Product> entries = result.Products;
 
       if (entries.Count == 0) {

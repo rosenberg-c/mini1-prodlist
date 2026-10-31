@@ -19,7 +19,7 @@ namespace App.tests.Tests {
       Product pizza = await manager.CreateAsync("Food", "Pizza", 120m);
       Product mouse = await manager.CreateAsync("Electronics", "Mouse", 299m);
 
-      ProductListResult result = await manager.ProductListSorted();
+      ProductListResult result = await manager.ListProductsSortedAsync();
 
       Assert.Equal([pizza, mouse, keyboard], result.Products);
       Assert.Equal(1018m, result.Total);
@@ -49,7 +49,7 @@ namespace App.tests.Tests {
         Path.Combine(_dir, "products.json")
       ));
 
-      ProductListResult result = await manager.ProductListSorted();
+      ProductListResult result = await manager.ListProductsSortedAsync();
 
       Assert.Empty(result.Products);
       Assert.Equal(0m, result.Total);
@@ -98,7 +98,7 @@ namespace App.tests.Tests {
       await manager.CreateAsync("Food", "First", decimal.MaxValue);
       await manager.CreateAsync("Food", "Second", decimal.MaxValue);
 
-      await Assert.ThrowsAsync<OverflowException>(() => manager.ProductListSorted());
+      await Assert.ThrowsAsync<OverflowException>(() => manager.ListProductsSortedAsync());
       Assert.Equal(2, (await store.GetAllAsync()).Count);
     }
 
