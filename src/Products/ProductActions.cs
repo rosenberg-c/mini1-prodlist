@@ -68,6 +68,7 @@ namespace App.src.Products {
           Product updated;
           switch (choice) {
             case "1":
+              Console.WriteLine($"-- Current Category: {old.Category} --");
               if (!ProductPrompts.TryReadCategory(out string category)) {
                 return;
               }
@@ -76,6 +77,7 @@ namespace App.src.Products {
               break;
 
             case "2":
+              Console.WriteLine($"-- Current Name: {old.Name} --");
               if (!ProductPrompts.TryReadName(out string name)) {
                 return;
               }
@@ -84,6 +86,7 @@ namespace App.src.Products {
               break;
 
             case "3":
+              Console.WriteLine($"-- Current price: {old.Price} --");
               if (!ProductPrompts.TryReadPrice(out decimal price)) {
                 return;
               }
@@ -174,7 +177,6 @@ namespace App.src.Products {
           Console.WriteLine();
           ProductDisplay.DisplayTable(entries);
           Console.WriteLine();
-
           continue;
         }
 
@@ -182,7 +184,6 @@ namespace App.src.Products {
           Console.WriteLine();
           ProductDisplay.DisplayTable(entries, highlightMatches: true);
           Console.WriteLine();
-
           continue;
         }
       }
