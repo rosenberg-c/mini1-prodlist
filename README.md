@@ -35,16 +35,14 @@ The current `products.json` schema is version 4. On startup, the app rejects fil
 For vscode users the extension "C# Dev Kit" from Microsoft may need to be installed
 
 
-## Linting
+## Formatting prerequisite
+
+Install the JetBrains CLI for `make format`:
 
 ```sh
-Install ReSharper tools
 dotnet tool install -g JetBrains.ReSharper.GlobalTools
-
-Add tools to PATH (if needed)
-export PATH="$PATH:$HOME/.dotnet/tools"
+export PATH="$PATH:$HOME/.dotnet/tools" # If jb is not on PATH
 ```
-
 
 ## Tests and code style
 
@@ -53,11 +51,11 @@ From the project folder, run:
 ```sh
 make build   # Build app and storage dependency
 make test    # Run tests
-make lint    # Check formatting without changing files
-make format  # Format app and test code
+make lint    # Check .NET formatting without changing files
+make format  # Format app and tests with JetBrains ReSharper
 ```
 
-These commands use the .NET SDK. `make` is also required; if you don't have it, run `dotnet test tests/App.Tests.csproj` for tests or see the equivalent `dotnet format` commands in the `Makefile`.
+`make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. Without Make, run `dotnet test tests/App.Tests.csproj` for tests or use the commands in the `Makefile`.
 
 ## Make
 

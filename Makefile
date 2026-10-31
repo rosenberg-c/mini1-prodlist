@@ -1,4 +1,5 @@
 DOTNET ?= dotnet
+JB ?= jb
 PROJECT ?= App.csproj
 TESTS ?= tests/App.Tests.csproj
 
@@ -30,8 +31,8 @@ lint: deps
 
 .PHONY: format
 format: deps
-	$(DOTNET) format $(PROJECT)
-	$(DOTNET) format $(TESTS)
+	$(JB) cleanupcode $(PROJECT) --profile="Built-in: Reformat Code"
+	$(JB) cleanupcode $(TESTS) --profile="Built-in: Reformat Code"
 
 .PHONY: clean
 clean:
