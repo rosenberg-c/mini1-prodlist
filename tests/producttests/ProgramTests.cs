@@ -480,7 +480,7 @@ namespace App.tests.Tests {
         UseShellExecute = false
       };
       start.Environment["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1";
-      start.ArgumentList.Add(typeof(Product).Assembly.Location);
+      start.ArgumentList.Add(typeof(ProductHost.Program).Assembly.Location);
 
       using Process process = Process.Start(start)
         ?? throw new InvalidOperationException("Could not start the app.");

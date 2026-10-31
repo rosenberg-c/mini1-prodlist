@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="../../App.csproj" />
+        <ProjectReference Include="../producthost/ProductHost.csproj" />
     </ItemGroup>
 
     <ItemGroup>
