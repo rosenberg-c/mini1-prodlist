@@ -11,7 +11,7 @@ A small console app for managing products.
    make run
    ```
 
-   `make run` initializes the pinned `sharp-storage` Git submodule first. If you're on Windows or not using Make, run `git submodule update --init --recursive` from the project folder after cloning, then run `dotnet run --project App.csproj`. The submodule uses a GitHub SSH URL, so GitHub SSH access must be configured. Alternatively, clone with `git clone --recurse-submodules <repo-url>` to initialize the submodule during cloning.
+   `make run` initializes the pinned `sharp-storage`(https://github.com/rosenberg-c/sharp-storage) Git submodule first. If you're on Windows or not using Make, run `git submodule update --init --recursive` from the project folder after cloning, then run `dotnet run --project App.csproj`. The submodule uses a GitHub SSH URL, so GitHub SSH access must be configured. Alternatively, clone with `git clone --recurse-submodules <repo-url>` to initialize the submodule during cloning.
 
 3. Choose a menu option (1–6). Type `q` at the main menu to quit, or at a prompt to return to the main menu. The app also quits if input ends.
 
