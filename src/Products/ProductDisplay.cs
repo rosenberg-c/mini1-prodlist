@@ -8,7 +8,7 @@ namespace App.src.Products {
     ) {
       ConsoleTable.Write(
         ["Category", "Name", "Price"],
-        products.Select(static p => (IReadOnlyList<string>)[
+        products.Select(static p => (IReadOnlyList<string>) [
             p.Category, p.Name, $"{p.Price:0.##} kr"
           ]
         ),
@@ -47,7 +47,8 @@ namespace App.src.Products {
       IReadOnlyList<string>[] categories = products
         .GroupBy(static p => p.Category)
         .OrderBy(static g => g.Key)
-        .Select(static g => (IReadOnlyList<string>)[g.Key, g.Count().ToString()]
+        .Select(static g => (IReadOnlyList<string>)
+          [g.Key, g.Count().ToString()]
         )
         .ToArray();
 

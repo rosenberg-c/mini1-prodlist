@@ -1,6 +1,7 @@
 DOTNET ?= dotnet
 JB ?= jb
 PROJECT ?= App.csproj
+SOLUTION ?= App.sln
 PRODUCT_TESTS ?= tests/producttests/App.Tests.csproj
 APP_TESTS ?= tests/apptests/App.Integration.Tests.csproj
 PRODUCT_HOST ?= tests/producthost/ProductHost.csproj
@@ -39,10 +40,7 @@ lint: deps
 
 .PHONY: format
 format: deps
-	$(JB) cleanupcode $(PROJECT) --profile="Built-in: Reformat Code"
-	$(JB) cleanupcode $(PRODUCT_HOST) --profile="Built-in: Reformat Code"
-	$(JB) cleanupcode $(PRODUCT_TESTS) --profile="Built-in: Reformat Code"
-	$(JB) cleanupcode $(APP_TESTS) --profile="Built-in: Reformat Code"
+	$(JB) cleanupcode $(SOLUTION) --profile="Built-in: Reformat Code" --include="src/**/*.cs;tests/**/*.cs"
 
 .PHONY: clean
 clean:
