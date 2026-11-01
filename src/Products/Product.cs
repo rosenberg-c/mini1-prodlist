@@ -5,7 +5,6 @@ namespace App.src.Products {
     string Name,
     decimal Price
   ) {
-
     public Product Copy() {
       return new Product(Id, Category, Name, Price);
     }
@@ -21,6 +20,5 @@ namespace App.src.Products {
     public Product WithPrice(decimal price) {
       return this with { Price = price };
     }
-
   }
 }

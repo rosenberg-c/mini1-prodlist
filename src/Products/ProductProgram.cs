@@ -4,7 +4,7 @@ namespace App.src.Products {
   public class ProductProgram {
     public static async Task RunAsync() {
       string path = Environment.GetEnvironmentVariable("APP_DATA_PATH")
-        ?? "products.json";
+                    ?? "products.json";
 
       ProductStore store = new(path);
 

@@ -19,7 +19,8 @@ namespace App.src.Products {
       decimal price
     ) {
       if (!TextFieldValidation.TryField(category, out string cat)) {
-        throw new ArgumentException("Category cannot be empty.", nameof(category)
+        throw new ArgumentException("Category cannot be empty.",
+          nameof(category)
         );
       }
 
@@ -46,7 +47,8 @@ namespace App.src.Products {
       return _store.UpdateAsync(id, product);
     }
 
-    internal static List<Product> SortForDisplay(IEnumerable<Product> products) {
+    internal static List<Product>
+      SortForDisplay(IEnumerable<Product> products) {
       return products.OrderBy(static p => p.Price)
         .ThenBy(static p => p.Category, StringComparer.OrdinalIgnoreCase)
         .ThenBy(static p => p.Name, StringComparer.OrdinalIgnoreCase)

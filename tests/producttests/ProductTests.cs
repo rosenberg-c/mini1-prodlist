@@ -9,9 +9,12 @@ namespace App.tests.Tests {
       Guid id = Guid.Parse("11111111-1111-4111-8111-111111111111");
       Product product = new(id, "Electronics", "Mouse", 299.50m);
 
-      using JsonDocument json = JsonDocument.Parse(JsonSerializer.Serialize(product));
+      using JsonDocument json =
+        JsonDocument.Parse(JsonSerializer.Serialize(product));
       Assert.Equal(id, json.RootElement.GetProperty("Id").GetGuid());
-      Assert.Equal("Electronics", json.RootElement.GetProperty("Category").GetString());
+      Assert.Equal("Electronics",
+        json.RootElement.GetProperty("Category").GetString()
+      );
       Assert.Equal("Mouse", json.RootElement.GetProperty("Name").GetString());
       Assert.Equal(299.50m, json.RootElement.GetProperty("Price").GetDecimal());
     }

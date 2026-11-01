@@ -9,7 +9,8 @@ namespace App.tests.Tests {
       string input = 1.25m.ToString(CultureInfo.CurrentCulture);
 
       bool result = ProductPriceValidation.TryPrice(input, out decimal price,
-        out string error);
+        out string error
+      );
 
       Assert.True(result);
       Assert.Equal(1.25m, price);
@@ -24,7 +25,8 @@ namespace App.tests.Tests {
       string? input, int expectedPrice, string expectedError
     ) {
       bool result = ProductPriceValidation.TryPrice(input, out decimal price,
-        out string error);
+        out string error
+      );
 
       Assert.False(result);
       Assert.Equal(expectedPrice, price);

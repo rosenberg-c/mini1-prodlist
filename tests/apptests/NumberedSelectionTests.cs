@@ -7,7 +7,8 @@ namespace App.tests.Tests {
     public void ParseIndex_SelectsFromNonProductList() {
       string[] books = ["Dune", "The Hobbit"];
 
-      NumberedSelectionResult result = NumberedSelection.ParseIndex(books.Length, "2");
+      NumberedSelectionResult result =
+        NumberedSelection.ParseIndex(books.Length, "2");
 
       Assert.Equal(SelectionStatus.Selected, result.Status);
       Assert.Equal("The Hobbit", books[result.Index]);
@@ -27,7 +28,8 @@ namespace App.tests.Tests {
     [Theory]
     [InlineData(null)]
     [InlineData(" Q ")]
-    public void ParseIndex_DistinguishesCancellationFromInvalidInput(string? input) {
+    public void ParseIndex_DistinguishesCancellationFromInvalidInput(
+      string? input) {
       NumberedSelectionResult result = NumberedSelection.ParseIndex(2, input);
 
       Assert.Equal(SelectionStatus.Cancelled, result.Status);

@@ -12,6 +12,5 @@ namespace App.src.ConsoleCore {
     internal static void Footer() {
       Console.WriteLine("".PadRight(Pad, '-'));
     }
-
   }
 }

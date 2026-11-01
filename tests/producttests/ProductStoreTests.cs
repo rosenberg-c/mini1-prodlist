@@ -13,7 +13,8 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task CreateAsync_PersistsFieldsAndDistinctIds_ForRepeatedNames() {
+    public async Task
+      CreateAsync_PersistsFieldsAndDistinctIds_ForRepeatedNames() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);
 
@@ -27,11 +28,15 @@ namespace App.tests.Tests {
       Assert.Equal(299.50m, first.Price);
       Assert.Equal([first, second], await new ProductStore(path).GetAllAsync());
 
-      using JsonDocument document = JsonDocument.Parse(await File.ReadAllTextAsync(path));
+      using JsonDocument document =
+        JsonDocument.Parse(await File.ReadAllTextAsync(path));
       Assert.Equal(ProductStore.SchemaVersion,
-        document.RootElement.GetProperty("schemaVersion").GetInt32());
+        document.RootElement.GetProperty("schemaVersion").GetInt32()
+      );
       Assert.Equal(299.50m,
-        document.RootElement.GetProperty("data")[0].GetProperty("Price").GetDecimal());
+        document.RootElement.GetProperty("data")[0].GetProperty("Price")
+          .GetDecimal()
+      );
     }
 
     [Fact]
@@ -51,10 +56,13 @@ namespace App.tests.Tests {
       ProductStore store = new(path);
       Product first = await store.CreateAsync("Office", "Pen", 1.25m);
       Product second = await store.CreateAsync("Office", "Pen", 1.25m);
-      Product updated = second with { Category = "Food", Name = "Pizza", Price = 0m };
+      Product updated = second with {
+        Category = "Food", Name = "Pizza", Price = 0m
+      };
 
       Assert.True(await store.UpdateAsync(second.Id, updated));
-      Assert.Equal([first, updated], await new ProductStore(path).GetAllAsync());
+      Assert.Equal([first, updated], await new ProductStore(path).GetAllAsync()
+      );
       Assert.Equal(second.Id, updated.Id);
     }
 
@@ -66,7 +74,9 @@ namespace App.tests.Tests {
       string before = await File.ReadAllTextAsync(path);
 
       Assert.False(await store.UpdateAsync(Guid.NewGuid(),
-        existing with { Name = "Changed" }));
+          existing with { Name = "Changed" }
+        )
+      );
       Assert.Equal(before, await File.ReadAllTextAsync(path));
       Assert.Equal([existing], await store.GetAllAsync());
     }
@@ -79,7 +89,8 @@ namespace App.tests.Tests {
       string before = await File.ReadAllTextAsync(path);
 
       await Assert.ThrowsAsync<InvalidOperationException>(() =>
-        store.UpdateAsync(existing.Id, existing with { Id = Guid.NewGuid() }));
+        store.UpdateAsync(existing.Id, existing with { Id = Guid.NewGuid() })
+      );
       Assert.Equal(before, await File.ReadAllTextAsync(path));
       Assert.Equal([existing], await store.GetAllAsync());
     }

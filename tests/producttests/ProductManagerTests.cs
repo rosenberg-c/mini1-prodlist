@@ -12,10 +12,12 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task ProductListSorted_OrdersByPriceAndTotalsWithoutChangingStorageOrder() {
+    public async Task
+      ProductListSorted_OrdersByPriceAndTotalsWithoutChangingStorageOrder() {
       ProductStore store = new(Path.Combine(_dir, "products.json"));
       ProductManager manager = new(store);
-      Product keyboard = await manager.CreateAsync("Electronics", "Keyboard", 599m);
+      Product keyboard =
+        await manager.CreateAsync("Electronics", "Keyboard", 599m);
       Product pizza = await manager.CreateAsync("Food", "Pizza", 120m);
       Product mouse = await manager.CreateAsync("Electronics", "Mouse", 299m);
 
@@ -35,19 +37,22 @@ namespace App.tests.Tests {
       Product electronicsA2 = Item(5, "Electronics", "A", 10m);
 
       List<Product> sorted = ProductManager.SortForDisplay([
-        food, office, electronicsB, electronicsA2, electronicsA1
-      ]);
+          food, office, electronicsB, electronicsA2, electronicsA1
+        ]
+      );
 
       Assert.Equal([
-        electronicsA1, electronicsA2, electronicsB, office, food
-      ], sorted);
+          electronicsA1, electronicsA2, electronicsB, office, food
+        ], sorted
+      );
     }
 
     [Fact]
     public async Task ProductListSorted_EmptyInventoryHasZeroTotal() {
       ProductManager manager = new(new ProductStore(
-        Path.Combine(_dir, "products.json")
-      ));
+          Path.Combine(_dir, "products.json")
+        )
+      );
 
       ProductListResult result = await manager.ListProductsSortedAsync();
 
@@ -67,8 +72,9 @@ namespace App.tests.Tests {
       string path = Path.Combine(_dir, "products.json");
       ProductManager manager = new(new ProductStore(path));
 
-      ArgumentException error = Assert.Throws<ArgumentException>(
-        () => { _ = manager.CreateAsync(category, name, price); }
+      ArgumentException error = Assert.Throws<ArgumentException>(() => {
+          _ = manager.CreateAsync(category, name, price);
+        }
       );
 
       Assert.Equal(parameter, error.ParamName);
@@ -76,7 +82,8 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task CreateAsync_TrimsFieldsAndAcceptsZeroAndFractionalPrices() {
+    public async Task
+      CreateAsync_TrimsFieldsAndAcceptsZeroAndFractionalPrices() {
       string path = Path.Combine(_dir, "products.json");
       ProductManager manager = new(new ProductStore(path));
 
@@ -98,12 +105,16 @@ namespace App.tests.Tests {
       await manager.CreateAsync("Food", "First", decimal.MaxValue);
       await manager.CreateAsync("Food", "Second", decimal.MaxValue);
 
-      await Assert.ThrowsAsync<OverflowException>(() => manager.ListProductsSortedAsync());
+      await Assert.ThrowsAsync<OverflowException>(() =>
+        manager.ListProductsSortedAsync()
+      );
       Assert.Equal(2, (await store.GetAllAsync()).Count);
     }
 
-    private static Product Item(int id, string category, string name, decimal price) {
-      return new Product(new Guid(id, 0, 0, new byte[8]), category, name, price);
+    private static Product Item(int id, string category, string name,
+      decimal price) {
+      return new Product(new Guid(id, 0, 0, new byte[8]), category, name, price
+      );
     }
 
     public void Dispose() {

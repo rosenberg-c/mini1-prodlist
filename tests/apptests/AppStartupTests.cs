@@ -9,7 +9,8 @@ namespace App.tests.Tests {
     [InlineData("")]
     public async Task App_QuitsCleanlyOnQuitOrEndOfInput(string input) {
       string directory = Path.Combine(Path.GetTempPath(),
-        "app-startup-tests", Guid.NewGuid().ToString("N"));
+        "app-startup-tests", Guid.NewGuid().ToString("N")
+      );
       Directory.CreateDirectory(directory);
 
       try {
@@ -23,7 +24,9 @@ namespace App.tests.Tests {
         start.ArgumentList.Add(typeof(Program).Assembly.Location);
 
         using Process process = Process.Start(start)
-          ?? throw new InvalidOperationException("Could not start the app.");
+                                ?? throw new InvalidOperationException(
+                                  "Could not start the app."
+                                );
         try {
           Task<string> output = process.StandardOutput.ReadToEndAsync();
           Task<string> error = process.StandardError.ReadToEndAsync();
@@ -35,7 +38,8 @@ namespace App.tests.Tests {
           string stdout = await output;
           string stderr = await error;
           Assert.True(process.ExitCode == 0,
-            $"App exited with {process.ExitCode}: {stderr}");
+            $"App exited with {process.ExitCode}: {stderr}"
+          );
           Assert.Contains("Application closed.", stdout);
         }
         finally {

@@ -95,7 +95,8 @@ namespace App.src.Products {
               break;
 
             default:
-              ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");
+              ConsoleSupport.WriteLineYellow("Invalid option. Please try again."
+              );
               continue;
           }
 
