@@ -37,6 +37,13 @@ namespace App.src.ConsoleCore {
       Console.ResetColor();
     }
 
+    public static void WriteWhiteBackground(string prompt) {
+      Console.BackgroundColor = ConsoleColor.White;
+      Console.ForegroundColor = ConsoleColor.Black;
+      Console.Write(prompt);
+      Console.ResetColor();
+    }
+
     public static void WriteLineRed(string prompt) {
       Console.ForegroundColor = ConsoleColor.Red;
       Console.WriteLine(prompt);
