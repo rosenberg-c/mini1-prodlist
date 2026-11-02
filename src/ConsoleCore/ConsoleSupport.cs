@@ -31,6 +31,14 @@ namespace App.src.ConsoleCore {
       }
     }
 
+    internal static bool TryReadMenuChoice(
+      [NotNullWhen(true)] out string? choice,
+      string prompt = "Select option: "
+    ) {
+      choice = ReadString(prompt);
+      return !IsExitOrNull(choice);
+    }
+
     public static void WriteLineGreen(string prompt) {
       Console.ForegroundColor = ConsoleColor.Green;
       Console.WriteLine(prompt);
