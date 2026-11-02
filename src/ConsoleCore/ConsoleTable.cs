@@ -6,8 +6,9 @@ namespace App.src.ConsoleCore {
       IReadOnlyList<string> headers,
       IEnumerable<IReadOnlyList<string>> rows,
       int width = MinimumCellWidth,
-      bool numberRows = false,
-      bool highlightRows = false
+      bool numberRows = true,
+      bool highlightRows = false,
+      string? header = null
     ) {
       if (headers.Count == 0 || width < 1) {
         throw new ArgumentException(
@@ -31,13 +32,23 @@ namespace App.src.ConsoleCore {
         cellWidth = Math.Max(cellWidth, cells.Max(static cell => cell.Length));
       }
 
-      string headerPrefix = numberRows ? "|    " : "";
+      string headerPrefix = numberRows ? "     " : "";
       string borderPrefix = numberRows ? "+----+" : "+";
 
       string segment = new('-', cellWidth + 2);
+      string borderH =
+        $"{headerPrefix}+{string.Concat(Enumerable.Repeat($"{segment}+", headers.Count))}";
+
       string border =
         $"{borderPrefix}{string.Concat(Enumerable.Repeat($"{segment}+", headers.Count))}";
-      Console.WriteLine(border);
+
+      if (header != null) {
+        Console.Write($"{"".PadRight(numberRows ? 5 : 0, ' ')}");
+        ConsoleSupport.WriteWhiteBackground($" {header} ");
+        Console.WriteLine();
+      }
+
+      Console.WriteLine(borderH);
       Console.WriteLine($"{headerPrefix}{FormatRow(headers, cellWidth)}");
       Console.WriteLine(border);
 
