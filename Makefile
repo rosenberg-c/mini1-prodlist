@@ -48,4 +48,4 @@ clean:
 
 .PHONY: reset
 reset:
-	cp products.example.json "$(APP_DATA_PATH)"
+	cp todo.example.json "$(APP_DATA_PATH)"
