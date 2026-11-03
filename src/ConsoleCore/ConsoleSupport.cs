@@ -35,8 +35,14 @@ namespace App.src.ConsoleCore {
       [NotNullWhen(true)] out string? choice,
       string prompt = "Select option: "
     ) {
-      choice = ReadString(prompt);
-      return !IsExitOrNull(choice);
+      return TryReadInput(prompt, out choice);
+    }
+
+    internal static bool TryReadInput(
+      string prompt, [NotNullWhen(true)] out string? value
+    ) {
+      value = ReadString(prompt);
+      return !IsExitOrNull(value);
     }
 
     public static void WriteLineGreen(string prompt) {
