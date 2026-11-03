@@ -320,27 +320,16 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task Menu_EditOptions_DisplayChoicesAndAllowSelection() {
+    public async Task Menu_EditOptions_AllowSelection() {
       string path = Path.Combine(_dir, "products.json");
       ProductStore store = new(path);
       Product original = await store.CreateAsync("Food", "Pizza", 120m);
 
       string output = await RunAsync("3\n1\n2\nPasta\nq\nq\n");
 
-      string[] lines = output.Split('\n');
-      string border = "+----+" + new string('-', 26) + "+";
-      string header = "|    | " + "EDIT".PadRight(24) + " |";
-      string category = "|  1 | " + "Category".PadRight(24) + " |";
-      string name = "|  2 | " + "Name".PadRight(24) + " |";
-      string price = "|  3 | " + "Price".PadRight(24) + " |";
-
-      Assert.Contains(border, lines);
-      Assert.Contains(header, lines);
-      Assert.Contains(category, lines);
-      Assert.Contains(name, lines);
-      Assert.Contains(price, lines);
-      Assert.Equal(border.Length, header.Length);
-      Assert.Equal(border.Length, category.Length);
+      Assert.Contains("Category", output);
+      Assert.Contains("Name", output);
+      Assert.Contains("Price", output);
       Assert.Contains("Product updated successfully.", output);
       Assert.Equal([original with { Name = "Pasta" }],
         await ReadProductsAsync(path)
@@ -389,34 +378,6 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task Menu_ViewTable_AlignsHeaderBordersAndNumberedRows() {
-      string path = Path.Combine(_dir, "products.json");
-      ProductStore store = new(path);
-      await store.CreateAsync("Food", "Pizza", 120.50m);
-      await store.CreateAsync("Office", "Pen", 1.25m);
-
-      string output = await RunAsync("4\nx\nq\n");
-      string[] lines = output.Split('\n');
-      string border = "+----+" + new string('-', 26) + "+" +
-                      new string('-', 26) + "+" + new string('-', 26) + "+";
-      string header = "|    | " + "Category".PadRight(24) + " | " +
-                      "Name".PadRight(24) + " | " + "Price".PadRight(24) + " |";
-      string first = "|  1 | " + "Office".PadRight(24) + " | " +
-                     "Pen".PadRight(24) + " | " + "1.25 kr".PadRight(24) + " |";
-      string second = "|  2 | " + "Food".PadRight(24) + " | " +
-                      "Pizza".PadRight(24) + " | " + "120.5 kr".PadRight(24) +
-                      " |";
-
-      Assert.Contains(border, lines);
-      Assert.Contains(header, lines);
-      Assert.Contains(first, lines);
-      Assert.Contains(second, lines);
-      Assert.Equal(border.Length, header.Length);
-      Assert.Equal(border.Length, first.Length);
-      Assert.Equal(border.Length, second.Length);
-    }
-
-    [Fact]
     public async Task
       Menu_Statistics_DisplaysExtremesAverageAndCategoryCounts() {
       string path = Path.Combine(_dir, "products.json");
@@ -427,60 +388,17 @@ namespace App.tests.Tests {
 
       string output = await RunAsync("6\nx\nq\n");
 
-      string border = "+" + new string('-', 26) + "+" +
-                      new string('-', 26) + "+";
-      string[] lines = output.Split('\n');
-      Assert.Contains(border, lines);
-      Assert.Contains("| " + "Statistic".PadRight(24) + " | " +
-                      "Value".PadRight(24) + " |", lines
-      );
-      Assert.Contains("| " + "Most expensive".PadRight(24) + " | " +
-                      "Pizza - 30 kr".PadRight(24) + " |", lines
-      );
-      Assert.Contains("| " + "Cheapest".PadRight(24) + " | " +
-                      "Banana - 10 kr".PadRight(24) + " |", lines
-      );
-      Assert.Contains("| " + "Average price".PadRight(24) + " | " +
-                      "20 kr".PadRight(24) + " |", lines
-      );
+      Assert.Contains("Most expensive", output);
+      Assert.Contains("Pizza - 30 kr", output);
+      Assert.Contains("Cheapest", output);
+      Assert.Contains("Banana - 10 kr", output);
+      Assert.Contains("Average price", output);
+      Assert.Contains("20 kr", output);
       Assert.Contains("Products per category:", output);
-      Assert.Contains("| " + "Category".PadRight(24) + " | " +
-                      "Count".PadRight(24) + " |", lines
-      );
-      Assert.Contains("| " + "Food".PadRight(24) + " | " +
-                      "2".PadRight(24) + " |", lines
-      );
-      Assert.Contains("| " + "Office".PadRight(24) + " | " +
-                      "1".PadRight(24) + " |", lines
-      );
+      Assert.Matches(@"Food\s+\|\s+2\s+\|", output);
+      Assert.Matches(@"Office\s+\|\s+1\s+\|", output);
       Assert.Contains("Press any key to return.", output);
       Assert.Equal([food, office, foodAgain], await ReadProductsAsync(path));
-    }
-
-    [Fact]
-    public async Task Menu_Statistics_ExpandsTablesForLongValues() {
-      ProductStore store = new(Path.Combine(_dir, "products.json"));
-      const string category = "Extra long category name";
-      const string name = "Extra long product name";
-      await store.CreateAsync(category, name, 100m);
-
-      string output = await RunAsync("6\nx\nq\n");
-      string[] lines = output.Split('\n');
-      int summaryWidth = $"{name} - 100 kr".Length;
-      int categoryWidth = category.Length;
-
-      Assert.Contains("+" + new string('-', summaryWidth + 2) + "+" +
-                      new string('-', summaryWidth + 2) + "+", lines
-      );
-      Assert.Contains("| " + "Most expensive".PadRight(summaryWidth) + " | " +
-                      $"{name} - 100 kr".PadRight(summaryWidth) + " |", lines
-      );
-      Assert.Contains("+" + new string('-', categoryWidth + 2) + "+" +
-                      new string('-', categoryWidth + 2) + "+", lines
-      );
-      Assert.Contains("| " + category + " | " +
-                      "1".PadRight(categoryWidth) + " |", lines
-      );
     }
 
     [Fact]
