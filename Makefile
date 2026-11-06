@@ -49,3 +49,6 @@ clean:
 .PHONY: reset
 reset:
 	cp assets.example.json "$(APP_DATA_PATH)"
+	@for file in bin/Debug/net*/assets.json; do \
+		if [ -f "$$file" ]; then cp assets.example.json "$$file" || exit $$?; fi; \
+	done
