@@ -387,6 +387,82 @@ namespace App.tests.Tests {
       }
     }
 
+    [Fact]
+    public async Task RemoveAsset_DeletesOnlySelectedAssetFromFile() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        Asset keep = await store.CreateAsync(id => new Computer(
+            id, "Apple", "Keep", new DateOnly(2024, 3, 15),
+            100m, Office.Sweden
+          )
+        );
+        await store.CreateAsync(id => new MobilePhone(
+            id, "Samsung", "Remove", new DateOnly(2025, 1, 10),
+            200m, Office.Turkey
+          )
+        );
+
+        string output = await RunAppAsync(directory, path,
+          "4\n9\n2\ny\n\nq\n"
+        );
+
+        Assert.Contains("4. Remove", output);
+        Assert.Contains("Purchase Date", output);
+        Assert.Contains("|  1 | Computer", output);
+        Assert.Contains("|  2 | MobilePhone", output);
+        Assert.Contains("Choose 1-2.", output);
+        Assert.Contains("Asset removed.", output);
+        Asset remaining =
+          Assert.Single(await new AssetsStore(path).GetAllAsync());
+        Assert.Equal(keep.Id, remaining.Id);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Theory]
+    [InlineData("4\nq\n\nq\n")]
+    [InlineData("4\n1\nn\n\nq\n")]
+    public async Task RemoveAsset_CancelLeavesFileUnchanged(string input) {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        await store.CreateAsync(id => new Computer(
+            id, "Apple", "Keep", new DateOnly(2024, 3, 15),
+            100m, Office.Sweden
+          )
+        );
+        string before = await File.ReadAllTextAsync(path);
+
+        string output = await RunAppAsync(directory, path, input);
+
+        Assert.DoesNotContain("Asset removed.", output);
+        Assert.Equal(before, await File.ReadAllTextAsync(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task RemoveAsset_EmptyInventoryDoesNotCreateFile() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        string output = await RunAppAsync(directory, path, "4\n\nq\n");
+
+        Assert.Contains("No assets to remove.", output);
+        Assert.False(File.Exists(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
     private static string CreateTempDirectory() {
       string path = Path.Combine(Path.GetTempPath(),
         "asset-menu-tests", Guid.NewGuid().ToString("N")

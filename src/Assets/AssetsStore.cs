@@ -19,5 +19,9 @@ namespace App.src.Assets {
     internal Task<Asset> CreateAsync(Func<Guid, Asset> factory) {
       return _storage.CreateAsync(factory);
     }
+
+    internal Task<bool> DeleteAsync(Guid id) {
+      return _storage.DeleteAsync(id);
+    }
   }
 }

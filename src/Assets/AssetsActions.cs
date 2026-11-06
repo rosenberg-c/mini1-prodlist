@@ -91,6 +91,65 @@ namespace App.src.Assets {
       }
     }
 
+    internal async Task RemoveAsync() {
+      try {
+        List<Asset> assets = await GetAllAsync();
+        if (assets.Count == 0) {
+          Console.WriteLine("No assets to remove.");
+          return;
+        }
+
+        ConsoleTable.Write(
+          ["Type", "Brand", "Model", "Purchase Date", "Office"],
+          assets.Select(asset => (IReadOnlyList<string>) [
+              asset.Type.ToString(), asset.Brand, asset.Model,
+              asset.PurchaseDate.ToString("yyyy-MM-dd",
+                CultureInfo.InvariantCulture
+              ),
+              asset.Office.ToString()
+            ]
+          )
+        );
+
+        NumberedSelectionResult choice;
+        do {
+          choice = NumberedSelection.ReadIndex(assets.Count,
+            "Select asset to remove (q to cancel): "
+          );
+          if (choice.Status == SelectionStatus.Invalid) {
+            ConsoleSupport.WriteLineYellow($"Choose 1-{assets.Count}.");
+          }
+        } while (choice.Status == SelectionStatus.Invalid);
+
+        if (choice.Status == SelectionStatus.Cancelled) {
+          return;
+        }
+
+        Asset selected = assets[choice.Index];
+        if (!ConsoleSupport.TryReadInput(
+              $"Remove {selected.Brand} {selected.Model}? (y/N): ",
+              out string? confirmation
+            ) || !string.Equals(confirmation, "y",
+              StringComparison.OrdinalIgnoreCase
+            )) {
+          Console.WriteLine("Removal cancelled.");
+          return;
+        }
+
+        Console.WriteLine(await _m.DeleteAsync(selected.Id)
+          ? "Asset removed."
+          : "Asset no longer exists."
+        );
+      }
+
+      catch (Exception e) when (
+        e is IOException or UnauthorizedAccessException
+          or JsonException or InvalidDataException
+      ) {
+        ConsoleSupport.WriteLineRed($"Could not remove asset: {e.Message}");
+      }
+    }
+
     private static bool TryReadAssetType(out AssetType type) {
       AssetType[] types = Enum.GetValues<AssetType>();
 

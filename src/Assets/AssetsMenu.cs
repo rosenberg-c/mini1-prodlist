@@ -15,7 +15,7 @@ namespace App.src.Assets {
       Console.WriteLine("1. Show List (by date or office)");
       Console.WriteLine("2. Add New");
       Console.WriteLine("3. ..");
-      Console.WriteLine("4. ..");
+      Console.WriteLine("4. Remove Asset");
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
       ConsoleRender.Footer();
@@ -42,6 +42,11 @@ namespace App.src.Assets {
           case "3":
             ConsoleRender.Header("Edit");
             _actions.Edit();
+            ConsoleSupport.Pause();
+            break;
+          case "4":
+            ConsoleRender.Header("Remove");
+            await _actions.RemoveAsync();
             ConsoleSupport.Pause();
             break;
           default:

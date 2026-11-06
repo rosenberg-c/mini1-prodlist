@@ -14,8 +14,8 @@ namespace App.src.Assets {
       return _store.CreateAsync(factory);
     }
 
-    internal Task<bool> DeleteAsync(Guid _) {
-      return Task.FromResult(false);
+    internal Task<bool> DeleteAsync(Guid id) {
+      return _store.DeleteAsync(id);
     }
 
     internal Task<bool> UpdateAsync(Guid _) {
