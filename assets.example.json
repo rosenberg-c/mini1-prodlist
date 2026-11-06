@@ -8,7 +8,6 @@
       "Model": "MacBook Pro",
       "PurchaseDate": "2024-03-15",
       "PriceUsd": 1500,
-      "PriceLocal": 15000,
       "Office": "Sweden"
     },
     {
@@ -18,7 +17,6 @@
       "Model": "ThinkPad X1",
       "PurchaseDate": "2023-10-01",
       "PriceUsd": 1200,
-      "PriceLocal": 72000,
       "Office": "Turkey"
     },
     {
@@ -28,7 +26,6 @@
       "Model": "Galaxy S23",
       "PurchaseDate": "2025-01-10",
       "PriceUsd": 900,
-      "PriceLocal": 9000,
       "Office": "Sweden"
     },
     {
@@ -38,7 +35,6 @@
       "Model": "iPhone 15",
       "PurchaseDate": "2024-12-05",
       "PriceUsd": 1000,
-      "PriceLocal": 1000,
       "Office": "USA"
     }
   ]

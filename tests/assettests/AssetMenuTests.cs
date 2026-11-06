@@ -10,7 +10,7 @@ namespace App.tests.Tests {
       try {
         string path = Path.Combine(directory, "assets.json");
         string output = await RunAppAsync(directory, path,
-          "2\n3\n1\n \nApple\nMacBook Pro\n2024-22-15\n2024-03-15\n-1\n1500\n15000\n9\n1\n\nq\n"
+          "2\n3\n1\n \nApple\nMacBook Pro\n2024-22-15\n2024-03-15\n-1\n1500\n9\n1\n\nq\n"
         );
 
         Assert.Contains("1. Computer", output);
@@ -32,8 +32,11 @@ namespace App.tests.Tests {
         Assert.Equal("MacBook Pro", computer.Model);
         Assert.Equal(new DateOnly(2024, 3, 15), computer.PurchaseDate);
         Assert.Equal(1500m, computer.PriceUsd);
-        Assert.Equal(15000m, computer.PriceLocal);
         Assert.Equal(Office.Sweden, computer.Office);
+        Assert.DoesNotContain("Price (local):", output);
+        Assert.DoesNotContain("\"PriceLocal\"",
+          await File.ReadAllTextAsync(path)
+        );
         Assert.Contains("\"Office\": \"Sweden\"",
           await File.ReadAllTextAsync(path)
         );
@@ -49,13 +52,53 @@ namespace App.tests.Tests {
       try {
         string path = Path.Combine(directory, "assets.json");
         string output = await RunAppAsync(directory, path,
-          "2\n2\nSamsung\nGalaxy S23\n2025-01-10\n900\n9000\n3\n\nq\n"
+          "2\n2\nSamsung\nGalaxy S23\n2025-01-10\n900\n3\n\nq\n"
         );
 
         Assert.Contains("Asset added.", output);
         Asset asset = Assert.Single(await new AssetsStore(path).GetAllAsync());
         Assert.IsType<MobilePhone>(asset);
         Assert.Equal(Office.Turkey, asset.Office);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Theory]
+    [InlineData(Office.Sweden, 1234.50, "SEK")]
+    [InlineData(Office.USA, 123.45, "USD")]
+    [InlineData(Office.Turkey, 7407.00, "TRY")]
+    public void ConvertPrice_UsesOfficeRate(
+      Office office, double expectedAmount, string expectedCurrency
+    ) {
+      var (amount, currency) = CurrencyConverter.Convert(123.45m, office);
+      Assert.Equal((decimal) expectedAmount, amount);
+      Assert.Equal(expectedCurrency, currency);
+    }
+
+    [Fact]
+    public async Task ShowAsset_IgnoresSavedLocalPriceAndRecalculates() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        await store.CreateAsync(id => new Computer(
+            id, "Lenovo", "ThinkPad", new DateOnly(2024, 3, 15),
+            1200m, Office.Turkey
+          )
+        );
+        string json = await File.ReadAllTextAsync(path);
+        await File.WriteAllTextAsync(path,
+          json.Replace("\"PriceUsd\": 1200,",
+            "\"PriceUsd\": 1200,\n      \"PriceLocal\": 1,"
+          )
+        );
+
+        string output = await RunAppAsync(directory, path, "1\n1\nq\nq\n");
+        Assert.Contains("72000.00 TRY", output);
+        Assert.DoesNotContain("PriceLocal", output);
+        Assert.Equal(1200m, Assert.Single(await store.GetAllAsync()).PriceUsd);
       }
       finally {
         Directory.Delete(directory, recursive: true);
@@ -83,7 +126,7 @@ namespace App.tests.Tests {
       try {
         string path = Path.Combine(directory, "assets.json");
         string output = await RunAppAsync(directory, path,
-          "2\n1\nApple\nMacBook Pro\n2024-03-15\n1500\n15000\nq\n\nq\n"
+          "2\n1\nApple\nMacBook Pro\n2024-03-15\n1500\nq\n\nq\n"
         );
 
         Assert.DoesNotContain("Asset added.", output);
@@ -102,12 +145,12 @@ namespace App.tests.Tests {
         AssetsStore store = new(path);
         await store.CreateAsync(id => new Computer(
             id, "Apple", "MacBook Pro", new DateOnly(2024, 3, 15),
-            1500m, 15000m, Office.Sweden
+            1500m, Office.Sweden
           )
         );
         await store.CreateAsync(id => new MobilePhone(
             id, "Samsung", "Galaxy S23", new DateOnly(2025, 1, 10),
-            900m, 9000m, Office.USA
+            900m, Office.USA
           )
         );
 
@@ -144,8 +187,8 @@ namespace App.tests.Tests {
             Assert.Contains("Computer", row);
             Assert.Contains("Apple", row);
             Assert.Contains("2024-03-15", row);
-            Assert.Contains("1500", row);
-            Assert.Contains("15000", row);
+            Assert.Contains("1500.00", row);
+            Assert.Contains("15000.00 SEK", row);
             Assert.Contains("Sweden", row);
           }
         );
@@ -157,8 +200,8 @@ namespace App.tests.Tests {
             Assert.Contains("MobilePhone", row);
             Assert.Contains("Samsung", row);
             Assert.Contains("2025-01-10", row);
-            Assert.Contains("900", row);
-            Assert.Contains("9000", row);
+            Assert.Contains("900.00", row);
+            Assert.Contains("900.00 USD", row);
             Assert.Contains("USA", row);
           }
         );
@@ -177,34 +220,34 @@ namespace App.tests.Tests {
         AssetsStore store = new(path);
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
         await store.CreateAsync(id => new MobilePhone(
-            id, "Nokia", "Expired", today.AddYears(-4), 100m, 100m, Office.USA
+            id, "Nokia", "Expired", today.AddYears(-4), 100m, Office.USA
           )
         );
         await store.CreateAsync(id => new Computer(
             id, "Apple", "Three months", today.AddMonths(3).AddYears(-3),
-            100m, 100m, Office.USA
+            100m, Office.USA
           )
         );
         await store.CreateAsync(id => new Computer(
             id, "Lenovo", "Six months", today.AddMonths(6).AddYears(-3),
-            100m, 100m, Office.USA
+            100m, Office.USA
           )
         );
         await store.CreateAsync(id => new Computer(
             id, "Dell", "Before red",
             today.AddMonths(3).AddDays(1).AddYears(-3),
-            100m, 100m, Office.USA
+            100m, Office.USA
           )
         );
         await store.CreateAsync(id => new Computer(
             id, "HP", "Before yellow",
             today.AddMonths(6).AddDays(1).AddYears(-3),
-            100m, 100m, Office.USA
+            100m, Office.USA
           )
         );
         await store.CreateAsync(id => new Computer(
             id, "Asus", "Safe", today.AddMonths(7).AddYears(-3),
-            100m, 100m, Office.USA
+            100m, Office.USA
           )
         );
 
@@ -246,7 +289,7 @@ namespace App.tests.Tests {
                    { Office.USA, Office.Turkey, Office.Sweden }) {
           await store.CreateAsync(id => new Computer(
               id, "Apple", office.ToString(), new DateOnly(2024, 3, 15),
-              100m, 100m, office
+              100m, office
             )
           );
         }

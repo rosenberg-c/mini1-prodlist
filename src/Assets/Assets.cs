@@ -3,12 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace App.src.Assets {
   [JsonConverter(typeof(JsonStringEnumConverter))]
-  public enum OfficeCurrency {
-    Usd,
-    Sek
-  }
-
-  [JsonConverter(typeof(JsonStringEnumConverter))]
   public enum Office {
     Sweden,
     USA,
@@ -29,7 +23,6 @@ namespace App.src.Assets {
     string model,
     DateOnly purchaseDate,
     decimal priceUsd,
-    decimal priceLocal,
     Office office
   ) {
     public Guid Id { get; } = id;
@@ -37,7 +30,6 @@ namespace App.src.Assets {
     public string Model { get; } = model;
     public DateOnly PurchaseDate { get; } = purchaseDate;
     public decimal PriceUsd { get; } = priceUsd;
-    public decimal PriceLocal { get; } = priceLocal;
     public Office Office { get; } = office;
 
     [JsonIgnore] public abstract AssetType Type { get; }
@@ -50,10 +42,9 @@ namespace App.src.Assets {
       string model,
       DateOnly purchaseDate,
       decimal priceUsd,
-      decimal priceLocal,
       Office office
     ) : base(
-      id, brand, model, purchaseDate, priceUsd, priceLocal, office
+      id, brand, model, purchaseDate, priceUsd, office
     ) {
     }
 
@@ -67,10 +58,9 @@ namespace App.src.Assets {
       string model,
       DateOnly purchaseDate,
       decimal priceUsd,
-      decimal priceLocal,
       Office office
     ) : base(
-      id, brand, model, purchaseDate, priceUsd, priceLocal, office
+      id, brand, model, purchaseDate, priceUsd, office
     ) {
     }
 

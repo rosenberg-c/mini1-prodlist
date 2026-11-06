@@ -29,13 +29,16 @@ namespace App.src.Assets {
     private static IReadOnlyList<string> ToRow(
       Asset asset, EndOfLifeStatus status
     ) {
+      var (amount, currency) = CurrencyConverter.Convert(
+        asset.PriceUsd, asset.Office
+      );
       return [
         asset.Type.ToString(),
         asset.Brand,
         asset.Model,
         asset.PurchaseDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-        asset.PriceUsd.ToString(CultureInfo.CurrentCulture),
-        asset.PriceLocal.ToString(CultureInfo.CurrentCulture),
+        asset.PriceUsd.ToString("F2", CultureInfo.CurrentCulture),
+        $"{amount.ToString("F2", CultureInfo.CurrentCulture)} {currency}",
         asset.Office.ToString(),
         status switch {
           EndOfLifeStatus.Red => "RED",

@@ -66,7 +66,6 @@ namespace App.src.Assets {
           || !TryReadText("Model: ", out string model)
           || !TryReadDate(out DateOnly purchaseDate)
           || !TryReadPrice("Price (USD): ", out decimal priceUsd)
-          || !TryReadPrice("Price (local): ", out decimal priceLocal)
           || !TryReadOffice(out Office office)) {
         return;
       }
@@ -74,10 +73,10 @@ namespace App.src.Assets {
       try {
         await _m.CreateAsync(id => type switch {
             AssetType.Computer => new Computer(
-              id, brand, model, purchaseDate, priceUsd, priceLocal, office
+              id, brand, model, purchaseDate, priceUsd, office
             ),
             AssetType.MobilePhone => new MobilePhone(
-              id, brand, model, purchaseDate, priceUsd, priceLocal, office
+              id, brand, model, purchaseDate, priceUsd, office
             ),
             _ => throw new InvalidOperationException("Unsupported asset type.")
           }
