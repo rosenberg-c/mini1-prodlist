@@ -2,12 +2,12 @@ DOTNET ?= dotnet
 JB ?= jb
 PROJECT ?= App.csproj
 SOLUTION ?= App.sln
-PRODUCT_TESTS ?= tests/producttests/App.Tests.csproj
+ASSET_TESTS ?= tests/assettests/App.Tests.csproj
 APP_TESTS ?= tests/apptests/App.Integration.Tests.csproj
-PRODUCT_HOST ?= tests/producthost/ProductHost.csproj
+ASSETS_HOST ?= tests/assetshost/AssetsHost.csproj
 
 -include .env
-APP_DATA_PATH ?= $(CURDIR)/products.json
+APP_DATA_PATH ?= $(CURDIR)/assets.json
 
 .PHONY: deps
 deps:
@@ -24,7 +24,7 @@ build: deps
 
 .PHONY: test
 test: deps
-	$(DOTNET) test $(PRODUCT_TESTS)
+	$(DOTNET) test $(ASSET_TESTS)
 	$(DOTNET) test $(APP_TESTS)
 
 .PHONY: run
@@ -34,8 +34,8 @@ run: deps
 .PHONY: lint
 lint: deps
 	$(DOTNET) format $(PROJECT) --verify-no-changes
-	$(DOTNET) format $(PRODUCT_HOST) --verify-no-changes
-	$(DOTNET) format $(PRODUCT_TESTS) --verify-no-changes
+	$(DOTNET) format $(ASSETS_HOST) --verify-no-changes
+	$(DOTNET) format $(ASSET_TESTS) --verify-no-changes
 	$(DOTNET) format $(APP_TESTS) --verify-no-changes
 
 .PHONY: format
@@ -48,4 +48,4 @@ clean:
 
 .PHONY: reset
 reset:
-	cp products.example.json "$(APP_DATA_PATH)"
+	cp assets.example.json "$(APP_DATA_PATH)"

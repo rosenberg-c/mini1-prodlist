@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "data": [
+    {
+      "$assetType": "computer",
+      "Id": "a91d5dc0-7d36-45ef-a53d-e263c8507041",
+      "Brand": "Apple",
+      "Model": "MacBook Pro",
+      "PurchaseDate": "2024-03-15",
+      "PriceUsd": 1500,
+      "PriceLocal": 15000,
+      "Office": "Sweden"
+    },
+    {
+      "$assetType": "computer",
+      "Id": "b4c77a7e-df7a-4fd7-b49d-9d625f23ad0b",
+      "Brand": "Lenovo",
+      "Model": "ThinkPad X1",
+      "PurchaseDate": "2023-10-01",
+      "PriceUsd": 1200,
+      "PriceLocal": 1200,
+      "Office": "USA"
+    },
+    {
+      "$assetType": "mobilePhone",
+      "Id": "c5d0f4a9-49f6-4aa0-b02b-783f701a6475",
+      "Brand": "Samsung",
+      "Model": "Galaxy S23",
+      "PurchaseDate": "2025-01-10",
+      "PriceUsd": 900,
+      "PriceLocal": 9000,
+      "Office": "Sweden"
+    },
+    {
+      "$assetType": "mobilePhone",
+      "Id": "d8e320be-0bc2-41c9-a27d-675da6f34f85",
+      "Brand": "Apple",
+      "Model": "iPhone 15",
+      "PurchaseDate": "2024-12-05",
+      "PriceUsd": 1000,
+      "PriceLocal": 1000,
+      "Office": "USA"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ using Xunit;
 namespace App.tests.Tests {
   public sealed class NumberedSelectionTests {
     [Fact]
-    public void ParseIndex_SelectsFromNonProductList() {
+    public void ParseIndex_SelectsFromGenericList() {
       string[] books = ["Dune", "The Hobbit"];
 
       NumberedSelectionResult result =

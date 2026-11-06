@@ -13,13 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpStorage", "dependencie
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "producthost", "producthost", "{899235DD-6848-6B68-E8D0-C765340A2F87}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assetshost", "assetshost", "{899235DD-6848-6B68-E8D0-C765340A2F87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductHost", "tests\producthost\ProductHost.csproj", "{F308ACF9-2D75-4B28-B792-6D5F09339F49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetsHost", "tests\assetshost\AssetsHost.csproj", "{F308ACF9-2D75-4B28-B792-6D5F09339F49}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "producttests", "producttests", "{9C6FF23D-B495-EA46-979D-53B562FF3FCE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assettests", "assettests", "{9C6FF23D-B495-EA46-979D-53B562FF3FCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Tests", "tests\producttests\App.Tests.csproj", "{F874AF6F-DF52-4AC5-988D-3D844E682953}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Tests", "tests\assettests\App.Tests.csproj", "{F874AF6F-DF52-4AC5-988D-3D844E682953}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apptests", "apptests", "{4F5A5C49-068F-2EE6-C690-EE25A9CBAC5C}"
 EndProject
