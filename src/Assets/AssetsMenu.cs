@@ -10,7 +10,7 @@ namespace App.src.Assets {
 
     private static void DisplayMeny() {
       Console.Clear();
-      ConsoleRender.Header("Welcome to Assets App");
+      ConsoleRender.Header("Assets Management App");
       Console.WriteLine("");
       Console.WriteLine("1. Show");
       Console.WriteLine("2. Add");
