@@ -1,10 +1,13 @@
+using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using App.src.ConsoleCore;
 using App.src.Validation;
 
 namespace App.src.Assets {
   internal sealed class AssetsActions {
+    private static string waitChar = "> ";
     private readonly AssetsManager _m;
 
     internal AssetsActions(
@@ -58,8 +61,6 @@ namespace App.src.Assets {
     }
 
     internal async Task AddAsync() {
-      Console.WriteLine("1. Computer");
-      Console.WriteLine("2. Mobile phone");
       if (!TryReadAssetType(out AssetType type)
           || !TryReadText("Brand: ", out string brand)
           || !TryReadText("Model: ", out string model)
@@ -92,36 +93,47 @@ namespace App.src.Assets {
     }
 
     private static bool TryReadAssetType(out AssetType type) {
+      AssetType[] types = Enum.GetValues<AssetType>();
+
+      Console.WriteLine($"Select type (1-{types.Length}): ");
+      for (int index = 0; index < types.Length; index++) {
+        Console.WriteLine($"  {index + 1}. {GetAssetTypeLabel(types[index])}");
+      }
+
       while (true) {
-        if (!ConsoleSupport.TryReadMenuChoice(
-              out string? input, "Select type (1 or 2): "
-            )) {
+        if (!ConsoleSupport.TryReadMenuChoice(out string? input, waitChar)) {
           type = default;
           return false;
         }
 
-        if (input is "1" or "2") {
-          type = input == "1" ? AssetType.Computer : AssetType.MobilePhone;
+        if (int.TryParse(input, out int selection)
+            && selection >= 1 && selection <= types.Length) {
+          type = types[selection - 1];
           return true;
         }
 
-        ConsoleSupport.WriteLineYellow("Choose 1 or 2.");
+        ConsoleSupport.WriteLineYellow($"Choose 1-{types.Length}.");
       }
+    }
+
+    private static string GetAssetTypeLabel(AssetType type) {
+      return typeof(AssetType)
+               .GetField(type.ToString())?
+               .GetCustomAttribute<DescriptionAttribute>()?.Description
+             ?? type.ToString();
     }
 
     private static bool TryReadOffice(out Office office) {
       Office[] offices = Enum.GetValues<Office>();
+
       Console.WriteLine($"Select office (1-{offices.Length}): ");
 
       for (int index = 0; index < offices.Length; index++) {
         Console.WriteLine($"  {index + 1}. {offices[index]}");
       }
 
-
       while (true) {
-        if (!ConsoleSupport.TryReadMenuChoice(
-              out string? input, ": "
-            )) {
+        if (!ConsoleSupport.TryReadMenuChoice(out string? input, waitChar)) {
           office = default;
           return false;
         }

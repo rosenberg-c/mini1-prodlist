@@ -13,7 +13,9 @@ namespace App.tests.Tests {
           "2\n3\n1\n \nApple\nMacBook Pro\n2024-22-15\n2024-03-15\n-1\n1500\n15000\n9\n1\n\nq\n"
         );
 
-        Assert.Contains("Choose 1 or 2.", output);
+        Assert.Contains("1. Computer", output);
+        Assert.Contains("2. Mobile phone", output);
+        Assert.Contains("Choose 1-2.", output);
         Assert.Contains("This field cannot be empty.", output);
         Assert.Contains("Enter a valid date", output);
         Assert.Contains("Enter a non-negative price.", output);

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace App.src.Assets {
@@ -16,7 +17,7 @@ namespace App.src.Assets {
 
   public enum AssetType {
     Computer,
-    MobilePhone
+    [Description("Mobile phone")] MobilePhone
   }
 
   [JsonPolymorphic(TypeDiscriminatorPropertyName = "$assetType")]
