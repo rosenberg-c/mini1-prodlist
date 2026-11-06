@@ -41,6 +41,7 @@ namespace App.src.Assets {
 
       int months = (today.Year - PurchaseDate.Year) * 12
         + today.Month - PurchaseDate.Month;
+
       if (PurchaseDate.AddMonths(months) > today) {
         months--;
       }
