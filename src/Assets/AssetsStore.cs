@@ -12,20 +12,33 @@ namespace App.src.Assets {
       );
     }
 
-    internal Task<List<Asset>> GetAllAsync() {
-      return _storage.GetAllAsync();
+    internal async Task<List<Asset>> GetAllAsync() {
+      List<Asset> assets = await _storage.GetAllAsync();
+      ValidateUniqueIds(assets);
+      return assets;
     }
 
-    internal Task<Asset> CreateAsync(Func<Guid, Asset> factory) {
-      return _storage.CreateAsync(factory);
+    internal async Task<Asset> CreateAsync(Func<Guid, Asset> factory) {
+      return await _storage.CreateAsync(factory);
     }
 
-    internal Task<bool> DeleteAsync(Guid id) {
-      return _storage.DeleteAsync(id);
+    internal async Task<bool> DeleteAsync(Guid id) {
+      return await _storage.DeleteAsync(id);
     }
 
-    internal Task<bool> UpdateAsync(Guid id, Func<Asset, Asset> update) {
-      return _storage.UpdateAsync(id, update);
+    internal async Task<bool> UpdateAsync(Guid id, Func<Asset, Asset> update) {
+      return await _storage.UpdateAsync(id, update);
+    }
+
+    private static void ValidateUniqueIds(IEnumerable<Asset> assets) {
+      HashSet<Guid> ids = [];
+      foreach (Asset asset in assets) {
+        if (!ids.Add(asset.Id)) {
+          throw new InvalidDataException(
+            $"\n\n  -- Duplicate asset ID: {asset.Id}. --\n"
+          );
+        }
+      }
     }
   }
 }

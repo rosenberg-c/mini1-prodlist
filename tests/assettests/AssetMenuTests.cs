@@ -65,6 +65,42 @@ namespace App.tests.Tests {
       }
     }
 
+    [Fact]
+    public async Task DuplicateIdsInFile_RejectLoadingWithoutOverwriting() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        Asset first = await store.CreateAsync(id => new Computer(
+            id, "Apple", "MacBook Pro", new DateOnly(2024, 3, 15),
+            1500m, Office.Sweden
+          )
+        );
+        Asset second = await store.CreateAsync(id => new MobilePhone(
+            id, "Samsung", "Galaxy S23", new DateOnly(2025, 1, 10),
+            900m, Office.USA
+          )
+        );
+        string invalid = (await File.ReadAllTextAsync(path))
+          .Replace(second.Id.ToString(), first.Id.ToString());
+        await File.WriteAllTextAsync(path, invalid);
+
+        InvalidDataException error =
+          await Assert.ThrowsAsync<InvalidDataException>(() =>
+            store.GetAllAsync()
+          );
+        Assert.Contains("Duplicate asset ID", error.Message);
+
+        string output = await RunAppAsync(directory, path, "q\n");
+        Assert.Contains("Cannot load", output);
+        Assert.Contains("Duplicate asset ID", output);
+        Assert.Equal(invalid, await File.ReadAllTextAsync(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
     [Theory]
     [InlineData(Office.Sweden, 1234.50, "SEK")]
     [InlineData(Office.USA, 123.45, "USD")]
