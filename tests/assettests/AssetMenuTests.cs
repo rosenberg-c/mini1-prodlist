@@ -93,7 +93,7 @@ namespace App.tests.Tests {
         Assert.Contains("Price (Local)", output);
         Assert.Equal(2, output.Split("| Sweden ").Length - 1);
         string[] rows = output.Split('\n');
-        int[] expectedWidths = [11, 7, 11, 13, 11, 13, 6];
+        int[] expectedWidths = [11, 7, 11, 13, 11, 13, 6, 6];
         string[] headerRows = rows.Where(row => row.StartsWith("| Type "))
           .ToArray();
         Assert.Equal(2, headerRows.Length);
@@ -130,6 +130,63 @@ namespace App.tests.Tests {
           Assert.Contains("USA", row);
         });
         Assert.Contains("\nAdd\n", output);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task ShowByTypeAndDate_SortsAndAppliesEndOfLifeWarnings() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        await store.CreateAsync(id => new MobilePhone(
+          id, "Nokia", "Expired", today.AddYears(-4), 100m, 100m, "USA"
+        ));
+        await store.CreateAsync(id => new Computer(
+          id, "Apple", "Three months", today.AddMonths(3).AddYears(-3),
+          100m, 100m, "USA"
+        ));
+        await store.CreateAsync(id => new Computer(
+          id, "Lenovo", "Six months", today.AddMonths(6).AddYears(-3),
+          100m, 100m, "USA"
+        ));
+        await store.CreateAsync(id => new Computer(
+          id, "Dell", "Before red", today.AddMonths(3).AddDays(1).AddYears(-3),
+          100m, 100m, "USA"
+        ));
+        await store.CreateAsync(id => new Computer(
+          id, "HP", "Before yellow", today.AddMonths(6).AddDays(1).AddYears(-3),
+          100m, 100m, "USA"
+        ));
+        await store.CreateAsync(id => new Computer(
+          id, "Asus", "Safe", today.AddMonths(7).AddYears(-3),
+          100m, 100m, "USA"
+        ));
+
+        string output = await RunAppAsync(directory, path, "1\n3\nq\nq\n");
+        Assert.Contains("3. By asset type, then purchase date", output);
+        string[] rows = output.Split('\n')
+          .Where(row => row.StartsWith("| Computer ") || row.StartsWith("| MobilePhone "))
+          .ToArray();
+        Assert.Equal(6, rows.Length);
+        Assert.Contains("Three months", rows[0]);
+        Assert.Contains("RED", rows[0]);
+        Assert.Contains("Before red", rows[1]);
+        Assert.Contains("YELLOW", rows[1]);
+        Assert.Contains("Six months", rows[2]);
+        Assert.Contains("YELLOW", rows[2]);
+        Assert.Contains("Before yellow", rows[3]);
+        Assert.DoesNotContain("RED", rows[3]);
+        Assert.DoesNotContain("YELLOW", rows[3]);
+        Assert.Contains("Safe", rows[4]);
+        Assert.DoesNotContain("RED", rows[4]);
+        Assert.DoesNotContain("YELLOW", rows[4]);
+        Assert.Contains("Expired", rows[5]);
+        Assert.Contains("RED", rows[5]);
       }
       finally {
         Directory.Delete(directory, recursive: true);

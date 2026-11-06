@@ -6,7 +6,8 @@ namespace App.src.ConsoleCore {
       int width = 1,
       bool numberRows = true,
       bool highlightRows = false,
-      string? header = null
+      string? header = null,
+      Func<int, ConsoleColor?>? rowColor = null
     ) {
       // Validate the table and requested minimum width.
       if (headers.Count == 0 || width < 1) {
@@ -62,7 +63,12 @@ namespace App.src.ConsoleCore {
       foreach (IReadOnlyList<string> cells in tableRows) {
         string prefix = numberRows ? $"| {index + 1,2} " : "";
         string line = $"{prefix}{FormatRow(cells, columnWidths)}";
-        if (highlightRows) {
+        ConsoleColor? color = rowColor?.Invoke(index);
+        if (color is ConsoleColor.Red) {
+          ConsoleSupport.WriteLineRed(line);
+        } else if (color is ConsoleColor.Yellow) {
+          ConsoleSupport.WriteLineYellow(line);
+        } else if (highlightRows) {
           ConsoleSupport.WriteLineGreen(line);
         } else {
           Console.WriteLine(line);

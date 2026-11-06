@@ -32,6 +32,7 @@ namespace App.src.Assets {
       while (true) {
         Console.WriteLine("1. By office");
         Console.WriteLine("2. By purchase date");
+        Console.WriteLine("3. By asset type, then purchase date");
         Console.WriteLine("q to return");
         if (!ConsoleSupport.TryReadMenuChoice(out string? choice)) {
           return;
@@ -43,6 +44,9 @@ namespace App.src.Assets {
             break;
           case "2":
             AssetsDisplay.DisplayByDate(assets);
+            break;
+          case "3":
+            AssetsDisplay.DisplayByTypeAndDate(assets);
             break;
           default:
             ConsoleSupport.WriteLineYellow(
