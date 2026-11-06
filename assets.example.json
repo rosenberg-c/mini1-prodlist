@@ -18,8 +18,8 @@
       "Model": "ThinkPad X1",
       "PurchaseDate": "2023-10-01",
       "PriceUsd": 1200,
-      "PriceLocal": 1200,
-      "Office": "USA"
+      "PriceLocal": 72000,
+      "Office": "Turkey"
     },
     {
       "$assetType": "mobilePhone",

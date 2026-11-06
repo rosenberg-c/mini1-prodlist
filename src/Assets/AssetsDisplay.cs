@@ -36,7 +36,7 @@ namespace App.src.Assets {
         asset.PurchaseDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
         asset.PriceUsd.ToString(CultureInfo.CurrentCulture),
         asset.PriceLocal.ToString(CultureInfo.CurrentCulture),
-        asset.Office,
+        asset.Office.ToString(),
         status switch {
           EndOfLifeStatus.Red => "RED",
           EndOfLifeStatus.Yellow => "YELLOW",
@@ -48,8 +48,9 @@ namespace App.src.Assets {
     private static void Display(IEnumerable<Asset> assets) {
       DateOnly today = DateOnly.FromDateTime(DateTime.Today);
       var entries = assets.Select(asset => (
-        Asset: asset, Status: Status(asset, today)
-      )).ToArray();
+          Asset: asset, Status: Status(asset, today)
+        )
+      ).ToArray();
 
       ConsoleTable.Write(
         headers,
@@ -72,7 +73,7 @@ namespace App.src.Assets {
     }
 
     internal static void DisplayByOffice(List<Asset> tasks) {
-      Display(tasks.OrderBy(static task => task.Office));
+      Display(tasks.OrderBy(static task => task.Office.ToString()));
     }
 
     internal static void DisplayByDate(List<Asset> tasks) {

@@ -66,20 +66,20 @@ namespace App.src.Assets {
           || !TryReadDate(out DateOnly purchaseDate)
           || !TryReadPrice("Price (USD): ", out decimal priceUsd)
           || !TryReadPrice("Price (local): ", out decimal priceLocal)
-          || !TryReadText("Office: ", out string office)) {
+          || !TryReadOffice(out Office office)) {
         return;
       }
 
       try {
         await _m.CreateAsync(id => type switch {
-          AssetType.Computer => new Computer(
-            id, brand, model, purchaseDate, priceUsd, priceLocal, office
-          ),
-          AssetType.MobilePhone => new MobilePhone(
-            id, brand, model, purchaseDate, priceUsd, priceLocal, office
-          ),
-          _ => throw new InvalidOperationException("Unsupported asset type.")
-        }
+            AssetType.Computer => new Computer(
+              id, brand, model, purchaseDate, priceUsd, priceLocal, office
+            ),
+            AssetType.MobilePhone => new MobilePhone(
+              id, brand, model, purchaseDate, priceUsd, priceLocal, office
+            ),
+            _ => throw new InvalidOperationException("Unsupported asset type.")
+          }
         );
         Console.WriteLine("Asset added.");
       }
@@ -106,6 +106,33 @@ namespace App.src.Assets {
         }
 
         ConsoleSupport.WriteLineYellow("Choose 1 or 2.");
+      }
+    }
+
+    private static bool TryReadOffice(out Office office) {
+      Office[] offices = Enum.GetValues<Office>();
+      Console.WriteLine($"Select office (1-{offices.Length}): ");
+
+      for (int index = 0; index < offices.Length; index++) {
+        Console.WriteLine($"  {index + 1}. {offices[index]}");
+      }
+
+
+      while (true) {
+        if (!ConsoleSupport.TryReadMenuChoice(
+              out string? input, ": "
+            )) {
+          office = default;
+          return false;
+        }
+
+        if (int.TryParse(input, out int selection)
+            && selection >= 1 && selection <= offices.Length) {
+          office = offices[selection - 1];
+          return true;
+        }
+
+        ConsoleSupport.WriteLineYellow($"Choose 1-{offices.Length}.");
       }
     }
 

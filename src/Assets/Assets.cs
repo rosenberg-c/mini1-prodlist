@@ -7,6 +7,13 @@ namespace App.src.Assets {
     Sek
   }
 
+  [JsonConverter(typeof(JsonStringEnumConverter))]
+  public enum Office {
+    Sweden,
+    USA,
+    Turkey
+  }
+
   public enum AssetType {
     Computer,
     MobilePhone
@@ -22,7 +29,7 @@ namespace App.src.Assets {
     DateOnly purchaseDate,
     decimal priceUsd,
     decimal priceLocal,
-    string office
+    Office office
   ) {
     public Guid Id { get; } = id;
     public string Brand { get; } = brand;
@@ -30,7 +37,7 @@ namespace App.src.Assets {
     public DateOnly PurchaseDate { get; } = purchaseDate;
     public decimal PriceUsd { get; } = priceUsd;
     public decimal PriceLocal { get; } = priceLocal;
-    public string Office { get; } = office;
+    public Office Office { get; } = office;
 
     [JsonIgnore] public abstract AssetType Type { get; }
   }
@@ -43,7 +50,7 @@ namespace App.src.Assets {
       DateOnly purchaseDate,
       decimal priceUsd,
       decimal priceLocal,
-      string office
+      Office office
     ) : base(
       id, brand, model, purchaseDate, priceUsd, priceLocal, office
     ) {
@@ -60,7 +67,7 @@ namespace App.src.Assets {
       DateOnly purchaseDate,
       decimal priceUsd,
       decimal priceLocal,
-      string office
+      Office office
     ) : base(
       id, brand, model, purchaseDate, priceUsd, priceLocal, office
     ) {
