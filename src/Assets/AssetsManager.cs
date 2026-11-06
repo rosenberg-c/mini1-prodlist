@@ -18,8 +18,8 @@ namespace App.src.Assets {
       return _store.DeleteAsync(id);
     }
 
-    internal Task<bool> UpdateAsync(Guid _) {
-      return Task.FromResult(false);
+    internal Task<bool> UpdateAsync(Guid id, Func<Asset, Asset> update) {
+      return _store.UpdateAsync(id, update);
     }
 
     internal static List<Asset> SortForDisplay(IEnumerable<Asset> assets) {

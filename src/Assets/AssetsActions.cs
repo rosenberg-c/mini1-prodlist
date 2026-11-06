@@ -36,6 +36,7 @@ namespace App.src.Assets {
         Console.WriteLine("1. By office");
         Console.WriteLine("2. By purchase date");
         Console.WriteLine("3. By asset type, then purchase date");
+        Console.WriteLine();
         Console.WriteLine("q to return");
         if (!ConsoleSupport.TryReadMenuChoice(out string? choice)) {
           return;
@@ -62,24 +63,18 @@ namespace App.src.Assets {
 
     internal async Task AddAsync() {
       if (!TryReadAssetType(out AssetType type)
-          || !TryReadText("Brand: ", out string brand)
-          || !TryReadText("Model: ", out string model)
+          || !TryReadText("Brand", out string brand)
+          || !TryReadText("Model", out string model)
           || !TryReadDate(out DateOnly purchaseDate)
-          || !TryReadPrice("Price (USD): ", out decimal priceUsd)
+          || !TryReadPrice("Price (USD)", out decimal priceUsd)
           || !TryReadOffice(out Office office)) {
         return;
       }
 
       try {
-        await _m.CreateAsync(id => type switch {
-            AssetType.Computer => new Computer(
-              id, brand, model, purchaseDate, priceUsd, office
-            ),
-            AssetType.MobilePhone => new MobilePhone(
-              id, brand, model, purchaseDate, priceUsd, office
-            ),
-            _ => throw new InvalidOperationException("Unsupported asset type.")
-          }
+        await _m.CreateAsync(id => CreateAsset(
+            id, type, brand, model, purchaseDate, priceUsd, office
+          )
         );
         Console.WriteLine("Asset added.");
       }
@@ -91,6 +86,63 @@ namespace App.src.Assets {
       }
     }
 
+    internal async Task EditAsync() {
+      try {
+        List<Asset> assets = await GetAllAsync();
+        if (assets.Count == 0) {
+          Console.WriteLine("No assets to edit.");
+          return;
+        }
+
+        ShowSelectionTable(assets);
+        NumberedSelectionResult choice;
+        do {
+          choice = NumberedSelection.ReadIndex(assets.Count,
+            "Select asset to edit (q to cancel): "
+          );
+          if (choice.Status == SelectionStatus.Invalid) {
+            ConsoleSupport.WriteLineYellow($"Choose 1-{assets.Count}.");
+          }
+        } while (choice.Status == SelectionStatus.Invalid);
+
+        if (choice.Status == SelectionStatus.Cancelled) {
+          return;
+        }
+
+        Asset selected = assets[choice.Index];
+        Console.WriteLine();
+        Console.WriteLine("Press Enter to keep the previous value.");
+        Console.WriteLine();
+
+        if (!TryReadAssetType(out AssetType type, selected.Type)
+            || !TryReadText("Brand", out string brand, selected.Brand)
+            || !TryReadText("Model", out string model, selected.Model)
+            || !TryReadDate(out DateOnly purchaseDate, selected.PurchaseDate)
+            || !TryReadPrice("Price (USD)", out decimal priceUsd,
+              selected.PriceUsd
+            )
+            || !TryReadOffice(out Office office, selected.Office)) {
+          return;
+        }
+
+        Console.WriteLine(await _m.UpdateAsync(selected.Id, existing =>
+            CreateAsset(
+              existing.Id, type, brand, model, purchaseDate, priceUsd, office
+            )
+          )
+            ? "Asset updated."
+            : "Asset no longer exists."
+        );
+      }
+
+      catch (Exception e) when (
+        e is IOException or UnauthorizedAccessException
+          or JsonException or InvalidDataException
+      ) {
+        ConsoleSupport.WriteLineRed($"Could not edit asset: {e.Message}");
+      }
+    }
+
     internal async Task RemoveAsync() {
       try {
         List<Asset> assets = await GetAllAsync();
@@ -99,17 +151,7 @@ namespace App.src.Assets {
           return;
         }
 
-        ConsoleTable.Write(
-          ["Type", "Brand", "Model", "Purchase Date", "Office"],
-          assets.Select(asset => (IReadOnlyList<string>) [
-              asset.Type.ToString(), asset.Brand, asset.Model,
-              asset.PurchaseDate.ToString("yyyy-MM-dd",
-                CultureInfo.InvariantCulture
-              ),
-              asset.Office.ToString()
-            ]
-          )
-        );
+        ShowSelectionTable(assets);
 
         NumberedSelectionResult choice;
         do {
@@ -150,10 +192,44 @@ namespace App.src.Assets {
       }
     }
 
-    private static bool TryReadAssetType(out AssetType type) {
+    private static void ShowSelectionTable(List<Asset> assets) {
+      ConsoleTable.Write(
+        ["Type", "Brand", "Model", "Purchase Date", "Office"],
+        assets.Select(asset => (IReadOnlyList<string>) [
+            asset.Type.ToString(), asset.Brand, asset.Model,
+            asset.PurchaseDate.ToString("yyyy-MM-dd",
+              CultureInfo.InvariantCulture
+            ),
+            asset.Office.ToString()
+          ]
+        )
+      );
+    }
+
+    private static Asset CreateAsset(
+      Guid id, AssetType type, string brand, string model,
+      DateOnly purchaseDate, decimal priceUsd, Office office
+    ) {
+      return type switch {
+        AssetType.Computer => new Computer(
+          id, brand, model, purchaseDate, priceUsd, office
+        ),
+        AssetType.MobilePhone => new MobilePhone(
+          id, brand, model, purchaseDate, priceUsd, office
+        ),
+        _ => throw new InvalidOperationException("Unsupported asset type.")
+      };
+    }
+
+    private static bool TryReadAssetType(
+      out AssetType type, AssetType? current = null
+    ) {
       AssetType[] types = Enum.GetValues<AssetType>();
 
-      Console.WriteLine($"Select type (1-{types.Length}): ");
+      string label = current is AssetType saved
+        ? $" [{GetAssetTypeLabel(saved)}]"
+        : "";
+      Console.WriteLine($"Select type (1-{types.Length}){label}: ");
       for (int index = 0; index < types.Length; index++) {
         Console.WriteLine($"  {index + 1}. {GetAssetTypeLabel(types[index])}");
       }
@@ -162,6 +238,11 @@ namespace App.src.Assets {
         if (!ConsoleSupport.TryReadMenuChoice(out string? input, waitChar)) {
           type = default;
           return false;
+        }
+
+        if (input.Length == 0 && current is AssetType existing) {
+          type = existing;
+          return true;
         }
 
         if (int.TryParse(input, out int selection)
@@ -181,10 +262,13 @@ namespace App.src.Assets {
              ?? type.ToString();
     }
 
-    private static bool TryReadOffice(out Office office) {
+    private static bool TryReadOffice(
+      out Office office, Office? current = null
+    ) {
       Office[] offices = Enum.GetValues<Office>();
 
-      Console.WriteLine($"Select office (1-{offices.Length}): ");
+      string label = current is Office saved ? $" [{saved}]" : "";
+      Console.WriteLine($"Select office (1-{offices.Length}){label}: ");
 
       for (int index = 0; index < offices.Length; index++) {
         Console.WriteLine($"  {index + 1}. {offices[index]}");
@@ -194,6 +278,11 @@ namespace App.src.Assets {
         if (!ConsoleSupport.TryReadMenuChoice(out string? input, waitChar)) {
           office = default;
           return false;
+        }
+
+        if (input.Length == 0 && current is Office existing) {
+          office = existing;
+          return true;
         }
 
         if (int.TryParse(input, out int selection)
@@ -206,11 +295,21 @@ namespace App.src.Assets {
       }
     }
 
-    private static bool TryReadText(string prompt, out string value) {
+    private static bool TryReadText(
+      string prompt, out string value, string? current = null
+    ) {
       while (true) {
-        if (!ConsoleSupport.TryReadInput(prompt, out string? input)) {
+        string label = current is null
+          ? $"{prompt}: "
+          : $"{prompt} [{current}]: ";
+        if (!ConsoleSupport.TryReadInput(label, out string? input)) {
           value = string.Empty;
           return false;
+        }
+
+        if (input.Length == 0 && current is not null) {
+          value = current;
+          return true;
         }
 
         if (TextFieldValidation.TryField(input, out value)) {
@@ -221,13 +320,22 @@ namespace App.src.Assets {
       }
     }
 
-    private static bool TryReadDate(out DateOnly date) {
+    private static bool TryReadDate(
+      out DateOnly date, DateOnly? current = null
+    ) {
       while (true) {
-        if (!ConsoleSupport.TryReadInput(
-              "Purchase date (yyyy-MM-dd): ", out string? input
-            )) {
+        string prompt = current is DateOnly saved
+          ? $"Purchase date (yyyy-MM-dd) [{saved.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}]: "
+          : "Purchase date (yyyy-MM-dd): ";
+
+        if (!ConsoleSupport.TryReadInput(prompt, out string? input)) {
           date = default;
           return false;
+        }
+
+        if (input.Length == 0 && current is DateOnly existing) {
+          date = existing;
+          return true;
         }
 
         if (DateOnly.TryParseExact(
@@ -243,11 +351,21 @@ namespace App.src.Assets {
       }
     }
 
-    private static bool TryReadPrice(string prompt, out decimal price) {
+    private static bool TryReadPrice(
+      string prompt, out decimal price, decimal? current = null
+    ) {
       while (true) {
-        if (!ConsoleSupport.TryReadInput(prompt, out string? input)) {
+        string label = current is decimal saved
+          ? $"{prompt} [{saved.ToString("F2", CultureInfo.CurrentCulture)}]: "
+          : $"{prompt}: ";
+        if (!ConsoleSupport.TryReadInput(label, out string? input)) {
           price = default;
           return false;
+        }
+
+        if (input.Length == 0 && current is decimal existing) {
+          price = existing;
+          return true;
         }
 
         if (decimal.TryParse(
@@ -259,10 +377,6 @@ namespace App.src.Assets {
 
         ConsoleSupport.WriteLineYellow("Enter a non-negative price.");
       }
-    }
-
-    internal void Edit() {
-      Console.WriteLine("Not implemented.");
     }
   }
 }

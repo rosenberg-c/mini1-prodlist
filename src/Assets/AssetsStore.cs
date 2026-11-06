@@ -23,5 +23,9 @@ namespace App.src.Assets {
     internal Task<bool> DeleteAsync(Guid id) {
       return _storage.DeleteAsync(id);
     }
+
+    internal Task<bool> UpdateAsync(Guid id, Func<Asset, Asset> update) {
+      return _storage.UpdateAsync(id, update);
+    }
   }
 }

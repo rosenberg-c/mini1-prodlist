@@ -14,7 +14,7 @@ namespace App.src.Assets {
       Console.WriteLine("");
       Console.WriteLine("1. Show");
       Console.WriteLine("2. Add");
-      Console.WriteLine("3. ..");
+      Console.WriteLine("3. Edit");
       Console.WriteLine("4. Remove");
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
@@ -41,7 +41,7 @@ namespace App.src.Assets {
             break;
           case "3":
             ConsoleRender.Header("Edit");
-            _actions.Edit();
+            await _actions.EditAsync();
             ConsoleSupport.Pause();
             break;
           case "4":

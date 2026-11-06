@@ -463,6 +463,132 @@ namespace App.tests.Tests {
       }
     }
 
+    [Fact]
+    public async Task EditAsset_UpdatesSelectedAssetAndPreservesId() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        Asset keep = await store.CreateAsync(id => new Computer(
+            id, "Apple", "Keep", new DateOnly(2024, 3, 15),
+            100m, Office.Sweden
+          )
+        );
+        Asset edited = await store.CreateAsync(id => new Computer(
+            id, "Lenovo", "Old", new DateOnly(2023, 1, 1),
+            200m, Office.USA
+          )
+        );
+
+        string output = await RunAppAsync(directory, path,
+          "3\n9\n2\n2\nSamsung\nGalaxy S24\ninvalid\n2025-01-10\n-1\n700\n3\n\nq\n"
+        );
+
+        Assert.Contains("3. Edit", output);
+        Assert.Contains("|  2 | Computer", output);
+        Assert.Contains("Choose 1-2.", output);
+        Assert.Contains("Enter a valid date", output);
+        Assert.Contains("Enter a non-negative price.", output);
+        Assert.Contains("Asset updated.", output);
+        List<Asset> saved = await new AssetsStore(path).GetAllAsync();
+        Assert.Equal(2, saved.Count);
+        Assert.Equal(keep.Id, saved[0].Id);
+        Assert.Equal("Keep", saved[0].Model);
+        MobilePhone phone = Assert.IsType<MobilePhone>(saved[1]);
+        Assert.Equal(edited.Id, phone.Id);
+        Assert.Equal("Samsung", phone.Brand);
+        Assert.Equal("Galaxy S24", phone.Model);
+        Assert.Equal(new DateOnly(2025, 1, 10), phone.PurchaseDate);
+        Assert.Equal(700m, phone.PriceUsd);
+        Assert.Equal(Office.Turkey, phone.Office);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task EditAsset_EnterKeepsDisplayedValues() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        Asset original = await store.CreateAsync(id => new Computer(
+            id, "Apple", "Old", new DateOnly(2024, 3, 15),
+            100m, Office.Sweden
+          )
+        );
+
+        string output = await RunAppAsync(directory, path,
+          "3\n1\n\n\nUpdated\n\n\n\n\nq\n"
+        );
+
+        Assert.Contains(
+          "Press Enter to keep the previous value shown in brackets.",
+          output
+        );
+        Assert.Contains("Select type (1-2) [Computer]:", output);
+        Assert.Contains("Brand [Apple]:", output);
+        Assert.Contains("Model [Old]:", output);
+        Assert.Contains("Purchase date (yyyy-MM-dd) [2024-03-15]:", output);
+        Assert.Contains("Price (USD) [100.00]:", output);
+        Assert.Contains("Select office (1-3) [Sweden]:", output);
+        Assert.Contains("Asset updated.", output);
+        Asset saved = Assert.Single(await new AssetsStore(path).GetAllAsync());
+        Assert.IsType<Computer>(saved);
+        Assert.Equal(original.Id, saved.Id);
+        Assert.Equal("Apple", saved.Brand);
+        Assert.Equal("Updated", saved.Model);
+        Assert.Equal(new DateOnly(2024, 3, 15), saved.PurchaseDate);
+        Assert.Equal(100m, saved.PriceUsd);
+        Assert.Equal(Office.Sweden, saved.Office);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Theory]
+    [InlineData("3\nq\n\nq\n")]
+    [InlineData("3\n1\n1\nq\n\nq\n")]
+    [InlineData("3\n1\n\n\n\n\n\nq\n\nq\n")]
+    public async Task EditAsset_CancelLeavesFileUnchanged(string input) {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        await store.CreateAsync(id => new Computer(
+            id, "Apple", "Keep", new DateOnly(2024, 3, 15),
+            100m, Office.Sweden
+          )
+        );
+        string before = await File.ReadAllTextAsync(path);
+
+        string output = await RunAppAsync(directory, path, input);
+
+        Assert.DoesNotContain("Asset updated.", output);
+        Assert.Equal(before, await File.ReadAllTextAsync(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task EditAsset_EmptyInventoryDoesNotCreateFile() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        string output = await RunAppAsync(directory, path, "3\n\nq\n");
+
+        Assert.Contains("No assets to edit.", output);
+        Assert.False(File.Exists(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
     private static string CreateTempDirectory() {
       string path = Path.Combine(Path.GetTempPath(),
         "asset-menu-tests", Guid.NewGuid().ToString("N")
