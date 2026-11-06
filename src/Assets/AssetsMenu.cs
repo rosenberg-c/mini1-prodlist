@@ -16,6 +16,7 @@ namespace App.src.Assets {
       Console.WriteLine("2. Add");
       Console.WriteLine("3. Edit");
       Console.WriteLine("4. Remove");
+      Console.WriteLine("5. Search");
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
       ConsoleRender.Footer();
@@ -47,6 +48,11 @@ namespace App.src.Assets {
           case "4":
             ConsoleRender.Header("Remove");
             await _actions.RemoveAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "5":
+            ConsoleRender.Header("Search");
+            await _actions.SearchAsync();
             ConsoleSupport.Pause();
             break;
           default:

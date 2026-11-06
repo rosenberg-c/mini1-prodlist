@@ -371,6 +371,58 @@ namespace App.tests.Tests {
       }
     }
 
+    [Theory]
+    [InlineData("apple", "MacBook Pro", "Galaxy S23")]
+    [InlineData("BOOK", "MacBook Pro", "Galaxy S23")]
+    [InlineData("samsung", "Galaxy S23", "MacBook Pro")]
+    public async Task Search_FindsBrandOrModelIgnoringCase(
+      string query, string expected, string excluded
+    ) {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        AssetsStore store = new(path);
+        await store.CreateAsync(id => new Computer(
+            id, "Apple", "MacBook Pro", new DateOnly(2024, 3, 15),
+            1500m, Office.Sweden
+          )
+        );
+        await store.CreateAsync(id => new MobilePhone(
+            id, "Samsung", "Galaxy S23", new DateOnly(2025, 1, 10),
+            900m, Office.USA
+          )
+        );
+
+        string output =
+          await RunAppAsync(directory, path, $"5\n{query}\n\nq\n");
+        Assert.Contains("5. Search", output);
+        Assert.Contains($"| {expected} ", output);
+        Assert.DoesNotContain($"| {excluded} ", output);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Theory]
+    [InlineData("missing", "No matching assets found.")]
+    [InlineData("   ", "Enter a brand or model to search.")]
+    public async Task Search_NoResultsOrEmptyQueryShowsMessage(
+      string query, string expected
+    ) {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        string output =
+          await RunAppAsync(directory, path, $"5\n{query}\n\nq\n");
+        Assert.Contains(expected, output);
+        Assert.False(File.Exists(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
     [Fact]
     public async Task ShowMenu_EmptyInventoryExplainsAndReturns() {
       string directory = CreateTempDirectory();

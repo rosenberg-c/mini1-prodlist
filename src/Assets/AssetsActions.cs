@@ -61,6 +61,45 @@ namespace App.src.Assets {
       }
     }
 
+    internal async Task SearchAsync() {
+      if (!ConsoleSupport.TryReadInput("Search brand or model (q to cancel): ",
+            out string? query
+          )) {
+        return;
+      }
+
+      if (query.Length == 0) {
+        ConsoleSupport.WriteLineYellow("Enter a brand or model to search.");
+        return;
+      }
+
+      try {
+        List<Asset> matches = (await GetAllAsync())
+          .Where(asset => asset.Brand.Contains(query,
+                            StringComparison.OrdinalIgnoreCase
+                          ) ||
+                          asset.Model.Contains(query,
+                            StringComparison.OrdinalIgnoreCase
+                          )
+          )
+          .ToList();
+
+        if (matches.Count == 0) {
+          Console.WriteLine("No matching assets found.");
+          return;
+        }
+
+        AssetsDisplay.DisplayByOffice(matches);
+      }
+
+      catch (Exception e) when (
+        e is IOException or UnauthorizedAccessException
+          or JsonException or InvalidDataException
+      ) {
+        ConsoleSupport.WriteLineRed($"Could not search assets: {e.Message}");
+      }
+    }
+
     internal async Task AddAsync() {
       if (!TryReadAssetType(out AssetType type)
           || !TryReadText("Brand", out string brand)
