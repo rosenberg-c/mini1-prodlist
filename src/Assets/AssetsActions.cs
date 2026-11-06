@@ -9,11 +9,13 @@ namespace App.src.Assets {
   internal sealed class AssetsActions {
     private static string waitChar = "> ";
     private readonly AssetsManager _m;
+    private readonly string _reportPath;
 
     internal AssetsActions(
-      AssetsManager manager
+      AssetsManager manager, string reportPath
     ) {
       _m = manager;
+      _reportPath = reportPath;
     }
 
     private async Task<List<Asset>> GetAllAsync() {
@@ -22,6 +24,21 @@ namespace App.src.Assets {
 
     internal async Task<List<Asset>> GetAssetsAsync() {
       return await GetAllAsync();
+    }
+
+    internal async Task ExportAsync() {
+      try {
+        await AssetsReport.ExportAsync(await GetAllAsync(), _reportPath,
+          DateOnly.FromDateTime(DateTime.Today)
+        );
+        Console.WriteLine($"JSON report exported to {_reportPath}.");
+      }
+      catch (Exception e) when (
+        e is IOException or UnauthorizedAccessException
+          or JsonException or InvalidDataException
+      ) {
+        ConsoleSupport.WriteLineRed($"Could not export assets: {e.Message}");
+      }
     }
 
     internal async Task ShowAsync() {

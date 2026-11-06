@@ -4,8 +4,8 @@ namespace App.src.Assets {
   internal sealed class AssetsMenu {
     private readonly AssetsActions _actions;
 
-    internal AssetsMenu(AssetsManager manager) {
-      _actions = new AssetsActions(manager);
+    internal AssetsMenu(AssetsManager manager, string reportPath) {
+      _actions = new AssetsActions(manager, reportPath);
     }
 
     private static void DisplayMeny() {
@@ -17,6 +17,7 @@ namespace App.src.Assets {
       Console.WriteLine("3. Edit");
       Console.WriteLine("4. Remove");
       Console.WriteLine("5. Search");
+      Console.WriteLine("6. Export JSON report");
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
       ConsoleRender.Footer();
@@ -53,6 +54,11 @@ namespace App.src.Assets {
           case "5":
             ConsoleRender.Header("Search");
             await _actions.SearchAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "6":
+            ConsoleRender.Header("Export JSON report");
+            await _actions.ExportAsync();
             ConsoleSupport.Pause();
             break;
           default:

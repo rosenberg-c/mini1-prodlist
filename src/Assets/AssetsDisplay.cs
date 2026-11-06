@@ -26,6 +26,13 @@ namespace App.src.Assets {
         : EndOfLifeStatus.None;
     }
 
+    internal static string StatusLabel(Asset asset, DateOnly today) =>
+      Status(asset, today) switch {
+        EndOfLifeStatus.Red => "RED",
+        EndOfLifeStatus.Yellow => "YELLOW",
+        _ => ""
+      };
+
     private static IReadOnlyList<string> ToRow(
       Asset asset, EndOfLifeStatus status, DateOnly today
     ) {
@@ -42,11 +49,7 @@ namespace App.src.Assets {
         asset.PriceUsd.ToString("F2", CultureInfo.CurrentCulture),
         $"{amount.ToString("F2", CultureInfo.CurrentCulture)} {currency}",
         asset.Office.ToString(),
-        status switch {
-          EndOfLifeStatus.Red => "RED",
-          EndOfLifeStatus.Yellow => "YELLOW",
-          _ => ""
-        }
+        StatusLabel(asset, today)
       ];
     }
 

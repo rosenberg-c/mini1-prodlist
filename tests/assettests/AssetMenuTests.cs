@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using App.src.Assets;
 using Xunit;
 
@@ -671,6 +672,90 @@ namespace App.tests.Tests {
 
         Assert.Contains("No assets to edit.", output);
         Assert.False(File.Exists(path));
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task ExportJson_CreatesReportWithoutChangingSavedAssets() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        string reportPath = Path.Combine(directory, "assets-report.json");
+        AssetsStore store = new(path);
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        Asset asset = await store.CreateAsync(id => new Computer(
+            id, "Apple", "MacBook Pro", today.AddYears(-4),
+            1500m, Office.Sweden
+          )
+        );
+        string original = await File.ReadAllTextAsync(path);
+
+        string output = await RunAppAsync(directory, path, "6\n\nq\n");
+
+        Assert.Contains($"JSON report exported to {reportPath}.", output);
+        Assert.Equal(original, await File.ReadAllTextAsync(path));
+        using JsonDocument report = JsonDocument.Parse(
+          await File.ReadAllTextAsync(reportPath)
+        );
+        JsonElement row = Assert.Single(report.RootElement.EnumerateArray());
+        Assert.Equal(asset.Id.ToString(), row.GetProperty("id").GetString());
+        Assert.Equal("Computer", row.GetProperty("type").GetString());
+        Assert.Equal("MacBook Pro", row.GetProperty("model").GetString());
+        Assert.Equal(1500m, row.GetProperty("priceUsd").GetDecimal());
+        Assert.Equal(15000m, row.GetProperty("priceLocal").GetDecimal());
+        Assert.Equal("SEK", row.GetProperty("currency").GetString());
+        Assert.Equal("Sweden", row.GetProperty("office").GetString());
+        Assert.Equal("RED", row.GetProperty("status").GetString());
+        Assert.Equal(4, row.GetProperty("ageYears").GetInt32());
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task ExportJson_EmptyInventoryCreatesEmptyReport() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        string reportPath = Path.Combine(directory, "assets-report.json");
+
+        await RunAppAsync(directory, path, "6\n\nq\n");
+
+        Assert.False(File.Exists(path));
+        using JsonDocument report = JsonDocument.Parse(
+          await File.ReadAllTextAsync(reportPath)
+        );
+        Assert.Empty(report.RootElement.EnumerateArray());
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task ExportJson_DoesNotOverwriteDataNamedLikeReport() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets-report.json");
+        await new AssetsStore(path).CreateAsync(id => new MobilePhone(
+            id, "Samsung", "Galaxy", new DateOnly(2025, 1, 10),
+            900m, Office.USA
+          )
+        );
+        string original = await File.ReadAllTextAsync(path);
+
+        await RunAppAsync(directory, path, "6\n\nq\n");
+
+        Assert.Equal(original, await File.ReadAllTextAsync(path));
+        Assert.True(File.Exists(Path.Combine(directory,
+              "assets-report-report.json"
+            )
+          )
+        );
       }
       finally {
         Directory.Delete(directory, recursive: true);

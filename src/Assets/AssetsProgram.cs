@@ -20,7 +20,13 @@ namespace App.src.Assets {
       }
 
       AssetsManager manager = new(store);
-      await new AssetsMenu(manager).RunAsync();
+      string dataPath = Path.GetFullPath(path);
+      string reportPath = Path.Combine(
+        Path.GetDirectoryName(dataPath)!,
+        $"{Path.GetFileNameWithoutExtension(dataPath)}-report.json"
+      );
+
+      await new AssetsMenu(manager, reportPath).RunAsync();
     }
   }
 }
