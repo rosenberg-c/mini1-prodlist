@@ -280,7 +280,7 @@ namespace App.tests.Tests {
     }
 
     [Fact]
-    public async Task ShowByOffice_PreservesAlphabeticalOrder() {
+    public async Task ShowByOffice_SortsByOfficeThenPurchaseDate() {
       string directory = CreateTempDirectory();
       try {
         string path = Path.Combine(directory, "assets.json");
@@ -293,14 +293,21 @@ namespace App.tests.Tests {
             )
           );
         }
+        await store.CreateAsync(id => new Computer(
+            id, "Dell", "Older Sweden", new DateOnly(2023, 3, 15),
+            100m, Office.Sweden
+          )
+        );
 
         string output = await RunAppAsync(directory, path, "1\n1\nq\nq\n");
         string[] rows = output.Split('\n')
           .Where(row => row.StartsWith("| Computer ")).ToArray();
-        Assert.Equal(3, rows.Length);
+        Assert.Equal(4, rows.Length);
         Assert.Contains("Sweden", rows[0]);
-        Assert.Contains("Turkey", rows[1]);
-        Assert.Contains("USA", rows[2]);
+        Assert.Contains("Older Sweden", rows[0]);
+        Assert.Contains("Sweden", rows[1]);
+        Assert.Contains("Turkey", rows[2]);
+        Assert.Contains("USA", rows[3]);
       }
       finally {
         Directory.Delete(directory, recursive: true);

@@ -76,7 +76,9 @@ namespace App.src.Assets {
     }
 
     internal static void DisplayByOffice(List<Asset> tasks) {
-      Display(tasks.OrderBy(static task => task.Office.ToString()));
+      Display(tasks
+        .OrderBy(static task => task.Office.ToString())
+        .ThenBy(static task => task.PurchaseDate));
     }
 
     internal static void DisplayByDate(List<Asset> tasks) {
