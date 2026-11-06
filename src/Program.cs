@@ -1,9 +1,9 @@
-using App.src.Products;
+using App.src.Assets;
 
 namespace App.src {
   public class Program {
     public static async Task Main() {
-      await ProductProgram.RunAsync();
+      await AssetsProgram.RunAsync();
       Console.WriteLine("Application closed.");
     }
   }
