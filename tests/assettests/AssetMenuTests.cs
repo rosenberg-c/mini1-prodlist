@@ -576,7 +576,7 @@ namespace App.tests.Tests {
         );
 
         Assert.Contains(
-          "Press Enter to keep the previous value shown in brackets.",
+          "Press Enter to keep the previous value.",
           output
         );
         Assert.Contains("Select type (1-2) [Computer]:", output);
