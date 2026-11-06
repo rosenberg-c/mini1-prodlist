@@ -12,10 +12,10 @@ namespace App.src.Assets {
       Console.Clear();
       ConsoleRender.Header("Welcome to Assets App");
       Console.WriteLine("");
-      Console.WriteLine("1. Show List (by date or office)");
-      Console.WriteLine("2. Add New");
+      Console.WriteLine("1. Show");
+      Console.WriteLine("2. Add");
       Console.WriteLine("3. ..");
-      Console.WriteLine("4. Remove Asset");
+      Console.WriteLine("4. Remove");
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
       ConsoleRender.Footer();
