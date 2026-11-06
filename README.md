@@ -17,11 +17,12 @@ A C# console app for tracking company computers and mobile phones.
 
 ## Using the app
 
-- **Show List (1):** Choose to display assets by office or purchase date. The table shows type, brand, model, purchase date, USD and local prices, and office.
-- **Add New (2):** Choose a computer or mobile phone, then enter brand, model, purchase date, USD and local prices, and office. Enter `q` to cancel at any prompt.
+- **Show (1):** Sort by office and purchase date, purchase date alone, or asset type and purchase date. The table includes prices, age, and end-of-life status.
+- **Add (2):** Choose a computer or mobile phone, then enter brand, model, purchase date, USD price, and office. Local price is calculated from the office's fixed exchange rate.
+- **Edit (3), Remove (4), Search (5):** Update or remove an asset, or search by brand or model.
 - **Export JSON report (6):** Write a report alongside the saved asset file by adding `-report` before `.json` (for example, `assets.json` → `assets-report.json`). The report contains current age, local price, currency, and end-of-life status. Exporting again replaces the previous report without changing the saved asset file.
 
-Brand, model, and office cannot be empty. Prices must be non-negative numbers in your system's number format. Dates use `yyyy-MM-dd`. The app saves assets to `assets.json` in the folder where you run it; run it from the same folder next time to keep your assets. Use `make reset` to copy the sample `assets.example.json` to that path (overwrites existing data).
+Brand and model cannot be empty; choose an office from Sweden, USA, or Turkey. USD prices must be non-negative numbers in your system's number format. Dates use `yyyy-MM-dd`. Enter `q` to cancel at a prompt. The app saves assets to `assets.json` in the folder where you run it; run it from the same folder next time to keep your assets. Use `make reset` to copy the sample `assets.example.json` to that path (overwrites existing data).
 
 ## Existing asset files
 
