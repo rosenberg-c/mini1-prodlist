@@ -33,6 +33,20 @@ namespace App.src.Assets {
     public Office Office { get; } = office;
 
     [JsonIgnore] public abstract AssetType Type { get; }
+
+    public (int Years, int Months) Age(DateOnly today) {
+      if (today < PurchaseDate) {
+        return (0, 0);
+      }
+
+      int months = (today.Year - PurchaseDate.Year) * 12
+        + today.Month - PurchaseDate.Month;
+      if (PurchaseDate.AddMonths(months) > today) {
+        months--;
+      }
+
+      return (months / 12, months % 12);
+    }
   }
 
   public sealed class Computer : Asset {

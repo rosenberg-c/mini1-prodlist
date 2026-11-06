@@ -10,7 +10,7 @@ namespace App.src.Assets {
     }
 
     private static readonly IReadOnlyList<string> headers = [
-      "Type", "Brand", "Model", "Purchase Date", "Price (USD)",
+      "Type", "Brand", "Model", "Purchase Date", "Age", "Price (USD)",
       "Price (Local)", "Office", "Status"
     ];
 
@@ -27,16 +27,18 @@ namespace App.src.Assets {
     }
 
     private static IReadOnlyList<string> ToRow(
-      Asset asset, EndOfLifeStatus status
+      Asset asset, EndOfLifeStatus status, DateOnly today
     ) {
       var (amount, currency) = CurrencyConverter.Convert(
         asset.PriceUsd, asset.Office
       );
+      var (years, months) = asset.Age(today);
       return [
         asset.Type.ToString(),
         asset.Brand,
         asset.Model,
         asset.PurchaseDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        $"{years}y {months}m",
         asset.PriceUsd.ToString("F2", CultureInfo.CurrentCulture),
         $"{amount.ToString("F2", CultureInfo.CurrentCulture)} {currency}",
         asset.Office.ToString(),
@@ -57,7 +59,7 @@ namespace App.src.Assets {
 
       ConsoleTable.Write(
         headers,
-        entries.Select(entry => ToRow(entry.Asset, entry.Status)),
+        entries.Select(entry => ToRow(entry.Asset, entry.Status, today)),
         numberRows: false,
         rowColor: index => entries[index].Status switch {
           EndOfLifeStatus.Red => ConsoleColor.Red,
@@ -78,7 +80,8 @@ namespace App.src.Assets {
     internal static void DisplayByOffice(List<Asset> tasks) {
       Display(tasks
         .OrderBy(static task => task.Office.ToString())
-        .ThenBy(static task => task.PurchaseDate));
+        .ThenBy(static task => task.PurchaseDate)
+      );
     }
 
     internal static void DisplayByDate(List<Asset> tasks) {

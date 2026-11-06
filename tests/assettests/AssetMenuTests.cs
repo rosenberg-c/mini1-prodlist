@@ -77,6 +77,30 @@ namespace App.tests.Tests {
       Assert.Equal(expectedCurrency, currency);
     }
 
+    [Theory]
+    [InlineData(2022, 3, 15, 2024, 3, 14, 1, 11)]
+    [InlineData(2022, 3, 15, 2024, 3, 15, 2, 0)]
+    [InlineData(2024, 2, 29, 2025, 2, 27, 0, 11)]
+    [InlineData(2024, 2, 29, 2025, 2, 28, 1, 0)]
+    [InlineData(2024, 1, 31, 2024, 2, 28, 0, 0)]
+    [InlineData(2024, 1, 31, 2024, 2, 29, 0, 1)]
+    [InlineData(2027, 3, 15, 2026, 3, 15, 0, 0)]
+    public void Age_CountsCompletedYearsAndMonths(
+      int purchaseYear, int purchaseMonth, int purchaseDay,
+      int todayYear, int todayMonth, int todayDay,
+      int expectedYears, int expectedMonths
+    ) {
+      Asset asset = new Computer(Guid.NewGuid(), "Apple", "MacBook Pro",
+        new DateOnly(purchaseYear, purchaseMonth, purchaseDay),
+        100m, Office.USA
+      );
+
+      Assert.Equal((expectedYears, expectedMonths), asset.Age(
+          new DateOnly(todayYear, todayMonth, todayDay)
+        )
+      );
+    }
+
     [Fact]
     public async Task ShowAsset_IgnoresSavedLocalPriceAndRecalculates() {
       string directory = CreateTempDirectory();
@@ -99,6 +123,32 @@ namespace App.tests.Tests {
         Assert.Contains("72000.00 TRY", output);
         Assert.DoesNotContain("PriceLocal", output);
         Assert.Equal(1200m, Assert.Single(await store.GetAllAsync()).PriceUsd);
+      }
+      finally {
+        Directory.Delete(directory, recursive: true);
+      }
+    }
+
+    [Fact]
+    public async Task ShowAsset_DisplaysCalculatedAge() {
+      string directory = CreateTempDirectory();
+      try {
+        string path = Path.Combine(directory, "assets.json");
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly purchaseDate = today.AddMonths(-35);
+        AssetsStore store = new(path);
+        await store.CreateAsync(id => new Computer(
+            id, "Apple", "Age check", purchaseDate, 100m, Office.USA
+          )
+        );
+
+        string output = await RunAppAsync(directory, path, "1\n1\nq\nq\n");
+        Assert.Contains("| Age ", output);
+        string row = Assert.Single(output.Split('\n'),
+          line => line.StartsWith("| Computer ")
+        );
+        Assert.Contains($"| {purchaseDate:yyyy-MM-dd} ", row);
+        Assert.Contains("| 2y 11m ", row);
       }
       finally {
         Directory.Delete(directory, recursive: true);
@@ -165,7 +215,13 @@ namespace App.tests.Tests {
         Assert.Contains("Price (Local)", output);
         Assert.Equal(2, output.Split("| Sweden ").Length - 1);
         string[] rows = output.Split('\n');
-        int[] expectedWidths = [11, 7, 11, 13, 11, 13, 6, 6];
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        int ageWidth = (await store.GetAllAsync()).Max(asset => {
+            var (years, months) = asset.Age(today);
+            return $"{years}y {months}m".Length;
+          }
+        );
+        int[] expectedWidths = [11, 7, 11, 13, ageWidth, 11, 13, 6, 6];
         string[] headerRows = rows.Where(row => row.StartsWith("| Type "))
           .ToArray();
         Assert.Equal(2, headerRows.Length);
@@ -293,6 +349,7 @@ namespace App.tests.Tests {
             )
           );
         }
+
         await store.CreateAsync(id => new Computer(
             id, "Dell", "Older Sweden", new DateOnly(2023, 3, 15),
             100m, Office.Sweden
