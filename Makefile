@@ -1,3 +1,5 @@
+include Makefile.mermaid.mk
+
 DOTNET ?= dotnet
 JB ?= jb
 PROJECT ?= App.csproj

@@ -6,3 +6,4 @@
 *.v2.bak
 .vscode/
 .env
+*.generated.png

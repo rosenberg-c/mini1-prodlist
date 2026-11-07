@@ -1,0 +1,6 @@
+/* Applied to every generated diagram via mmdc -C (see .mermaid/render.sh). */
+
+/* Keep nodes and labels off the canvas edge. */
+svg {
+  margin: 16px;
+}
