@@ -53,7 +53,7 @@ make lint    # Check .NET formatting without changing files
 make format  # Format app and tests with JetBrains ReSharper
 ```
 
-`make format` uses the checked-in `App.sln`; add new projects with `dotnet sln App.sln add path/to/New.csproj` (no update needed for new `.cs` files). `make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. `tests/apptests` covers app-wide startup and shared console behavior. `tests/assettests` covers asset workflows through `tests/assetshost`, an asset-only executable that runs the asset menu directly. Without Make, run `dotnet test tests/apptests/App.Integration.Tests.csproj` or `dotnet test tests/assettests/App.Tests.csproj` separately. `make test` runs both suites.
+`make format` uses the checked-in `App.sln`; add new projects with `dotnet sln App.sln add path/to/New.csproj` (no update needed for new `.cs` files). `make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. `tests/apptests` covers app-wide startup and shared console behavior. `tests/assettests` covers asset workflows through `tests/assetshost`, an asset-only executable that runs the asset menu directly. `tests/todotests` covers todo serialization and validation. Without Make, run `dotnet test tests/apptests/App.Integration.Tests.csproj`, `dotnet test tests/assettests/App.Tests.csproj`, or `dotnet test tests/todotests/App.Tests.csproj` separately. `make test` runs all three suites.
 
 ## Make
 
