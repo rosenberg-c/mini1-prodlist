@@ -7,7 +7,9 @@ APP_TESTS ?= tests/apptests/App.Integration.Tests.csproj
 ASSETS_HOST ?= tests/assetshost/AssetsHost.csproj
 
 -include .env
-APP_DATA_PATH ?= $(CURDIR)/assets.json
+DATA_FILE ?= assets.json
+DATA_EXAMPLE ?= assets.example.json
+APP_DATA_PATH ?= $(CURDIR)/$(DATA_FILE)
 
 .PHONY: deps
 deps:
@@ -48,7 +50,7 @@ clean:
 
 .PHONY: reset
 reset:
-	cp assets.example.json "$(APP_DATA_PATH)"
-	@for file in bin/Debug/net*/assets.json; do \
-		if [ -f "$$file" ]; then cp assets.example.json "$$file" || exit $$?; fi; \
+	cp "$(DATA_EXAMPLE)" "$(APP_DATA_PATH)"
+	@for file in bin/Debug/net*/$(DATA_FILE); do \
+		if [ -f "$$file" ]; then cp "$(DATA_EXAMPLE)" "$$file" || exit $$?; fi; \
 	done
