@@ -182,7 +182,7 @@ namespace App.tests.Tests {
         string output = await RunAppAsync(directory, path, "1\n1\nq\nq\n");
         Assert.Contains("| Age ", output);
         string row = Assert.Single(output.Split('\n'),
-          line => line.StartsWith("| Computer ")
+          IsAssetRow
         );
         Assert.Contains($"| {purchaseDate:yyyy-MM-dd} ", row);
         Assert.Contains("| 2y 11m ", row);
@@ -258,8 +258,8 @@ namespace App.tests.Tests {
             return $"{years}y {months}m".Length;
           }
         );
-        int[] expectedWidths = [11, 7, 11, 13, ageWidth, 11, 13, 6, 6];
-        string[] headerRows = rows.Where(row => row.StartsWith("| Type "))
+        int[] expectedWidths = [6, 11, 7, 11, 13, ageWidth, 11, 13, 6];
+        string[] headerRows = rows.Where(row => row.StartsWith("| Office "))
           .ToArray();
         Assert.Equal(2, headerRows.Length);
         string headerRow = headerRows[0];
@@ -347,9 +347,7 @@ namespace App.tests.Tests {
         string output = await RunAppAsync(directory, path, "1\n3\nq\nq\n");
         Assert.Contains("3. By asset type, then purchase date", output);
         string[] rows = output.Split('\n')
-          .Where(row =>
-            row.StartsWith("| Computer ") || row.StartsWith("| MobilePhone ")
-          )
+          .Where(IsAssetRow)
           .ToArray();
         Assert.Equal(6, rows.Length);
         Assert.Contains("Three months", rows[0]);
@@ -395,7 +393,7 @@ namespace App.tests.Tests {
 
         string output = await RunAppAsync(directory, path, "1\n1\nq\nq\n");
         string[] rows = output.Split('\n')
-          .Where(row => row.StartsWith("| Computer ")).ToArray();
+          .Where(IsAssetRow).ToArray();
         Assert.Equal(4, rows.Length);
         Assert.Contains("Sweden", rows[0]);
         Assert.Contains("Older Sweden", rows[0]);
@@ -760,6 +758,12 @@ namespace App.tests.Tests {
       finally {
         Directory.Delete(directory, recursive: true);
       }
+    }
+
+    private static bool IsAssetRow(string row) {
+      string[] cells = row.Split('|');
+      return cells.Length == 11 &&
+             cells[2].Trim() is "Computer" or "MobilePhone";
     }
 
     private static string CreateTempDirectory() {

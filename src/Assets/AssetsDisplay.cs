@@ -9,11 +9,6 @@ namespace App.src.Assets {
       Red
     }
 
-    private static readonly IReadOnlyList<string> headers = [
-      "Type", "Brand", "Model", "Purchase Date", "Age", "Price (USD)",
-      "Price (Local)", "Office", "Status"
-    ];
-
     private static EndOfLifeStatus Status(Asset asset, DateOnly today) {
       DateOnly endOfLife = asset.PurchaseDate.AddYears(3);
 
@@ -33,6 +28,11 @@ namespace App.src.Assets {
         _ => ""
       };
 
+    private static readonly IReadOnlyList<string> headers = [
+      "Office", "Type", "Brand", "Model", "Purchase Date", "Age", "Price (USD)",
+      "Price (Local)", "Status"
+    ];
+
     private static IReadOnlyList<string> ToRow(
       Asset asset, EndOfLifeStatus status, DateOnly today
     ) {
@@ -41,6 +41,7 @@ namespace App.src.Assets {
       );
       var (years, months) = asset.Age(today);
       return [
+        asset.Office.ToString(),
         asset.Type.ToString(),
         asset.Brand,
         asset.Model,
@@ -48,7 +49,6 @@ namespace App.src.Assets {
         $"{years}y {months}m",
         asset.PriceUsd.ToString("F2", CultureInfo.CurrentCulture),
         $"{amount.ToString("F2", CultureInfo.CurrentCulture)} {currency}",
-        asset.Office.ToString(),
         StatusLabel(asset, today)
       ];
     }
