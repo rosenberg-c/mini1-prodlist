@@ -200,51 +200,53 @@ namespace App.src.Assets {
     }
 
     internal async Task RemoveAsync() {
-      try {
-        List<Asset> assets = await GetAllAsync();
-        if (assets.Count == 0) {
-          Console.WriteLine("No assets to remove.");
-          return;
-        }
-
-        ShowSelectionTable(assets);
-
-        NumberedSelectionResult choice;
-        do {
-          choice = NumberedSelection.ReadIndex(assets.Count,
-            "Select asset to remove (q to cancel): "
-          );
-          if (choice.Status == SelectionStatus.Invalid) {
-            ConsoleSupport.WriteLineYellow($"Choose 1-{assets.Count}.");
+      while (true) {
+        try {
+          List<Asset> assets = await GetAllAsync();
+          if (assets.Count == 0) {
+            Console.WriteLine("No assets to remove.");
+            return;
           }
-        } while (choice.Status == SelectionStatus.Invalid);
 
-        if (choice.Status == SelectionStatus.Cancelled) {
-          return;
+          ShowSelectionTable(assets);
+
+          NumberedSelectionResult choice;
+          do {
+            choice = NumberedSelection.ReadIndex(assets.Count,
+              "Select asset to remove (q to cancel): "
+            );
+            if (choice.Status == SelectionStatus.Invalid) {
+              ConsoleSupport.WriteLineYellow($"Choose 1-{assets.Count}.");
+            }
+          } while (choice.Status == SelectionStatus.Invalid);
+
+          if (choice.Status == SelectionStatus.Cancelled) {
+            return;
+          }
+
+          Asset selected = assets[choice.Index];
+          if (!ConsoleSupport.TryReadInput(
+                $"Remove {selected.Brand} {selected.Model}? (y/N): ",
+                out string? confirmation
+              ) || !string.Equals(confirmation, "y",
+                StringComparison.OrdinalIgnoreCase
+              )) {
+            Console.WriteLine("Removal cancelled.");
+            return;
+          }
+
+          Console.WriteLine(await _m.DeleteAsync(selected.Id)
+            ? "Asset removed."
+            : "Asset no longer exists."
+          );
         }
 
-        Asset selected = assets[choice.Index];
-        if (!ConsoleSupport.TryReadInput(
-              $"Remove {selected.Brand} {selected.Model}? (y/N): ",
-              out string? confirmation
-            ) || !string.Equals(confirmation, "y",
-              StringComparison.OrdinalIgnoreCase
-            )) {
-          Console.WriteLine("Removal cancelled.");
-          return;
+        catch (Exception e) when (
+          e is IOException or UnauthorizedAccessException
+            or JsonException or InvalidDataException
+        ) {
+          ConsoleSupport.WriteLineRed($"Could not remove asset: {e.Message}");
         }
-
-        Console.WriteLine(await _m.DeleteAsync(selected.Id)
-          ? "Asset removed."
-          : "Asset no longer exists."
-        );
-      }
-
-      catch (Exception e) when (
-        e is IOException or UnauthorizedAccessException
-          or JsonException or InvalidDataException
-      ) {
-        ConsoleSupport.WriteLineRed($"Could not remove asset: {e.Message}");
       }
     }
 
