@@ -1,0 +1,72 @@
+classDiagram
+  direction LR
+
+  %% Planned todo operations; storage and model classes already exist.
+  class TodoMenu
+  class TodoActions
+  class TodoDisplay
+  class TodoManager {
+    +GetProjectsAsync() Task~List~TodoProject~~
+    +CreateProjectAsync(string title) Task~TodoProject~
+    +RenameProjectAsync(Guid projectId, string title) Task~bool~
+    +DeleteProjectAsync(Guid projectId) Task~bool~
+
+    +AddTaskAsync(Guid projectId, string title, string description, DateOnly? dueDate) Task~TodoTask?~
+    +UpdateTaskAsync(Guid taskId, string title, string description, DateOnly? dueDate) Task~bool~
+    +SetTaskStatusAsync(Guid taskId, TodoStatus status) Task~bool~
+    +MoveTaskAsync(Guid taskId, Guid destinationProjectId) Task~bool~
+    +DeleteTaskAsync(Guid taskId) Task~bool~
+  }
+  class TodoStore {
+    +GetAllAsync() Task~List~TodoProject~~
+    +CreateProjectAsync(string title) Task~TodoProject~
+    +UpdateProjectAsync(Guid projectId, update) Task~bool~
+    +DeleteProjectAsync(Guid projectId) Task~bool~
+  }
+  class TodoValidator {
+    +Validate(projects) void
+  }
+  class StorageRepository {
+    +GetAllAsync() Task~List~TEntry~~
+    +CreateAsync(factory) Task~TEntry~
+    +UpdateAsync(Guid id, update) Task~bool~
+    +DeleteAsync(Guid id) Task~bool~
+  }
+  class StorageDocument {
+    +int schemaVersion
+    +List~TEntry~ data
+  }
+  class StorageFileLocks
+  class TodoProject {
+    +Guid Id
+    +string Title
+    +List~TodoTask~ Tasks
+  }
+  class TodoStatus {
+    <<enumeration>>
+    Pending
+    InProgress
+    Completed
+  }
+  class TodoTask {
+    +Guid Id
+    +TodoStatus Status
+    +string Title
+    +string Description
+    +DateOnly? DueDate
+  }
+
+  TodoTask --> TodoStatus : status
+  TodoMenu --> TodoActions : invokes
+  TodoActions --> TodoManager : performs operations through
+  TodoActions --> TodoDisplay : renders tasks through
+  TodoManager --> TodoStore : reads and changes projects through
+  TodoStore --> TodoValidator : validates loaded projects
+  TodoStore *-- StorageRepository : holds repository of TodoProject
+  StorageRepository ..> StorageFileLocks : locks file operations
+  StorageRepository ..> StorageDocument : reads and writes JSON
+  StorageDocument "1" o-- "0..*" TodoProject : data when storing todos
+  %% Task due dates are optional. Mutations save immediately.
+  %% Missing IDs return false; AddTaskAsync returns null for a missing project.
+  %% Deleting a project also removes its contained tasks.
+  TodoProject "1" *-- "0..*" TodoTask : owns tasks
