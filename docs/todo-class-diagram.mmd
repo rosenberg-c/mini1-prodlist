@@ -1,7 +1,6 @@
 classDiagram
   direction LR
 
-  %% Planned todo operations; storage and model classes already exist.
   class TodoMenu {
     +RunAsync() Task
   }
@@ -19,6 +18,8 @@ classDiagram
     +DisplayTasksByDate(tasks) void
   }
   class TodoManager {
+    +GetProjectsAndTasksAsync() Task~(List~TodoProject~ Projects, List~TodoTask~ Tasks)>
+
     +GetProjectsAsync() Task~List~TodoProject~~
     +CreateProjectAsync(string title) Task~TodoProject~
     +RenameProjectAsync(Guid projectId, string title) Task~bool~
@@ -31,7 +32,7 @@ classDiagram
     +DeleteTaskAsync(Guid taskId) Task~bool~
   }
   class TodoStore {
-    +GetAllAsync() Task~List~TodoProject~~
+    +GetProjectsAsync() Task~List~TodoProject~~
     +CreateProjectAsync(string title) Task~TodoProject~
     +UpdateProjectAsync(Guid projectId, update) Task~bool~
     +DeleteProjectAsync(Guid projectId) Task~bool~
@@ -79,8 +80,5 @@ classDiagram
   StorageRepository ..> StorageFileLocks : locks file operations
   StorageRepository ..> StorageDocument : reads and writes JSON
   StorageDocument "1" o-- "0..*" TodoProject : data when storing todos
-  %% RenameProjectAsync is the manager's project update operation.
-  %% Task due dates are optional. Mutations save immediately.
-  %% Missing IDs return false; AddTaskAsync returns null for a missing project.
-  %% Deleting a project also removes its contained tasks.
+
   TodoProject "1" *-- "0..*" TodoTask : owns tasks
