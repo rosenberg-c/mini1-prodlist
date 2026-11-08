@@ -28,19 +28,8 @@ namespace App.src.Todo {
         switch (choice) {
           case "1":
             ConsoleRender.Header("Show Tasks");
-            await _actions.ShowTaskAsync(
-              DisplayMenu: () => {
-                Console.WriteLine();
-                Console.WriteLine("1. TasksByProject");
-                Console.WriteLine("2. TasksByDate");
-                Console.WriteLine();
-              },
-              DisplayInvalid: () => {
-                ConsoleSupport.WriteLineYellow(
-                  "Invalid option. Please try again."
-                );
-              }
-            );
+            await _actions.ShowTaskAsync();
+            break;
             break;
           default:
             ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");

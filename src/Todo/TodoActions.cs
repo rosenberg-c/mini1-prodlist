@@ -14,7 +14,10 @@ namespace App.src.Todo {
       (List<TodoProject> projects, List<TodoTask> tasks) =
         await _m.GetProjectsAndTasksAsync();
       while (true) {
-        DisplayMenu();
+        Console.WriteLine();
+        Console.WriteLine("1. TasksByProject");
+        Console.WriteLine("2. TasksByDate");
+        Console.WriteLine();
 
         if (!ConsoleSupport.TryReadMenuChoice(out string? choice)) {
           return;
@@ -28,7 +31,10 @@ namespace App.src.Todo {
             TodoDisplay.DisplayTasksByDate(tasks);
             break;
           default:
-            DisplayInvalid();
+            ConsoleSupport.WriteLineYellow(
+              "Invalid option. Please try again."
+            );
+
             break;
         }
       }
