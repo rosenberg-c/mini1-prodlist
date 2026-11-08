@@ -2,7 +2,7 @@
 MERMAID_RENDER ?= .mermaid/render.sh
 DOCS_DIR ?= docs
 MERMAID_IMAGE ?= minlag/mermaid-cli:latest
-MERMAID_THEME ?= dark
+MERMAID_THEME ?= redux-dark
 # \# escapes the comment character; override e.g. make mermaid-render MERMAID_BG="#1e1e1e"
 MERMAID_BG ?= \#222222
 MERMAID_SCALE ?= 10
