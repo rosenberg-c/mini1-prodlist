@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "data": [
+    {
+      "Id": "bca8f9a2-24d7-47ee-b885-032013bc9201",
+      "Title": "Personal",
+      "Tasks": [
+        {
+          "Id": "1b955cd5-1812-4f9d-b47f-9682f64d7a01",
+          "Status": "Pending",
+          "Title": "Buy groceries",
+          "Description": "Pick up milk and bread",
+          "DueDate": "2026-11-05"
+        },
+        {
+          "Id": "976eabce-99f5-486f-bce7-38605be68c02",
+          "Status": "Completed",
+          "Title": "Book appointment",
+          "Description": "Schedule a dentist visit",
+          "DueDate": "2026-11-03"
+        }
+      ]
+    },
+    {
+      "Id": "2da74f5f-0185-492f-b572-dd106c3b9202",
+      "Title": "Work",
+      "Tasks": [
+        {
+          "Id": "15c822eb-dfea-426d-abd4-76d1ef407a03",
+          "Status": "InProgress",
+          "Title": "Prepare presentation",
+          "Description": "Draft slides for the team meeting",
+          "DueDate": "2026-11-10"
+        }
+      ]
+    }
+  ]
+}
