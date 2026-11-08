@@ -14,7 +14,7 @@ namespace App.src.Todo {
     Guid Id,
     TodoStatus Status,
     string Title,
-    string Description,
+    string? Description,
     DateOnly? DueDate
   );
 

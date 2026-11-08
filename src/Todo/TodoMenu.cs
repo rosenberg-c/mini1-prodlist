@@ -13,6 +13,9 @@ namespace App.src.Todo {
       ConsoleRender.Header("Welcome to Todo App");
       Console.WriteLine("");
       Console.WriteLine("1. Show Task List (by date or project)");
+      Console.WriteLine("2. Add Task");
+      Console.WriteLine("3. Edit Task");
+
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
       ConsoleRender.Footer();
@@ -30,6 +33,15 @@ namespace App.src.Todo {
             ConsoleRender.Header("Show Tasks");
             await _actions.ShowTaskAsync();
             break;
+          case "2":
+            ConsoleRender.Header("Add Task");
+            await _actions.AddTaskAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "3":
+            ConsoleRender.Header("Edit Task");
+            await _actions.EditTaskAsync();
+            ConsoleSupport.Pause();
             break;
           default:
             ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");

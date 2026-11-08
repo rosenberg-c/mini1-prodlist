@@ -22,8 +22,20 @@ namespace App.src.Todo {
       throw new NotImplementedException();
     }
 
-    internal async Task UpdateProjectAsync() {
-      throw new NotImplementedException();
+    internal async Task UpdateProjectAsync(
+      Guid id,
+      Func<TodoProject, TodoProject> update
+    ) {
+      var projects = await GetProjectsAsync();
+      var project = projects.FirstOrDefault(p => p.Id == id);
+
+      if (project is null) {
+        throw new KeyNotFoundException("Project not found.");
+      }
+
+      if (!await _storage.UpdateAsync(id, update)) {
+        throw new KeyNotFoundException("Could not update project.");
+      }
     }
 
     internal async Task DeleteProjectAsync() {

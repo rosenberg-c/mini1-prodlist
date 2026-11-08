@@ -38,8 +38,15 @@ namespace App.src.Todo {
       throw new NotImplementedException();
     }
 
-    internal async Task AddTaskAsync() {
-      throw new NotImplementedException();
+    internal async Task AddTaskAsync(
+      Func<Guid, TodoTask> factory, TodoProject project
+    ) {
+      await _store.UpdateProjectAsync(project.Id,
+        (project) => {
+          project.Tasks.Add(factory(Guid.NewGuid()));
+          return project;
+        }
+      );
     }
 
     internal async Task UpdateTaskAsync() {
