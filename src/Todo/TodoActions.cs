@@ -173,6 +173,45 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task MoveTaskAsync() {
+      Console.WriteLine();
+
+      (List<TodoProject> currProjects, List<TodoTask> currTasks) =
+        await _m.GetProjectsAndTasksAsync();
+
+      if (currProjects.Count == 0) {
+        Console.WriteLine("No projects.");
+        return;
+      }
+
+      var currSelection = TaskChoice(currProjects);
+      if (currSelection is null) {
+        return;
+      }
+
+      (TodoTask moveTask, TodoProject fromProject) = currSelection.Value;
+
+      NumberedSelectionResult toChoice = ProjectChoice(currProjects);
+      if (toChoice.Status == SelectionStatus.Cancelled) {
+        return;
+      }
+
+      if (fromProject.Id == currProjects[toChoice.Index].Id) {
+        Console.WriteLine("Cannot move to same, select another project.");
+        return;
+      }
+
+      TodoProject toProject = currProjects[toChoice.Index];
+      try {
+        await _m.MoveProjectAsync(fromProject.Id, toProject.Id, moveTask.Id);
+
+        Console.WriteLine("Success.");
+      }
+      catch {
+        ConsoleSupport.WriteLineYellow("Could not move.");
+      }
+    }
+
     private NumberedSelectionResult ProjectChoice(
       List<TodoProject> projects
     ) {

@@ -38,6 +38,25 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task MoveProjectAsync(
+      Guid fromId,
+      Guid toId,
+      Guid taskId
+    ) {
+      await _storage.UpdatePairAsync(fromId, toId, (fromProject, toProject) => {
+          int index = fromProject.Tasks.FindIndex(t => t.Id == taskId);
+          if (index < 0) {
+            throw new KeyNotFoundException("Task not found.");
+          }
+
+          TodoTask task = fromProject.Tasks[index];
+          fromProject.Tasks.RemoveAt(index);
+          toProject.Tasks.Add(task);
+          return (fromProject, toProject);
+        }
+      );
+    }
+
     internal async Task DeleteProjectAsync() {
       throw new NotImplementedException();
     }

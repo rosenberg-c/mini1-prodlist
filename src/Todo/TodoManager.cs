@@ -38,6 +38,14 @@ namespace App.src.Todo {
       await _store.UpdateProjectAsync(id, update);
     }
 
+    internal async Task MoveProjectAsync(
+      Guid fromId,
+      Guid toId,
+      Guid taskId
+    ) {
+      await _store.MoveProjectAsync(fromId, toId, taskId);
+    }
+
     internal async Task DeleteProjectAsync() {
       throw new NotImplementedException();
     }

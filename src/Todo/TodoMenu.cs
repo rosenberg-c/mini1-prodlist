@@ -16,6 +16,7 @@ namespace App.src.Todo {
       Console.WriteLine("2. Add Task");
       Console.WriteLine("3. Edit Task");
       Console.WriteLine("4. Delete Task");
+      Console.WriteLine("5. Move Task");
 
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
@@ -47,6 +48,11 @@ namespace App.src.Todo {
           case "4":
             ConsoleRender.Header("Delete Task");
             await _actions.DeleteTaskAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "5":
+            ConsoleRender.Header("Move Task");
+            await _actions.MoveTaskAsync();
             ConsoleSupport.Pause();
             break;
           default:
