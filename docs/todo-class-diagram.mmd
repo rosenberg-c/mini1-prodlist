@@ -24,7 +24,7 @@ classDiagram
 
     +GetProjectsAsync() Task~List~TodoProject~~
     +CreateProjectAsync(string title) Task~TodoProject~
-    +RenameProjectAsync(Guid projectId, string title) Task~bool~
+    +UpdateProjectAsync(Guid projectId, string title) Task~bool~
     +DeleteProjectAsync(Guid projectId) Task~bool~
 
     +AddTaskAsync(Guid projectId, string title, string description, DateOnly? dueDate) Task~TodoTask?~
