@@ -212,6 +212,7 @@ namespace App.src.Todo {
       }
     }
 
+    // Project
     internal async Task CreateProjectAsync() {
       Console.WriteLine();
       if (!ConsoleInput.TryReadText("Title", out string title)) {
@@ -230,6 +231,41 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task RenameProjectAsync() {
+      (List<TodoProject> projects, List<TodoTask> _) =
+        await _m.GetProjectsAndTasksAsync();
+
+      if (projects.Count == 0) {
+        Console.WriteLine("No projects.");
+        return;
+      }
+
+      NumberedSelectionResult choice = ProjectChoice(projects);
+      if (choice.Status == SelectionStatus.Cancelled) {
+        return;
+      }
+
+      Console.WriteLine();
+      Console.WriteLine("Press Enter to keep the previous value.");
+      Console.WriteLine();
+      var project = projects[choice.Index];
+      if (!ConsoleInput.TryReadText("Title", out string title, project.Title)) {
+        return;
+      }
+
+      try {
+        await _m.UpdateProjectAsync(project.Id,
+          p => { return p.WithTitle(title); }
+        );
+
+        Console.WriteLine("Success.");
+      }
+      catch {
+        ConsoleSupport.WriteLineYellow("Could not rename.");
+      }
+    }
+
+    // Support
     private NumberedSelectionResult ProjectChoice(
       List<TodoProject> projects
     ) {

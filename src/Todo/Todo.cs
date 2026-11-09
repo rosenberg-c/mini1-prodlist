@@ -43,5 +43,9 @@ namespace App.src.Todo {
     Guid Id,
     string Title,
     List<TodoTask> Tasks
-  );
+  ) {
+    public TodoProject WithTitle(string value) {
+      return this with { Title = value };
+    }
+  }
 }

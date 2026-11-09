@@ -19,6 +19,7 @@ namespace App.src.Todo {
       Console.WriteLine("5. Move Task");
       Console.WriteLine();
       Console.WriteLine("6. Create Project");
+      Console.WriteLine("7. Rename Project");
 
 
       Console.WriteLine("");
@@ -61,6 +62,11 @@ namespace App.src.Todo {
           case "6":
             ConsoleRender.Header("Create Project");
             await _actions.CreateProjectAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "7":
+            ConsoleRender.Header("Rename Project");
+            await _actions.RenameProjectAsync();
             ConsoleSupport.Pause();
             break;
 
