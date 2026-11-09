@@ -212,6 +212,24 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task CreateProjectAsync() {
+      Console.WriteLine();
+      if (!ConsoleInput.TryReadText("Title", out string title)) {
+        return;
+      }
+
+      try {
+        await _m.CreateProjectAsync(id => {
+            return new TodoProject(id, title, []);
+          }
+        );
+        Console.WriteLine("Created Project");
+      }
+      catch {
+        ConsoleSupport.WriteLineRed("Could not create project");
+      }
+    }
+
     private NumberedSelectionResult ProjectChoice(
       List<TodoProject> projects
     ) {

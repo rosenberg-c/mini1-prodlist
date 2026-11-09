@@ -17,6 +17,9 @@ namespace App.src.Todo {
       Console.WriteLine("3. Edit Task");
       Console.WriteLine("4. Delete Task");
       Console.WriteLine("5. Move Task");
+      Console.WriteLine();
+      Console.WriteLine("6. Create Project");
+
 
       Console.WriteLine("");
       Console.WriteLine("q to quit or go back");
@@ -55,6 +58,12 @@ namespace App.src.Todo {
             await _actions.MoveTaskAsync();
             ConsoleSupport.Pause();
             break;
+          case "6":
+            ConsoleRender.Header("Create Project");
+            await _actions.CreateProjectAsync();
+            ConsoleSupport.Pause();
+            break;
+
           default:
             ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");
             break;

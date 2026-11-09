@@ -18,8 +18,8 @@ namespace App.src.Todo {
       return projects;
     }
 
-    internal async Task CreateProjectAsync() {
-      throw new NotImplementedException();
+    internal async Task<TodoProject> CreateProjectAsync(Func<Guid, TodoProject> factory) {
+      return await _storage.CreateAsync(factory);
     }
 
     internal async Task UpdateProjectAsync(
