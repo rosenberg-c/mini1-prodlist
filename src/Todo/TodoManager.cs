@@ -1,3 +1,5 @@
+using App.src.ConsoleCore;
+
 namespace App.src.Todo {
   internal class TodoManager {
     private readonly TodoStore _store;
@@ -49,8 +51,24 @@ namespace App.src.Todo {
       );
     }
 
-    internal async Task UpdateTaskAsync() {
-      throw new NotImplementedException();
+    internal async Task<bool> UpdateTaskAsync(TodoTask task,
+      TodoProject project) {
+      try {
+        await _store.UpdateProjectAsync(project.Id, project => {
+            int i = project.Tasks.FindIndex(existing => existing.Id == task.Id);
+            if (i < 0) {
+              throw new KeyNotFoundException("Task not found.");
+            }
+
+            project.Tasks[i] = task.Copy();
+            return project;
+          }
+        );
+        return true;
+      }
+      catch {
+        return false;
+      }
     }
 
     internal async Task SetTaskStatusAsync() {

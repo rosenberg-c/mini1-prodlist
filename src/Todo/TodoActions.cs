@@ -116,7 +116,7 @@ namespace App.src.Todo {
       Console.WriteLine();
 
       if (!ConsoleInput.TryReadText("Title", out string title, task.Title) ||
-          !ConsoleInput.TryReadText("Description", out string desc,
+          !ConsoleInput.TryReadOptionalText("Description", out string? desc,
             task.Description
           ) ||
           !TryReadStatus(out TodoStatus status, task.Status) ||
@@ -127,11 +127,18 @@ namespace App.src.Todo {
         return;
       }
 
-      Console.WriteLine(title);
-      Console.WriteLine(desc);
-      Console.WriteLine(status);
-      Console.WriteLine(date);
-      Console.WriteLine(_m.UpdateTaskAsync());
+      TodoTask updated = task;
+      updated = updated.WithTitle(title);
+      updated = updated.WithDescription(desc);
+      updated = updated.WithStatus(status);
+      updated = updated.WithDueDate(date);
+
+      bool saved = await _m.UpdateTaskAsync(updated, project);
+      if (saved) {
+        Console.WriteLine("Updated.");
+      } else {
+        ConsoleSupport.WriteLineYellow("Could not update");
+      }
     }
 
     private NumberedSelectionResult ProjectChoice(

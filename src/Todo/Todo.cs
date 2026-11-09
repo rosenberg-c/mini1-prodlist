@@ -10,13 +10,33 @@ namespace App.src.Todo {
   }
 
   [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-  public record TodoTask(
+  public sealed record TodoTask(
     Guid Id,
     TodoStatus Status,
     string Title,
     string? Description,
     DateOnly? DueDate
-  );
+  ) {
+    public TodoTask Copy() {
+      return new TodoTask(Id, Status, Title, Description, DueDate);
+    }
+
+    public TodoTask WithStatus(TodoStatus value) {
+      return this with { Status = value };
+    }
+
+    public TodoTask WithTitle(string value) {
+      return this with { Title = value };
+    }
+
+    public TodoTask WithDescription(string? value) {
+      return this with { Description = value };
+    }
+
+    public TodoTask WithDueDate(DateOnly? value) {
+      return this with { DueDate = value };
+    }
+  }
 
   [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
   public sealed record TodoProject(

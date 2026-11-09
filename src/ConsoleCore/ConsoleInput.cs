@@ -6,7 +6,7 @@ namespace App.src.ConsoleCore {
     private static string waitChar = "> ";
 
     internal static bool TryReadOptionalText(
-      string prompt, out string value, string? current = null
+      string prompt, out string? value, string? current = null
     ) {
       while (true) {
         string label = current is null
@@ -17,12 +17,13 @@ namespace App.src.ConsoleCore {
           return false;
         }
 
-        if (input.Length == 0) {
-          value = current ?? string.Empty;
+        string trimmed = input.Trim();
+        if (trimmed.Length == 0) {
+          value = current;
           return true;
         }
 
-        if (TextFieldValidation.TryField(input, out value)) {
+        if (TextFieldValidation.TryField(trimmed, out value)) {
           return true;
         }
 
