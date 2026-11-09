@@ -32,8 +32,10 @@ namespace App.src.Todo {
       throw new NotImplementedException();
     }
 
-    internal async Task RenameProjectAsync() {
-      throw new NotImplementedException();
+    internal async Task UpdateProjectAsync(
+      Guid id,
+      Func<TodoProject, TodoProject> update) {
+      await _store.UpdateProjectAsync(id, update);
     }
 
     internal async Task DeleteProjectAsync() {

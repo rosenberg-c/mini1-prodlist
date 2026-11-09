@@ -141,6 +141,38 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task DeleteTaskAsync() {
+      Console.WriteLine();
+
+      (List<TodoProject> projects, List<TodoTask> tasks) =
+        await _m.GetProjectsAndTasksAsync();
+
+      if (projects.Count == 0) {
+        Console.WriteLine("No projects.");
+        return;
+      }
+
+      var selection = TaskChoice(projects);
+      if (selection is null) {
+        return;
+      }
+
+      (TodoTask task, TodoProject project) = selection.Value;
+
+      try {
+        await _m.UpdateProjectAsync(project.Id,
+          prevProj => {
+            prevProj.Tasks.RemoveAll(t => t.Id == task.Id);
+            return prevProj;
+          }
+        );
+        Console.WriteLine("Success.");
+      }
+      catch {
+        ConsoleSupport.WriteLineYellow("Could not remove.");
+      }
+    }
+
     private NumberedSelectionResult ProjectChoice(
       List<TodoProject> projects
     ) {
