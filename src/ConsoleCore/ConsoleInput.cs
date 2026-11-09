@@ -10,8 +10,9 @@ namespace App.src.ConsoleCore {
     ) {
       while (true) {
         string label = current is null
-          ? $"{prompt} (optional): "
-          : $"{prompt} (optional) [{current}]: ";
+          ? $"{prompt} (optional) "
+          : $"{prompt} (optional) [{current}] ";
+        label += "/reset to clear: ";
         if (!ConsoleSupport.TryReadInput(label, out string? input)) {
           value = string.Empty;
           return false;
@@ -20,6 +21,11 @@ namespace App.src.ConsoleCore {
         string trimmed = input.Trim();
         if (trimmed.Length == 0) {
           value = current;
+          return true;
+        }
+
+        if (trimmed.Equals("/reset", StringComparison.OrdinalIgnoreCase)) {
+          value = null;
           return true;
         }
 
@@ -95,21 +101,27 @@ namespace App.src.ConsoleCore {
     ) {
       while (true) {
         string prompt = current is DateOnly saved
-          ? $"{label} (yyyy-MM-dd) [{saved.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}]: "
-          : $"{label} (yyyy-MM-dd, optional): ";
-
+          ? $"{label} (yyyy-MM-dd) [{saved.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}] "
+          : $"{label} (yyyy-MM-dd, optional) ";
+        prompt += "/reset to clear: ";
         if (!ConsoleSupport.TryReadInput(prompt, out string? input)) {
           date = default;
           return false;
         }
 
-        if (input.Length == 0) {
+        string trimmed = input.Trim();
+        if (trimmed.Length == 0) {
           date = current;
           return true;
         }
 
+        if (trimmed.Equals("/reset", StringComparison.OrdinalIgnoreCase)) {
+          date = null;
+          return true;
+        }
+
         if (DateOnly.TryParseExact(
-              input, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+              trimmed, "yyyy-MM-dd", CultureInfo.InvariantCulture,
               DateTimeStyles.None, out DateOnly parsed
             )) {
           date = parsed;
