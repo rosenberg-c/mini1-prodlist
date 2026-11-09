@@ -18,7 +18,8 @@ namespace App.src.Todo {
       return projects;
     }
 
-    internal async Task<TodoProject> CreateProjectAsync(Func<Guid, TodoProject> factory) {
+    internal async Task<TodoProject> CreateProjectAsync(
+      Func<Guid, TodoProject> factory) {
       return await _storage.CreateAsync(factory);
     }
 
@@ -57,8 +58,10 @@ namespace App.src.Todo {
       );
     }
 
-    internal async Task DeleteProjectAsync() {
-      throw new NotImplementedException();
+    internal async Task DeleteProjectAsync(Guid id) {
+      if (!await _storage.DeleteAsync(id)) {
+        throw new KeyNotFoundException("Could not remove project.");
+      }
     }
   }
 }

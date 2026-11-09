@@ -20,6 +20,7 @@ namespace App.src.Todo {
       Console.WriteLine();
       Console.WriteLine("6. Create Project");
       Console.WriteLine("7. Rename Project");
+      Console.WriteLine("8. Delete Project");
 
 
       Console.WriteLine("");
@@ -69,6 +70,12 @@ namespace App.src.Todo {
             await _actions.RenameProjectAsync();
             ConsoleSupport.Pause();
             break;
+          case "8":
+            ConsoleRender.Header("Delete Project");
+            await _actions.DeleteProjectAsync();
+            ConsoleSupport.Pause();
+            break;
+
 
           default:
             ConsoleSupport.WriteLineYellow("Invalid option. Please try again.");

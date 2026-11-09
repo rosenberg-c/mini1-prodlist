@@ -51,6 +51,85 @@ namespace App.tests.Tests {
       }
     }
 
+    [Fact]
+    public async Task
+      DeleteProject_WithTasksAndConfirmation_RemovesOnlySelectedProject() {
+      string path = TempPath();
+      try {
+        TodoProject removed = new(Guid.NewGuid(), "Remove", [TaskItem("Task")]);
+        TodoTask keptTask = TaskItem("Keep task");
+        TodoProject kept = new(Guid.NewGuid(), "Keep", [keptTask]);
+        await SeedAsync(path, removed, kept);
+
+        string output = await RunAppAsync(path, "8\n1\ny\n\nq\n");
+
+        Assert.Contains("Success.", output);
+        List<TodoProject> saved = await new TodoStore(path).GetProjectsAsync();
+        TodoProject remaining = Assert.Single(saved);
+        Assert.Equal(kept.Id, remaining.Id);
+        Assert.Equal(keptTask.Id, Assert.Single(remaining.Tasks).Id);
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
+    [Fact]
+    public async Task
+      DeleteProject_WithTasksAndDeclinedConfirmation_LeavesFileUnchanged() {
+      string path = TempPath();
+      try {
+        await SeedAsync(path,
+          new TodoProject(Guid.NewGuid(), "Keep", [TaskItem("Keep task")])
+        );
+        string before = await File.ReadAllTextAsync(path);
+
+        string output = await RunAppAsync(path, "8\n1\nn\n\nq\n");
+
+        Assert.Contains("Removal cancelled.", output);
+        Assert.Equal(before, await File.ReadAllTextAsync(path));
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
+    [Fact]
+    public async Task DeleteProject_EmptyProject_DoesNotRequireConfirmation() {
+      string path = TempPath();
+      try {
+        await SeedAsync(path, new TodoProject(Guid.NewGuid(), "Empty", []));
+
+        string output = await RunAppAsync(path, "8\n1\n\nq\n");
+
+        Assert.Contains("Success.", output);
+        Assert.DoesNotContain("really remove?", output);
+        Assert.Empty(await new TodoStore(path).GetProjectsAsync());
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
+    [Fact]
+    public async Task DeleteProject_MissingId_DoesNotChangeStoredProjects() {
+      string path = TempPath();
+      try {
+        TodoProject kept = new(Guid.NewGuid(), "Keep", []);
+        await SeedAsync(path, kept);
+        string before = await File.ReadAllTextAsync(path);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+          new TodoStore(path).DeleteProjectAsync(Guid.NewGuid())
+        );
+
+        Assert.Equal(before, await File.ReadAllTextAsync(path));
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
     private static TodoTask TaskItem(string title) =>
       new(Guid.NewGuid(), TodoStatus.Pending, title, null, null);
 
@@ -60,11 +139,11 @@ namespace App.tests.Tests {
 
     private static Task SeedAsync(string path, params TodoProject[] projects) =>
       File.WriteAllTextAsync(path, JsonSerializer.Serialize(new {
-          schemaVersion = TodoStore.SchemaVersion,
-          data = projects
-        }
-      )
-    );
+            schemaVersion = TodoStore.SchemaVersion,
+            data = projects
+          }
+        )
+      );
 
     private static async Task<string> RunAppAsync(string path, string input) {
       ProcessStartInfo start = new("dotnet") {

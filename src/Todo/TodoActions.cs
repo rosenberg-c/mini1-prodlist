@@ -265,6 +265,45 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task DeleteProjectAsync() {
+      (List<TodoProject> projects, List<TodoTask> _) =
+        await _m.GetProjectsAndTasksAsync();
+
+      if (projects.Count == 0) {
+        Console.WriteLine("No projects.");
+        return;
+      }
+
+      NumberedSelectionResult choice = ProjectChoice(projects);
+      if (choice.Status == SelectionStatus.Cancelled) {
+        return;
+      }
+
+      Console.WriteLine();
+      var project = projects[choice.Index];
+      if (project.Tasks.Count > 0) {
+        var shouldRemove = ConsoleSupport.TryReadInput(
+          $"There are still tasks, comfirm to remove? (y/N): ",
+          out string? confirmation
+        );
+        if (!shouldRemove || !string.Equals(confirmation, "y",
+              StringComparison.OrdinalIgnoreCase
+            )
+           ) {
+          Console.WriteLine("Removal cancelled.");
+          return;
+        }
+      }
+
+      try {
+        await _m.DeleteProjectAsync(project.Id);
+        Console.WriteLine("Success.");
+      }
+      catch {
+        ConsoleSupport.WriteLineYellow("Could not remove.");
+      }
+    }
+
     // Support
     private NumberedSelectionResult ProjectChoice(
       List<TodoProject> projects
