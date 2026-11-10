@@ -190,7 +190,7 @@ namespace App.src.Todo {
 
       TodoProject toProject = currProjects[toChoice.Index];
       try {
-        await _m.MoveProjectAsync(fromProject.Id, toProject.Id, moveTask.Id);
+        await _m.MoveTaskAsync(fromProject.Id, toProject.Id, moveTask.Id);
 
         Console.WriteLine("Success.");
       }

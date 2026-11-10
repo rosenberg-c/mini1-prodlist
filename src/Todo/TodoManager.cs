@@ -43,12 +43,12 @@ namespace App.src.Todo {
       await _store.UpdateProjectAsync(id, update);
     }
 
-    internal async Task MoveProjectAsync(
+    internal async Task MoveTaskAsync(
       Guid fromId,
       Guid toId,
       Guid taskId
     ) {
-      await _store.MoveProjectAsync(fromId, toId, taskId);
+      await _store.MoveTaskAsync(fromId, toId, taskId);
     }
 
     internal async Task DeleteProjectAsync(Guid id) {
@@ -115,10 +115,6 @@ namespace App.src.Todo {
     }
 
     internal async Task SetTaskStatusAsync() {
-      throw new NotImplementedException();
-    }
-
-    internal async Task MoveTaskAsync() {
       throw new NotImplementedException();
     }
 

@@ -29,7 +29,7 @@ namespace App.tests.Tests {
           )
         );
 
-        await new TodoStore(path).MoveProjectAsync(source.Id, destination.Id,
+        await new TodoStore(path).MoveTaskAsync(source.Id, destination.Id,
           move.Id
         );
 

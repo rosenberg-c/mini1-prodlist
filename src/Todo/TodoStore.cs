@@ -39,7 +39,7 @@ namespace App.src.Todo {
       }
     }
 
-    internal async Task MoveProjectAsync(
+    internal async Task MoveTaskAsync(
       Guid fromId,
       Guid toId,
       Guid taskId
