@@ -1,5 +1,3 @@
-using App.src.ConsoleCore;
-
 namespace App.src.Todo {
   internal class TodoManager {
     private readonly TodoStore _store;
