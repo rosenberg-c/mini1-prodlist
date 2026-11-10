@@ -16,7 +16,7 @@ namespace App.tests.Tests {
         TodoProject other = new(Guid.NewGuid(), "Second", [otherProjectTask]);
         await SeedAsync(path, project, other);
 
-        string output = await RunAppAsync(path, "4\n2\n\nq\n");
+        string output = await RunAppAsync(path, "5\n2\n\nq\n");
 
         Assert.Contains("Success.", output);
         List<TodoProject> saved = await new TodoStore(path).GetProjectsAsync();
@@ -41,7 +41,7 @@ namespace App.tests.Tests {
         );
         string before = await File.ReadAllTextAsync(path);
 
-        string output = await RunAppAsync(path, "4\nq\n\nq\n");
+        string output = await RunAppAsync(path, "5\nq\n\nq\n");
 
         Assert.DoesNotContain("Success.", output);
         Assert.Equal(before, await File.ReadAllTextAsync(path));
@@ -87,7 +87,7 @@ namespace App.tests.Tests {
         TodoProject kept = new(Guid.NewGuid(), "Keep", [keptTask]);
         await SeedAsync(path, removed, kept);
 
-        string output = await RunAppAsync(path, "8\n1\ny\n\nq\n");
+        string output = await RunAppAsync(path, "9\n1\ny\n\nq\n");
 
         Assert.Contains("Success.", output);
         List<TodoProject> saved = await new TodoStore(path).GetProjectsAsync();
@@ -110,7 +110,7 @@ namespace App.tests.Tests {
         );
         string before = await File.ReadAllTextAsync(path);
 
-        string output = await RunAppAsync(path, "8\n1\nn\n\nq\n");
+        string output = await RunAppAsync(path, "9\n1\nn\n\nq\n");
 
         Assert.Contains("Removal cancelled.", output);
         Assert.Equal(before, await File.ReadAllTextAsync(path));
@@ -126,7 +126,7 @@ namespace App.tests.Tests {
       try {
         await SeedAsync(path, new TodoProject(Guid.NewGuid(), "Empty", []));
 
-        string output = await RunAppAsync(path, "8\n1\n\nq\n");
+        string output = await RunAppAsync(path, "9\n1\n\nq\n");
 
         Assert.Contains("Success.", output);
         Assert.DoesNotContain("really remove?", output);
