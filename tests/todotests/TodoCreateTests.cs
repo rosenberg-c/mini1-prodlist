@@ -26,5 +26,41 @@ namespace App.tests.Tests {
         File.Delete(path);
       }
     }
+
+    [Fact]
+    public async Task AddTask_PersistsPendingTaskInSelectedProject() {
+      string path = Path.Combine(Path.GetTempPath(),
+        $"todo-add-task-{Guid.NewGuid():N}.json"
+      );
+      try {
+        TodoStore store = new(path);
+        TodoProject selected =
+          await store.CreateProjectAsync(id =>
+            new TodoProject(id, "Selected", [])
+          );
+        TodoProject other =
+          await store.CreateProjectAsync(id => new TodoProject(id, "Other", [])
+          );
+        DateOnly dueDate = new(2026, 11, 10);
+
+        await new TodoManager(store).AddTaskAsync(selected.Id, "Task",
+          "Details", dueDate
+        );
+
+        List<TodoProject> saved = await new TodoStore(path).GetProjectsAsync();
+        TodoTask task = Assert.Single(saved[0].Tasks);
+        Assert.Equal(selected.Id, saved[0].Id);
+        Assert.NotEqual(Guid.Empty, task.Id);
+        Assert.Equal(TodoStatus.Pending, task.Status);
+        Assert.Equal("Task", task.Title);
+        Assert.Equal("Details", task.Description);
+        Assert.Equal(dueDate, task.DueDate);
+        Assert.Equal(other.Id, saved[1].Id);
+        Assert.Empty(saved[1].Tasks);
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
   }
 }

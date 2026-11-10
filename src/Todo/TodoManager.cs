@@ -52,11 +52,21 @@ namespace App.src.Todo {
     }
 
     internal async Task AddTaskAsync(
-      Func<Guid, TodoTask> factory, TodoProject project
+      Guid projectId,
+      string title,
+      string? description,
+      DateOnly? dueDate
     ) {
-      await _store.UpdateProjectAsync(project.Id,
+      await _store.UpdateProjectAsync(projectId,
         (project) => {
-          project.Tasks.Add(factory(Guid.NewGuid()));
+          project.Tasks.Add(new(
+              Id: Guid.NewGuid(),
+              Status: TodoStatus.Pending,
+              Title: title,
+              Description: description,
+              DueDate: dueDate
+            )
+          );
           return project;
         }
       );

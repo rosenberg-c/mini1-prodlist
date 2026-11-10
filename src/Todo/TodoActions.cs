@@ -76,16 +76,7 @@ namespace App.src.Todo {
       }
 
       try {
-        await _m.AddTaskAsync(
-          id => new(
-            Id: id,
-            Status: TodoStatus.Pending,
-            Title: title,
-            Description: description,
-            DueDate: date
-          ),
-          selected
-        );
+        await _m.AddTaskAsync(selected.Id, title, description, date);
         Console.WriteLine("Task added.");
       }
       catch {
