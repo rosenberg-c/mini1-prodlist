@@ -6,8 +6,10 @@ namespace App.src.Todo {
     internal static void DisplayTasksByProject(List<TodoProject> projects) {
       for (int i = 0; i < projects.Count; i++) {
         ConsoleTable.Write(
-          ["Title", "Status", "Due"],
-          projects[i].Tasks.Select(TaskRow),
+          ["Title", "Status", "Description", "Due"],
+          projects[i].Tasks
+            .OrderBy(static task => task.DueDate)
+            .Select(TaskRow),
           header: projects[i].Title,
           numberRows: false
         );
@@ -16,7 +18,7 @@ namespace App.src.Todo {
 
     internal static void DisplayTasksByDate(List<TodoTask> tasks) {
       ConsoleTable.Write(
-        ["Title", "Status", "Due"],
+        ["Title", "Status", "Description", "Due"],
         tasks
           .OrderBy(static task => task.DueDate)
           .Select(TaskRow),
@@ -25,8 +27,9 @@ namespace App.src.Todo {
     }
 
     private static IReadOnlyList<string> TaskRow(TodoTask task) {
-      string? due = task.DueDate?.ToString(CultureInfo.InvariantCulture);
-      return [task.Title, task.Status.ToString(), due ?? ""];
+      string due = task.DueDate?.ToString(CultureInfo.InvariantCulture) ?? "";
+      string desc = task.Description ?? "";
+      return [task.Title, task.Status.ToString(), desc, due];
     }
   }
 }
