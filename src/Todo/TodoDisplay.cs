@@ -3,13 +3,14 @@ using App.src.ConsoleCore;
 namespace App.src.Todo {
   internal sealed class TodoDisplay {
     internal static void DisplayTasksByProject(List<TodoProject> projects) {
-      for (int i = 0; i < projects.Count; i++) {
+      var ordered = projects.OrderBy(static p => p.Title).ToList();
+      for (int i = 0; i < ordered.Count; i++) {
         ConsoleTable.Write(
           ["Title", "Status", "Due", "Description"],
-          projects[i].Tasks
+          ordered[i].Tasks
             .OrderBy(static task => task.DueDate)
             .Select(TaskRow),
-          header: projects[i].Title,
+          header: ordered[i].Title,
           numberRows: false
         );
       }
