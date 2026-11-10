@@ -114,10 +114,6 @@ namespace App.src.Todo {
       }
     }
 
-    internal async Task SetTaskStatusAsync() {
-      throw new NotImplementedException();
-    }
-
     internal async Task DeleteTaskAsync(Guid projectId, Guid taskId) {
       await UpdateProjectAsync(projectId,
         prevProj => {
