@@ -55,6 +55,12 @@ namespace App.src.Todo {
       await _store.DeleteProjectAsync(id);
     }
 
+    internal async Task RenameProjectAsync(Guid id, string title) {
+      ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+      await UpdateProjectAsync(id, p => { return p.WithTitle(title); });
+    }
+
     internal async Task AddTaskAsync(
       Guid projectId,
       string title,

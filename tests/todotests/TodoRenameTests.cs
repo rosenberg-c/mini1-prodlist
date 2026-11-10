@@ -39,5 +39,60 @@ namespace App.tests.Tests {
         File.Delete(path);
       }
     }
+
+    [Fact]
+    public async Task ManagerRenameProject_PreservesProjectAndTasks() {
+      string path = Path.Combine(Path.GetTempPath(),
+        $"todo-manager-rename-{Guid.NewGuid():N}.json"
+      );
+      try {
+        TodoStore store = new(path);
+        TodoManager manager = new(store);
+        TodoTask task = new(Guid.NewGuid(), TodoStatus.Pending, "Task", null,
+          null
+        );
+        TodoProject project = await store.CreateProjectAsync(id =>
+          new TodoProject(id, "Original", [task])
+        );
+
+        await manager.RenameProjectAsync(project.Id, "Renamed");
+
+        List<TodoProject> saved = await new TodoStore(path).GetProjectsAsync();
+        TodoProject renamed = Assert.Single(saved);
+        Assert.Equal(project.Id, renamed.Id);
+        Assert.Equal("Renamed", renamed.Title);
+        Assert.Equal([task], renamed.Tasks);
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ManagerRenameProject_RejectsBlankTitle(string title) {
+      string path = Path.Combine(Path.GetTempPath(),
+        $"todo-manager-rename-{Guid.NewGuid():N}.json"
+      );
+      try {
+        TodoStore store = new(path);
+        TodoManager manager = new(store);
+        TodoProject project = await manager.CreateProjectAsync("Original");
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+          manager.RenameProjectAsync(project.Id, title)
+        );
+
+        TodoProject saved = Assert.Single(
+          await new TodoStore(path).GetProjectsAsync()
+        );
+        Assert.Equal(project.Id, saved.Id);
+        Assert.Equal("Original", saved.Title);
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
   }
 }

@@ -238,10 +238,7 @@ namespace App.src.Todo {
       }
 
       try {
-        await _m.UpdateProjectAsync(project.Id,
-          p => { return p.WithTitle(title); }
-        );
-
+        await _m.RenameProjectAsync(project.Id, title);
         Console.WriteLine("Success.");
       }
       catch {
