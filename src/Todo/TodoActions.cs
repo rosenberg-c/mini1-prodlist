@@ -118,7 +118,6 @@ namespace App.src.Todo {
         return;
       }
 
-
       bool saved = await _m.UpdateTaskAsync(
         taskId: task.Id,
         title: title,
