@@ -3,8 +3,6 @@ using App.src.Validation;
 
 namespace App.src.ConsoleCore {
   internal sealed class ConsoleInput {
-    private static string waitChar = "> ";
-
     internal static bool TryReadOptionalText(
       string prompt, out string? value, string? current = null
     ) {
