@@ -1,72 +1,41 @@
-# Asset Tracking System
+# Todo App
 
-A C# console app for tracking company computers and mobile phones.
+A C# console app for managing projects and their tasks. Create projects, add tasks with optional descriptions and due dates, update their status, and move tasks between projects. Changes are saved as JSON so they are available the next time you run the app.
 
 ## Get started
 
 1. Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
-2. Open a terminal in this project folder and run:
+2. From the repository root, run:
 
    ```sh
    make run
    ```
 
-   `make run` initializes the pinned [sharp-storage](https://github.com/rosenberg-c/sharp-storage) Git submodule first. If you're on Windows or not using Make, run `git submodule update --init --recursive` from the project folder after cloning, then run `dotnet run --project App.csproj`. The submodule uses a GitHub SSH URL, so GitHub SSH access must be configured. Alternatively, clone with `git clone --recurse-submodules <repo-url>` to initialize the submodule during cloning.
+   `make run` initializes the pinned [sharp-storage](https://github.com/rosenberg-c/sharp-storage) Git submodule and saves Todo data in `todo.json` in the repository root. The submodule uses a GitHub SSH URL, so you need GitHub SSH access. Without Make, run `git submodule update --init --recursive` and then `dotnet run --project App.csproj` from the repository root. A direct `dotnet run` uses `data.json` by default unless you set `APP_DATA_PATH` to another file.
 
-3. Choose a menu option. Type `q` to quit the menu or cancel asset entry. The app also quits if input ends.
+3. Choose a numbered menu option. Enter `q` to quit or go back at a menu.
 
-## Using the app
+To start with example projects and tasks, run `make reset` before `make run`. **This overwrites your current `todo.json`.** The example data is in [`todo.example.json`](todo.example.json).
 
-- **Show (1):** Sort by office and purchase date, purchase date alone, or asset type and purchase date. The table includes prices, age, and end-of-life status.
-- **Add (2):** Choose a computer or mobile phone, then enter brand, model, purchase date, USD price, and office. Local price is calculated from the office's fixed exchange rate.
-- **Edit (3), Remove (4), Search (5):** Update or remove an asset, or search by brand or model.
-- **Export JSON report (6):** Write a report alongside the saved asset file by adding `-report` before `.json` (for example, `assets.json` → `assets-report.json`). The report contains current age, local price, currency, and end-of-life status. Exporting again replaces the previous report without changing the saved asset file.
+## What you can do
 
-Brand and model cannot be empty; choose an office from Sweden, USA, or Turkey. USD prices must be non-negative numbers in your system's number format. Dates use `yyyy-MM-dd`. Enter `q` to cancel at a prompt. The app saves assets to `assets.json` in the folder where you run it; run it from the same folder next time to keep your assets. Use `make reset` to copy the sample `assets.example.json` to that path (overwrites existing data).
+- View tasks grouped by project or date, or show a compact date-ordered list.
+- Add, edit, delete, and move tasks between projects. Tasks have a title, an optional description and due date, and a status (Pending, In Progress, or Completed).
+- Create, rename, and delete projects that hold tasks. Create a project before adding a task if your data file is empty.
 
-## Existing asset files
+## How it works
 
-The current `assets.json` schema is version 1. On startup, the app rejects unsupported schema versions or invalid JSON instead of changing them. Existing files from earlier office-based prototypes are not compatible with the current asset model; keep a backup before using another data file.
+The app separates console menus and input (`src/Todo/TodoMenu.cs` and `src/Todo/TodoActions.cs`) from task operations (`src/Todo/TodoManager.cs`) and JSON persistence (`src/Todo/TodoStore.cs`). `TodoStore` uses the sharp-storage submodule to read and write projects. `src/Todo/TodoValidator.cs` checks loaded project and task data before the menu starts.
 
-## VS Code
+The Todo data format uses schema version 1. If the file has invalid JSON, an unsupported schema version, or invalid Todo data, the app reports the problem rather than replacing the file. Back up the file before deleting or resetting it.
 
-For vscode users the extension "C# Dev Kit" from Microsoft may need to be installed
-
-
-## Formatting prerequisite
-
-Install the JetBrains CLI for `make format`:
+## Development
 
 ```sh
-dotnet tool install -g JetBrains.ReSharper.GlobalTools
-export PATH="$PATH:$HOME/.dotnet/tools" # If jb is not on PATH
-```
-
-## Tests and code style
-
-From the project folder, run:
-
-```sh
-make build   # Build app and storage dependency
-make test    # Run tests
+make build   # Build the app and initialize its dependency
+make test    # Run the test suites
 make lint    # Check .NET formatting without changing files
-make format  # Format app and tests with JetBrains ReSharper
+make format  # Format C# code with JetBrains ReSharper CLI
 ```
 
-`make format` uses the checked-in `App.sln`; add new projects with `dotnet sln App.sln add path/to/New.csproj` (no update needed for new `.cs` files). `make lint` uses `dotnet format` and does not check JetBrains-specific wrapping. `tests/apptests` covers app-wide startup and shared console behavior. `tests/assettests` covers asset workflows through `tests/assetshost`, an asset-only executable that runs the asset menu directly. `tests/todotests` covers todo serialization and validation. Without Make, run `dotnet test tests/apptests/App.Integration.Tests.csproj`, `dotnet test tests/assettests/App.Tests.csproj`, or `dotnet test tests/todotests/App.Tests.csproj` separately. `make test` runs all three suites.
-
-## Make
-
-Easy make commands
-
-```sh
-make deps
-make run
-make test
-make lint
-make format
-```
-
-## Running
-
-[<img src="assets/run.png" width="250"/>](assets/run.png)
+`make format` requires the [JetBrains ReSharper command-line tools](https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html) (`jb`). Todo tests live in `tests/todotests`; app integration tests live in `tests/apptests`.
