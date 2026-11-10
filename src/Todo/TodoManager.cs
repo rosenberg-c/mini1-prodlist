@@ -112,8 +112,16 @@ namespace App.src.Todo {
       throw new NotImplementedException();
     }
 
-    internal async Task DeleteTaskAsync() {
-      throw new NotImplementedException();
+    internal async Task DeleteTaskAsync(Guid projectId, Guid taskId) {
+      await UpdateProjectAsync(projectId,
+        prevProj => {
+          if (prevProj.Tasks.RemoveAll(t => t.Id == taskId) == 0) {
+            throw new KeyNotFoundException("Task not found.");
+          }
+
+          return prevProj;
+        }
+      );
     }
   }
 }

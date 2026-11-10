@@ -152,12 +152,7 @@ namespace App.src.Todo {
       (TodoTask task, TodoProject project) = selection.Value;
 
       try {
-        await _m.UpdateProjectAsync(project.Id,
-          prevProj => {
-            prevProj.Tasks.RemoveAll(t => t.Id == task.Id);
-            return prevProj;
-          }
-        );
+        await _m.DeleteTaskAsync(project.Id, task.Id);
         Console.WriteLine("Success.");
       }
       catch {

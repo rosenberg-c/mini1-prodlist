@@ -52,6 +52,32 @@ namespace App.tests.Tests {
     }
 
     [Fact]
+    public async Task DeleteTask_MissingId_ThrowsAndLeavesFileUnchanged() {
+      string path = TempPath();
+      try {
+        TodoTask kept = TaskItem("Keep");
+        TodoProject project = new(Guid.NewGuid(), "Project", [kept]);
+        await SeedAsync(path, project);
+        string before = await File.ReadAllTextAsync(path);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+          new TodoManager(new TodoStore(path)).DeleteTaskAsync(project.Id,
+            Guid.NewGuid()
+          )
+        );
+
+        Assert.Equal(before, await File.ReadAllTextAsync(path));
+        TodoProject saved = Assert.Single(
+          await new TodoStore(path).GetProjectsAsync()
+        );
+        Assert.Equal(kept, Assert.Single(saved.Tasks));
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
+    [Fact]
     public async Task
       DeleteProject_WithTasksAndConfirmation_RemovesOnlySelectedProject() {
       string path = TempPath();
