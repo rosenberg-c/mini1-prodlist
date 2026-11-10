@@ -1,4 +1,3 @@
-using System.Globalization;
 using App.src.ConsoleCore;
 
 namespace App.src.Todo {
@@ -6,7 +5,7 @@ namespace App.src.Todo {
     internal static void DisplayTasksByProject(List<TodoProject> projects) {
       for (int i = 0; i < projects.Count; i++) {
         ConsoleTable.Write(
-          ["Title", "Status", "Description", "Due"],
+          ["Title", "Status", "Due", "Description"],
           projects[i].Tasks
             .OrderBy(static task => task.DueDate)
             .Select(TaskRow),
@@ -18,7 +17,7 @@ namespace App.src.Todo {
 
     internal static void DisplayTasksByDate(List<TodoTask> tasks) {
       ConsoleTable.Write(
-        ["Title", "Status", "Description", "Due"],
+        ["Title", "Status", "Due", "Description"],
         tasks
           .OrderBy(static task => task.DueDate)
           .Select(TaskRow),
@@ -27,9 +26,7 @@ namespace App.src.Todo {
     }
 
     private static IReadOnlyList<string> TaskRow(TodoTask task) {
-      string due = task.DueDate?.ToString(CultureInfo.InvariantCulture) ?? "";
-      string desc = task.Description ?? "";
-      return [task.Title, task.Status.ToString(), desc, due];
+      return [task.Title, task.dispStatus, task.dispDueDate, task.dispDesc];
     }
   }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace App.src.Todo {
   [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -17,6 +18,14 @@ namespace App.src.Todo {
     string? Description,
     DateOnly? DueDate
   ) {
+    public string dispDesc => Description ?? string.Empty;
+
+    public string dispDueDate => DueDate?.ToString(
+      CultureInfo.InvariantCulture
+    ) ?? string.Empty;
+
+    public string dispStatus => Status.ToString();
+
     public TodoTask Copy() {
       return new TodoTask(Id, Status, Title, Description, DueDate);
     }
