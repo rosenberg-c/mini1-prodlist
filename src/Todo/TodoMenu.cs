@@ -13,14 +13,16 @@ namespace App.src.Todo {
       ConsoleRender.Header("Welcome to Todo App");
       Console.WriteLine("");
       Console.WriteLine("1. Show Task List (by date or project)");
-      Console.WriteLine("2. Add Task");
-      Console.WriteLine("3. Edit Task");
-      Console.WriteLine("4. Delete Task");
-      Console.WriteLine("5. Move Task");
+      Console.WriteLine("2. Short list by date");
+      Console.WriteLine("");
+      Console.WriteLine("3. Add Task");
+      Console.WriteLine("4. Edit Task");
+      Console.WriteLine("5. Delete Task");
+      Console.WriteLine("6. Move Task");
       Console.WriteLine();
-      Console.WriteLine("6. Create Project");
-      Console.WriteLine("7. Rename Project");
-      Console.WriteLine("8. Delete Project");
+      Console.WriteLine("7. Create Project");
+      Console.WriteLine("8. Rename Project");
+      Console.WriteLine("9. Delete Project");
 
 
       Console.WriteLine("");
@@ -41,36 +43,41 @@ namespace App.src.Todo {
             await _actions.ShowTaskAsync();
             break;
           case "2":
+            ConsoleRender.Header("Show compact Tasks");
+            await _actions.ShowShortTaskAsync();
+            ConsoleSupport.Pause();
+            break;
+          case "3":
             ConsoleRender.Header("Add Task");
             await _actions.AddTaskAsync();
             ConsoleSupport.Pause();
             break;
-          case "3":
+          case "4":
             ConsoleRender.Header("Edit Task");
             await _actions.EditTaskAsync();
             ConsoleSupport.Pause();
             break;
-          case "4":
+          case "5":
             ConsoleRender.Header("Delete Task");
             await _actions.DeleteTaskAsync();
             ConsoleSupport.Pause();
             break;
-          case "5":
+          case "6":
             ConsoleRender.Header("Move Task");
             await _actions.MoveTaskAsync();
             ConsoleSupport.Pause();
             break;
-          case "6":
+          case "7":
             ConsoleRender.Header("Create Project");
             await _actions.CreateProjectAsync();
             ConsoleSupport.Pause();
             break;
-          case "7":
+          case "8":
             ConsoleRender.Header("Rename Project");
             await _actions.RenameProjectAsync();
             ConsoleSupport.Pause();
             break;
-          case "8":
+          case "9":
             ConsoleRender.Header("Delete Project");
             await _actions.DeleteProjectAsync();
             ConsoleSupport.Pause();

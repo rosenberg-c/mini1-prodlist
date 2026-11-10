@@ -43,6 +43,12 @@ namespace App.src.Todo {
       }
     }
 
+    internal async Task ShowShortTaskAsync() {
+      (List<TodoProject> _, List<TodoTask> tasks) =
+        await _m.GetProjectsAndTasksAsync();
+      TodoDisplay.DisplaySimpleTasksByDate(tasks);
+    }
+
     internal async Task AddTaskAsync() {
       Console.WriteLine();
       List<TodoProject> projects = await _m.GetProjectsAsync();
