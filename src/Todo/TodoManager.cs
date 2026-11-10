@@ -72,16 +72,28 @@ namespace App.src.Todo {
       );
     }
 
-    internal async Task<bool> UpdateTaskAsync(TodoTask task,
-      TodoProject project) {
+    internal async Task<bool> UpdateTaskAsync(
+      Guid taskId,
+      string title,
+      string? description,
+      DateOnly? dueDate,
+      TodoStatus status,
+      Guid projectId
+    ) {
       try {
-        await _store.UpdateProjectAsync(project.Id, project => {
-            int i = project.Tasks.FindIndex(existing => existing.Id == task.Id);
+        await _store.UpdateProjectAsync(projectId, project => {
+            int i = project.Tasks.FindIndex(existing => existing.Id == taskId);
             if (i < 0) {
               throw new KeyNotFoundException("Task not found.");
             }
 
-            project.Tasks[i] = task.Copy();
+            TodoTask updated = project.Tasks[i];
+            updated = updated.WithTitle(title);
+            updated = updated.WithDescription(description);
+            updated = updated.WithStatus(status);
+            updated = updated.WithDueDate(dueDate);
+
+            project.Tasks[i] = updated;
             return project;
           }
         );

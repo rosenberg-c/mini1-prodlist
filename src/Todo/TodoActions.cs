@@ -118,13 +118,15 @@ namespace App.src.Todo {
         return;
       }
 
-      TodoTask updated = task;
-      updated = updated.WithTitle(title);
-      updated = updated.WithDescription(desc);
-      updated = updated.WithStatus(status);
-      updated = updated.WithDueDate(date);
 
-      bool saved = await _m.UpdateTaskAsync(updated, project);
+      bool saved = await _m.UpdateTaskAsync(
+        taskId: task.Id,
+        title: title,
+        description: desc,
+        dueDate: date,
+        status: status,
+        projectId: project.Id
+      );
       if (saved) {
         Console.WriteLine("Updated.");
       } else {
