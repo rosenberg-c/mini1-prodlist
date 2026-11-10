@@ -28,9 +28,13 @@ namespace App.src.Todo {
       return await _store.GetProjectsAsync();
     }
 
-    internal async Task<TodoProject> CreateProjectAsync(
-      Func<Guid, TodoProject> factory) {
-      return await _store.CreateProjectAsync(factory);
+    internal async Task<TodoProject> CreateProjectAsync(string title) {
+      ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+      return await _store.CreateProjectAsync(id => {
+          return new TodoProject(id, title, []);
+        }
+      );
     }
 
     internal async Task UpdateProjectAsync(

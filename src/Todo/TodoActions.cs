@@ -207,10 +207,7 @@ namespace App.src.Todo {
       }
 
       try {
-        await _m.CreateProjectAsync(id => {
-            return new TodoProject(id, title, []);
-          }
-        );
+        await _m.CreateProjectAsync(title);
         Console.WriteLine("Created Project");
       }
       catch {

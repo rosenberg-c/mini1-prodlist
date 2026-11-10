@@ -27,6 +27,30 @@ namespace App.tests.Tests {
       }
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("  ")]
+    public async Task CreateProject_InvalidTitle_DoesNotPersist(string title) {
+      string path = Path.Combine(Path.GetTempPath(),
+        $"todo-invalid-project-{Guid.NewGuid():N}.json"
+      );
+      try {
+        TodoStore store = new(path);
+
+        ArgumentException error =
+          await Assert.ThrowsAsync<ArgumentException>(() =>
+            new TodoManager(store).CreateProjectAsync(title)
+          );
+
+        Assert.Equal(nameof(title), error.ParamName);
+        Assert.Empty(await new TodoStore(path).GetProjectsAsync());
+        Assert.False(File.Exists(path));
+      }
+      finally {
+        File.Delete(path);
+      }
+    }
+
     [Fact]
     public async Task AddTask_PersistsPendingTaskInSelectedProject() {
       string path = Path.Combine(Path.GetTempPath(),
