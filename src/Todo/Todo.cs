@@ -18,12 +18,15 @@ namespace App.src.Todo {
     string? Description,
     DateOnly? DueDate
   ) {
+    [JsonIgnore]
     public string dispDesc => Description ?? string.Empty;
 
+    [JsonIgnore]
     public string dispDueDate => DueDate?.ToString(
       CultureInfo.InvariantCulture
     ) ?? string.Empty;
 
+    [JsonIgnore]
     public string dispStatus => Status.ToString();
 
     public TodoTask Copy() {
