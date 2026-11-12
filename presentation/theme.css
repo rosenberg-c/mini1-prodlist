@@ -17,3 +17,13 @@ section pre {
   background: #e9edf2;
   font-size: 0.7em;
 }
+
+section.row img {
+  vertical-align: top;
+}
+
+section.row p:has(> img) {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
