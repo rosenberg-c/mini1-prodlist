@@ -7,11 +7,12 @@ MERMAID_THEME ?= redux-dark
 MERMAID_BG ?= \#222222
 MERMAID_SCALE ?= 10
 MERMAID_CSS ?= .mermaid/mermaid.css
+MERMAID_CONFIG ?= .mermaid/mermaid.config.json
 
 .PHONY: mermaid-render
 mermaid-render:
-	DOCS_DIR="$(DOCS_DIR)" MERMAID_IMAGE="$(MERMAID_IMAGE)" MERMAID_THEME="$(MERMAID_THEME)" MERMAID_BG="$(MERMAID_BG)" MERMAID_SCALE="$(MERMAID_SCALE)" MERMAID_CSS="$(MERMAID_CSS)" "$(MERMAID_RENDER)"
+	DOCS_DIR="$(DOCS_DIR)" MERMAID_IMAGE="$(MERMAID_IMAGE)" MERMAID_THEME="$(MERMAID_THEME)" MERMAID_BG="$(MERMAID_BG)" MERMAID_SCALE="$(MERMAID_SCALE)" MERMAID_CSS="$(MERMAID_CSS)" MERMAID_CONFIG="$(MERMAID_CONFIG)" "$(MERMAID_RENDER)"
 
 .PHONY: mermaid-clean
 mermaid-clean:
-	find "$(DOCS_DIR)" -type f -name '*.generated.png' -delete
+	find "$(DOCS_DIR)" -type f \( -name '*.generated.png' -o -name '*.generated.svg' \) -delete

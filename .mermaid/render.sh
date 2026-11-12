@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Render every .mmd under DOCS_DIR to a sibling <name>.generated.png via Docker.
+# Render every .mmd under DOCS_DIR to sibling .generated.png and .generated.svg files.
 # Contract (env vars, all optional):
 #   DOCS_DIR      input directory (default: docs)
 #   MERMAID_IMAGE docker image (default: minlag/mermaid-cli:latest)
@@ -7,6 +7,7 @@
 #   MERMAID_BG    renderer background color (default: #222222)
 #   MERMAID_SCALE png scale factor (default: 4)
 #   MERMAID_CSS   css file passed to mmdc -C (default: .mermaid/mermaid.css)
+#   MERMAID_CONFIG config file passed to mmdc -c (default: .mermaid/mermaid.config.json)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -16,6 +17,7 @@ THEME="${MERMAID_THEME:-dark}"
 BG="${MERMAID_BG:-#222222}"
 SCALE="${MERMAID_SCALE:-4}"
 CSS_FILE="${MERMAID_CSS:-.mermaid/mermaid.css}"
+CONFIG_FILE="${MERMAID_CONFIG:-.mermaid/mermaid.config.json}"
 
 cd "$ROOT"
 
@@ -25,19 +27,21 @@ status=0
 count=0
 while IFS= read -r -d '' f; do
   rel="${f#./}"
-  out="${rel%.mmd}.generated.png"
   count=$((count + 1))
-  echo "render: $rel -> $out"
-  if ! docker run --rm \
-    -v "$ROOT:/work" -w /work \
-    "$IMAGE" \
-      -i "$rel" -o "$out" \
-      -t "$THEME" -b "$BG" \
-      -C "$CSS_FILE" \
-      --scale "$SCALE"; then
-    echo "render: FAILED $rel" >&2
-    status=1
-  fi
+  for ext in png svg; do
+    out="${rel%.mmd}.generated.$ext"
+    echo "render: $rel -> $out"
+    if ! docker run --rm \
+      -v "$ROOT:/work" -w /work \
+      "$IMAGE" \
+        -i "$rel" -o "$out" \
+        -t "$THEME" -b "$BG" \
+        -C "$CSS_FILE" -c "$CONFIG_FILE" \
+        --scale "$SCALE"; then
+      echo "render: FAILED $rel -> $out" >&2
+      status=1
+    fi
+  done
 done < <(find "$DOCS_DIR" -type f -name '*.mmd' -print0 | LC_ALL=C sort -z)
 
 if [ "$count" -eq 0 ]; then
