@@ -40,10 +40,7 @@ run: deps
 
 .PHONY: lint
 lint: deps
-	$(DOTNET) format $(PROJECT) --verify-no-changes
-	$(DOTNET) format $(TODO_HOST) --verify-no-changes
-	$(DOTNET) format $(TODO_TESTS) --verify-no-changes
-	$(DOTNET) format $(APP_TESTS) --verify-no-changes
+	$(JB) inspectcode $(SOLUTION) --include="src/**/*.cs;tests/**/*.cs" --severity=WARNING --output=- --format=Text
 
 .PHONY: format
 format: deps
