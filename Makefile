@@ -2,6 +2,8 @@ include Makefile.mermaid.mk
 
 DOTNET ?= dotnet
 JB ?= jb
+DOCKER ?= docker
+SOFFICE ?= /Applications/LibreOffice.app/Contents/MacOS/soffice
 PROJECT ?= App.csproj
 SOLUTION ?= App.sln
 ASSET_TESTS ?= tests/assettests/App.Tests.csproj
@@ -54,6 +56,14 @@ format: deps
 .PHONY: clean
 clean:
 	$(DOTNET) clean $(PROJECT)
+
+.PHONY: presentation
+presentation:
+	sh scripts/join-slides.sh presentation/slides.generated.md $$(printf '%s\n' presentation/slides/slide-*.md | sort -V)
+	$(DOCKER) run --rm --init -v "$(CURDIR):/home/marp/app" marpteam/marp-cli \
+		presentation/slides.generated.md --theme-set presentation/theme.css \
+		--pptx -o presentation/slides.generated.pptx
+	$(SOFFICE) --headless --convert-to odp --outdir presentation presentation/slides.generated.pptx
 
 .PHONY: reset
 reset:
