@@ -6,10 +6,8 @@ DOCKER ?= docker
 SOFFICE ?= /Applications/LibreOffice.app/Contents/MacOS/soffice
 PROJECT ?= App.csproj
 SOLUTION ?= App.sln
-ASSET_TESTS ?= tests/assettests/App.Tests.csproj
 TODO_TESTS ?= tests/todotests/App.Tests.csproj
 APP_TESTS ?= tests/apptests/App.Integration.Tests.csproj
-ASSETS_HOST ?= tests/assetshost/AssetsHost.csproj
 TODO_HOST ?= tests/todohost/TodoHost.csproj
 
 -include .env
@@ -43,9 +41,7 @@ run: deps
 .PHONY: lint
 lint: deps
 	$(DOTNET) format $(PROJECT) --verify-no-changes
-	$(DOTNET) format $(ASSETS_HOST) --verify-no-changes
 	$(DOTNET) format $(TODO_HOST) --verify-no-changes
-	$(DOTNET) format $(ASSET_TESTS) --verify-no-changes
 	$(DOTNET) format $(TODO_TESTS) --verify-no-changes
 	$(DOTNET) format $(APP_TESTS) --verify-no-changes
 
