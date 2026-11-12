@@ -1,3 +1,5 @@
+.~lock*
+*.generated.*
 **/bin/
 **/obj/
 *.json
@@ -6,4 +8,3 @@
 *.v2.bak
 .vscode/
 .env
-*.generated.png
