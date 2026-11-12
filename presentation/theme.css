@@ -1,0 +1,19 @@
+/* @theme todo */
+@import 'default';
+/* @import 'gaia'; */
+
+
+section {
+  background: #B7CEDF;
+  color: #1e293b;
+  align-content: start;
+}
+
+section h1 {
+  color: #0f172a;
+}
+
+section pre {
+  background: #e9edf2;
+  font-size: 0.7em;
+}
