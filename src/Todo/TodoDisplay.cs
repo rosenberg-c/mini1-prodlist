@@ -3,6 +3,7 @@ using App.src.ConsoleCore;
 namespace App.src.Todo {
   internal sealed class TodoDisplay {
     internal static void DisplayTasksByProject(List<TodoProject> projects) {
+      Console.WriteLine();
       var ordered = projects.OrderBy(static p => p.Title).ToList();
       for (int i = 0; i < ordered.Count; i++) {
         ConsoleTable.Write(
@@ -17,6 +18,7 @@ namespace App.src.Todo {
     }
 
     internal static void DisplayTasksByDate(List<TodoTask> tasks) {
+      Console.WriteLine();
       ConsoleTable.Write(
         ["Title", "Status", "Due", "Description"],
         tasks
