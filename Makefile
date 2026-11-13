@@ -58,6 +58,13 @@ presentation:
 		--allow-local-files --pptx -o presentation/slides.generated.pptx
 	$(SOFFICE) --headless --convert-to odp --outdir presentation presentation/slides.generated.pptx
 
+.PHONY: presentation-html
+presentation-html:
+	sh scripts/join-slides.sh presentation/slides.generated.md $$(printf '%s\n' presentation/slides/slide-*.md | sort -V)
+	$(DOCKER) run --rm --init -v "$(CURDIR):/home/marp/app" marpteam/marp-cli \
+		presentation/slides.generated.md --theme-set presentation/theme.css \
+		--allow-local-files -o presentation/slides.generated.html
+
 .PHONY: reset
 reset:
 	cp "$(DATA_EXAMPLE)" "$(APP_DATA_PATH)"
