@@ -23,6 +23,7 @@ namespace App.src.Todo {
       Console.WriteLine("7. Create Project");
       Console.WriteLine("8. Rename Project");
       Console.WriteLine("9. Delete Project");
+      Console.WriteLine("0. Search Tasks");
 
 
       Console.WriteLine("");
@@ -81,6 +82,10 @@ namespace App.src.Todo {
             ConsoleRender.Header("Delete Project");
             await _actions.DeleteProjectAsync();
             ConsoleSupport.Pause();
+            break;
+          case "0":
+            ConsoleRender.Header("Search Tasks");
+            await _actions.SearchAsync();
             break;
 
 

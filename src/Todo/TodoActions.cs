@@ -1,4 +1,5 @@
 using App.src.ConsoleCore;
+using App.src.Validation;
 using CI = App.src.ConsoleCore.ConsoleInput;
 using System.ComponentModel;
 using System.Reflection;
@@ -47,6 +48,55 @@ namespace App.src.Todo {
       (List<TodoProject> _, List<TodoTask> tasks) =
         await _m.GetProjectsAndTasksAsync();
       TodoDisplay.DisplaySimpleTasksByDate(tasks);
+    }
+
+    internal async Task SearchAsync() {
+      while (true) {
+        string? term =
+          ConsoleSupport.ReadString("Search project or task title: ");
+        if (ConsoleSupport.IsExitOrNull(term)) {
+          return;
+        }
+
+        if (term.Length > 0 && !TextFieldValidation.TryField(term, out _)) {
+          ConsoleSupport.WriteLineYellow("Invalid search query.");
+          continue;
+        }
+
+        List<TodoProject> projects = await _m.GetProjectsAsync();
+        var matches = FindTasks(projects, term);
+        if (matches.Count == 0) {
+          ConsoleSupport.WriteLineYellow("No tasks found.");
+          continue;
+        }
+
+        if (term.Length == 0) {
+          ConsoleSupport.WriteLineRed("Empty search query, list all.");
+        }
+
+        Console.WriteLine();
+        TodoDisplay.DisplaySearchResults(matches,
+          highlightMatches: term.Length > 0
+        );
+      }
+    }
+
+    internal static List<(TodoTask Task, TodoProject Project)> FindTasks(
+      IEnumerable<TodoProject> projects, string term
+    ) {
+      return projects
+        .SelectMany(project => project.Tasks
+          .Where(task => task.Title.Contains(term,
+                           StringComparison.OrdinalIgnoreCase
+                         ) ||
+                         project.Title.Contains(term,
+                           StringComparison.OrdinalIgnoreCase
+                         )
+          )
+          .Select(task => (Task: task, Project: project))
+        )
+        .OrderBy(result => result.Task.DueDate)
+        .ToList();
     }
 
     internal async Task AddTaskAsync() {

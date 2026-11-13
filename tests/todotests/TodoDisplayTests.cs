@@ -46,6 +46,27 @@ namespace App.tests.Tests {
       Assert.Equal(lines[0], lines[2]);
     }
 
+    [Fact]
+    public void SearchResults_ShowsProjectAndTaskDetails() {
+      TodoTask task = new(Guid.NewGuid(), TodoStatus.Pending, "Plan",
+        "Details", new DateOnly(2026, 11, 10)
+      );
+      TodoProject project = new(Guid.NewGuid(), "Home", [task]);
+
+      string[] lines = Capture(() => TodoDisplay.DisplaySearchResults(
+          [(task, project)], highlightMatches: true
+        )
+      );
+
+      Assert.Contains(lines, line => line.Contains("Project") &&
+                                     line.Contains("Title")
+      );
+      Assert.Contains(lines, line => line.Contains("Home") &&
+                                     line.Contains("Plan") &&
+                                     line.Contains("Details")
+      );
+    }
+
     private static string Row(params string[] cells) =>
       string.Concat(cells.Select(cell => cell.PadRight(20)));
 

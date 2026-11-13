@@ -28,6 +28,21 @@ namespace App.src.Todo {
       );
     }
 
+    internal static void DisplaySearchResults(
+      List<(TodoTask Task, TodoProject Project)> matches,
+      bool highlightMatches
+    ) {
+      ConsoleTable.Write(
+        ["Project", "Title", "Status", "Due", "Description"],
+        matches.Select(result => (IReadOnlyList<string>) [
+            result.Project.Title, result.Task.Title, result.Task.dispStatus,
+            result.Task.dispDueDate, result.Task.dispDesc
+          ]
+        ),
+        highlightRows: highlightMatches
+      );
+    }
+
     internal static void DisplaySimpleTasksByDate(List<TodoTask> tasks) {
       var header = new[] { "Title", "Status", "Due", "Description" };
       const int columnWidth = 20;
