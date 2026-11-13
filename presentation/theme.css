@@ -27,3 +27,24 @@ section.row p:has(> img) {
   justify-content: space-between;
   align-items: flex-start;
 }
+
+section.planning-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  column-gap: 2rem;
+  align-content: start;
+  align-items: start;
+}
+
+section.planning-columns h1 {
+  grid-column: 1 / -1;
+}
+
+section.planning-columns p:has(> img) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+section.planning-columns img {
+  max-width: 100%;
+}
