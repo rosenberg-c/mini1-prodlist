@@ -13,7 +13,7 @@ namespace App.src.Todo {
       ConsoleRender.Header("Welcome to Todo App");
       Console.WriteLine("");
       Console.WriteLine("1. Show Task List (by date or project)");
-      Console.WriteLine("2. Short list by date");
+      Console.WriteLine("2. Compact list by date");
       Console.WriteLine("");
       Console.WriteLine("3. Add Task");
       Console.WriteLine("4. Edit Task");
